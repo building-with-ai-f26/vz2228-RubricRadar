@@ -1,11 +1,18 @@
-# [Project Name]
+# Rubric Radar
 
-> **One-line pitch:** [Who is this for, and what job does it do for them?]
+> **Know what's missing. Understand what matters. Submit stronger work.**
 
-- **Builder:** [Your Name] (`@github-handle`)
-- **Pod:** [Pod Name / Number]
-- **Product Page & Living PRD:** [Add your GitHub Pages URL]
-- **App:** runs locally through Week 4; add a cloud URL in Build 5.
+An AI-powered pre-submission coach for MBA students reviewing written reports and project submissions against assignment instructions or rubrics.
+
+- **Builder:** `@victor-zu-97` (display name to confirm)
+- **Pod:** 12
+- **Product Page & Living PRD:** [Local page](./docs/index.html); GitHub Pages deployment has not been verified.
+- **Status:** PRD v1 reviewed; local text-only prototype implemented. One live synthetic DeepSeek review passed structural checks; no user tests or public deployment yet.
+- **Full PRD:** [PRD.md](./PRD.md)
+
+The MVP uses pasted instructions and draft text, student-confirmed requirements, evidence-backed findings, and up to three prioritized improvements. PDF uploads and saved revision comparisons are deferred.
+
+The app is planned to run locally through Week 4; add a cloud URL in Build 5.
 
 ## Start here: Build 1
 
@@ -26,6 +33,7 @@ Create your PostHog account in Week 1. Install it on the Product Page and local 
 | File / folder | Purpose |
 | --- | --- |
 | [`docs/index.html`](./docs/index.html) | Required public pitch, living PRD, and weekly build log. Update with actual work and evidence. |
+| [`PRD.md`](./PRD.md) | Full PRD v1, acceptance criteria, evaluation plan, and proposed architecture. |
 | [`Intent.md`](./Intent.md), [`Plan.md`](./Plan.md), [`journal/`](./journal/) | Optional drafting aids. No duplicate submission is required. |
 | [`AGENTS.md`](./AGENTS.md) | Local run commands, project context, and agent rules. Build 2 onward. |
 | [`tests/`](./tests/) | Verification guidance. Build 4 offers Track A domain evals **or** Track B user replays. |
@@ -35,11 +43,47 @@ Create your PostHog account in Week 1. Install it on the Product Page and local 
 
 ## Local setup
 
-Clone **your own repository** and ask your coding agent to document the exact install and run commands here and in `AGENTS.md`.
+Verified on Python 3.14.4. From the repository folder:
 
 ```bash
-git clone https://github.com/building-with-ai-f26/<your-repo-name>.git
-cd <your-repo-name>
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+cp .env.example .env
 ```
 
-If your app needs API keys, use a local environment file such as `.env`. Keep private keys out of source code, browser code, screenshots, and commits. The template ignores `.env`; `.env.example` contains placeholders only.
+If `.env` already exists, edit it rather than overwriting it. Set `OPENROUTER_API_KEY` locally; never paste or commit credentials. The default configurable model is `deepseek/deepseek-v4.1-flash` via OpenRouter. Restart the app after changing configuration.
+
+```bash
+.venv/bin/python -m streamlit run app.py
+```
+
+Open **http://127.0.0.1:8501**. The app binds to localhost. Paste instructions and a draft, consent to provider processing, extract and edit requirements, confirm, then review. Blank lines define draft paragraphs. Provisional limits: 12,000 instruction characters, 30,000 draft characters, 25 requirements, and 90 seconds per API request. Inputs are never silently truncated.
+
+## Verification
+
+```bash
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python -m pip check
+```
+
+The 12 deterministic tests cover evidence checks, output coverage, input bounds, API failures, privacy request settings, and the Streamlit workflow with mocked responses. They do not establish model accuracy.
+
+For a live synthetic feasibility check (two billable model calls):
+
+```bash
+.venv/bin/python tests/smoke_live.py
+```
+
+It prints operational metadata and statuses, not assignment text. Review the intentionally absent implementation risks manually. The required Build 4 ten-case evaluation remains outstanding.
+
+## Data handling and limitations
+
+- Assignment text lives in current-session server memory; no database, text logs, caching, or analytics are configured. Use **Clear this session** to reset inputs and results. Do not expose this development server publicly.
+- Requests send text to OpenRouter and a model provider. They require `data_collection: deny`, `zdr: true`, and parameter-compatible routing. If no eligible provider exists, the review fails rather than relaxing these controls.
+- OpenRouter account logging and data-use settings must still be verified before real coursework. These routing settings are not a blanket guarantee about every intermediary. See [data collection](https://openrouter.ai/docs/guides/privacy/data-collection) and [provider routing](https://openrouter.ai/docs/guides/routing/provider-selection).
+- Met/Partially Met evidence is checked against exact paragraph text. Unverified evidence becomes Needs Review and linked recommendations are withheld. Semantic correctness still requires human review.
+- No grade predictions, course-material verification, PDF input, saved history, or automatic comparisons.
+
+## Build 1 evidence status
+
+Local implementation and mocked-flow tests are complete. One live synthetic review completed using DeepSeek V4.1 Flash: 3 requirements, 2 Met, 1 Missing, and 1 recommendation. Reported inference cost was $0.003135; API durations totaled 10.84 seconds. This is one small feasibility result, not a quality evaluation or performance guarantee. Browser visual verification, a screenshot/GIF, and classmate feedback remain outstanding. Browser capture was blocked by unavailable browser access and computer-use permission. No prototype screenshot or broad model-quality result is claimed. Actual builder time and coding-agent costs have not been supplied.

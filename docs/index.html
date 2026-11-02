@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>[Your Product Name] · Building with AI (Fall 2026)</title>
+  <title>Rubric Radar · Building with AI (Fall 2026)</title>
 
   <!-- Week 1: create your PostHog account only.
        Build 2: paste your project's current PostHog web snippet here,
@@ -144,10 +144,10 @@
     <!-- HERO / PRODUCT PITCH -->
     <header>
       <span class="eyebrow">NYU Stern · Building with AI · Fall 2026</span>
-      <h1>[Your Product Name]</h1>
-      <p class="tagline">[One clear sentence: Who is this for, and what painful job does it do for them?]</p>
+      <h1>Rubric Radar</h1>
+      <p class="tagline">Know what’s missing. Understand what matters. Submit stronger work.</p>
       <div class="cta-row">
-        <a class="btn" href="#live-demo" onclick="window.posthog && posthog.capture('clicked_try_product')">See the Product →</a>
+        <a class="btn" href="#live-demo" onclick="window.posthog && posthog.capture('clicked_try_product')">Project Status →</a>
         <a class="btn btn-secondary" href="#prd">Read the Living PRD</a>
         <a class="btn btn-secondary" href="#build-log">Weekly Build Log</a>
       </div>
@@ -157,8 +157,8 @@
     <section id="live-demo">
       <h2>Product Showcase (Prototype / Live App / 2-Min Video)</h2>
       <p>
-        <strong>Current Status:</strong> [Build 1: local prototype / Builds 2–4: local app / Build 5: cloud app]<br />
-        <strong>Demo:</strong> [Add a screenshot or GIF now; add the live cloud app URL in Build 5.]
+        <strong>Current Status:</strong> Local text-only prototype implemented · Live synthetic smoke check completed · November 2, 2026<br />
+        <strong>Demo:</strong> Run locally with the README instructions. One live synthetic review completed. Browser visual verification and screenshot/GIF evidence remain outstanding.
       </p>
       <p class="meta">
         Ask your coding agent to embed a screenshot or GIF of your local prototype for Build 1. Keep this evidence current, then add your cloud app link and two-minute video in Build 5.
@@ -171,35 +171,42 @@
       <p class="meta">Updated every week as we test with real users and learn what works.</p>
 
       <h3>1. Target User & The Job to Be Done</h3>
-      <p><strong>Who is this for?</strong> [Name a specific, reachable person or role you have direct access to.]</p>
-      <p><strong>The painful "Before" workflow:</strong> [How do they do this today, and why is it slow, manual, or broken?]</p>
-      <p><strong>The "After" workflow with this product:</strong> [What does your tool do for them in one sitting?]</p>
+      <p><strong>Who is this for?</strong> MBA students reviewing written reports and project submissions. The builder can recruit 2–3 MBA classmates; testing has not occurred.</p>
+      <p><strong>The painful "Before" workflow:</strong> Hypothesis: students manually compare drafts with instructions or use general-purpose AI feedback, then struggle to verify findings and prioritize revisions.</p>
+      <p><strong>The "After" workflow with this product:</strong> Paste instructions and draft → confirm extracted requirements → inspect evidence-backed feedback → act on up to three priorities. Revise externally and reassess.</p>
 
       <h3>2. Scope & Explicit Non-Goals</h3>
       <ul>
-        <li><strong>In Scope (Core Workflow):</strong> [The 1 main workflow this product does reliably]</li>
-        <li><strong>Out of Scope #1:</strong> [Feature you are deliberately NOT building in 6 weeks]</li>
-        <li><strong>Out of Scope #2:</strong> [Feature you are deliberately NOT building in 6 weeks]</li>
-        <li><strong>Out of Scope #3:</strong> [Feature you are deliberately NOT building in 6 weeks]</li>
+        <li><strong>In Scope (Core Workflow):</strong> Text-only pre-submission review: requirement confirmation, Met / Partially Met / Missing / Needs Review findings, and priorities labeled Required fix or Optional enhancement. Reliability is not yet validated.</li>
+        <li><strong>Out of Scope #1:</strong> Writing or automatically rewriting assignments.</li>
+        <li><strong>Out of Scope #2:</strong> Official grades, grade predictions, or guarantees of completeness.</li>
+        <li><strong>Out of Scope #3:</strong> Slides, spreadsheets, LMS integrations, or collaboration features. PDF input and saved revision comparisons are deferred.</li>
       </ul>
 
       <h3>3. How It Works Under the Hood & Riskiest Assumption (Week 2+)</h3>
-      <p><strong>Riskiest Assumption:</strong> [What is the #1 technical or user risk that could sink this product?]</p>
-      <p><strong>Simple Architecture:</strong> [User Input] → [Your App / Server] → [AI Model / Tool] → [Output]</p>
+      <p><strong>Riskiest Assumption:</strong> Evidence-backed feedback must help students revise more effectively than ChatGPT with a strong prompt. Incorrect judgments and unactionable advice could erase that value.</p>
+      <p><strong>Simple Architecture:</strong> Pasted text → server → LLM requirement extraction → student confirmation → LLM evaluation → validated feedback. Implemented locally in Python/Streamlit with OpenRouter; no accounts or database. Broad model quality is not yet validated.</p>
+
+      <h3>Validation and Acceptance Criteria · PRD v1</h3>
+      <p>Proposed pilot: 2–3 MBA classmates using their assignments, compared with a consistent strong ChatGPT prompt. Targets are hypotheses: at least 90% explicit requirement recall before corrections; all displayed quotes match the draft; no major unsupported Met judgment in human review; at least two testers complete the flow unaided, make a useful revision, and prefer the product for a concrete reason. This small pilot cannot prove broad reliability or improved grades.</p>
+      <p>Every confirmed requirement receives one status and an explanation. Ambiguity is flagged; evidence is never invented. Mandatory gaps take priority over optional coaching. No overall grade is displayed. Assignment text must stay out of persistent application storage, logs, and analytics; provider data policies remain to be checked.</p>
+      <p>Assess reasoning and substantive rubric coverage using the supplied instructions and draft. Mentioning a topic alone does not establish adequate coverage. Verification against course readings, lectures, case exhibits, or other course materials is out of scope; judgments needing unavailable context receive Needs Review. Extra analytical depth beyond stated expectations is optional coaching, and recommendations guide students without writing replacement answers.</p>
+      <p>Record extraction errors before student corrections separately from evaluation errors against confirmed requirements. Useful revisions are stronger value evidence than preference alone. The approved prototype has provisional bounds of 12,000 instruction characters, 30,000 draft characters, and 25 requirements. The configurable initial model is DeepSeek V4.1 Flash via OpenRouter. One synthetic review returned three requirements (two Met, one Missing) and one recommendation, with $0.003135 reported inference cost and 10.84 seconds combined API duration. Broader quality and representative performance remain unvalidated.</p>
+      <p>Recommended Build 4 track: A — domain quality, with 10 cases and an outside target-user review. The full 12-section PRD, acceptance criteria, limitations, and open decisions are available in <a href="https://github.com/building-with-ai-f26/vz2228-RubricRadar/blob/main/PRD.md">PRD.md in the repository</a> after the documentation is pushed. This page and the PRD must be kept aligned.</p>
 
       <h3>4. Unit Economics & Analytics Snapshot (Updated Weekly)</h3>
       <div class="grid-2">
         <div class="stat-box">
           <div class="stat-label">Cumulative Build Spend</div>
-          <div class="stat-value">[Record actual spend]</div>
+          <div class="stat-value">Not recorded</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">Est. Cost Per User Run</div>
-          <div class="stat-value">[Not yet estimated]</div>
+          <div class="stat-value">$0.003135 · one synthetic run</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">User Evidence (Analytics from Build 2)</div>
-          <div class="stat-value">[Not yet measured]</div>
+          <div class="stat-value">No user tests yet</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">Sponsor Call (Week 6)</div>
@@ -216,10 +223,10 @@
       <div class="log-entry">
         <h3>Build 1 · Intent.md & Throwaway Prototype (Due Nov 9)</h3>
         <ul>
-          <li><strong>What shipped:</strong> [What you actually built; link your local prototype screenshot or GIF above.]</li>
-          <li><strong>Things learned with AI:</strong> [What you learned from AI practice and Terminus Episodes 1 and 2.]</li>
-          <li><strong>What broke / changed in PRD:</strong> [Fill in]</li>
-          <li><strong>Cost & time this week:</strong> $[0.00] · [0] hours</li>
+          <li><strong>What shipped:</strong> Implemented a local Streamlit prototype with pasted inputs, editable requirement confirmation, evidence-checked feedback, and revision priorities. Twelve deterministic tests passed, including a mocked UI flow; one live synthetic run also completed; broad model accuracy remains unvalidated. Public publication is not verified.</li>
+          <li><strong>Things learned with AI:</strong> Product planning separated requirement compliance from optional quality coaching. Terminus completion and related learning are not yet recorded.</li>
+          <li><strong>What broke / changed in PRD:</strong> PDF/history deferred. Invalid evidence becomes Needs Review. Configured DeepSeek V4.1 Flash; a live synthetic review completed. Fixed local Python certificate verification using a CA bundle. Browser capture was blocked by unavailable browser access and computer-use permission. User-value and model-quality assumptions remain untested.</li>
+          <li><strong>Cost & time this week:</strong> Successful synthetic run: $0.003135 runtime inference. Other request costs, coding-agent spend, and builder hours not fully recorded</li>
         </ul>
       </div>
 

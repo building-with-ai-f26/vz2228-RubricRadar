@@ -1,0 +1,5 @@
+# Versions verified locally on Python 3.14.4.
+streamlit==1.66.1
+python-dotenv==1.2.4
+jsonschema==4.26.0
+certifi==2026.10.23
