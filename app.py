@@ -27,6 +27,15 @@ def invalidate_confirmation():
         st.session_state.pop(key, None)
 
 
+def show_request_error(exc):
+    st.error(str(exc))
+    if exc.diagnostics:
+        with st.expander('Request diagnostics (no assignment text)', expanded=True):
+            st.json(exc.diagnostics)
+            st.caption('Null means the provider did not report a usable value. '
+                       'Output tokens may include reasoning; counts do not establish answer length.')
+
+
 def clear():
     st.session_state.clear()
 
@@ -50,19 +59,17 @@ if st.button('1. Extract requirements', type='primary', disabled=not allowed):
         st.session_state.requirement_text = '\n'.join(r['text'] for r in originals)
         st.session_state.extract_meta = meta
     except ReviewError as exc:
-        st.error(str(exc))
+        show_request_error(exc)
 
 if 'originals' in st.session_state:
     st.header('2. Check the requirements')
     st.write('Correct, add, or remove requirements below. Use one requirement per line, up to 25. '
              'Changed and new items are marked as student-provided; confirm that they reflect the assignment.')
-    with st.expander('Inspect extracted sources and ambiguities'):
+    with st.expander('Inspect extracted sources'):
         for i, r in enumerate(st.session_state.originals, 1):
             st.write(f'Requirement {i}')
             st.text(r['text'])
             st.text('Instruction excerpt: ' + r['source'])
-            if r['ambiguity']:
-                st.warning(r['ambiguity'])
     text = st.text_area('Requirements to confirm', key='requirement_text', height=220,
                         on_change=invalidate_confirmation)
     if st.button('Confirm requirements'):
@@ -70,48 +77,77 @@ if 'originals' in st.session_state:
             st.session_state.confirmed = confirmed_requirements(text, st.session_state.originals)
             st.session_state.pop('result', None)
         except ReviewError as exc:
-            st.error(str(exc))
+            show_request_error(exc)
 
 if 'confirmed' in st.session_state:
     st.success('Requirements confirmed. Ready to review your draft.')
-    for r in st.session_state.confirmed:
-        st.text(f"{r['id']}: {r['text']}" + (' [student-provided]' if r['student_added'] else ''))
+    with st.expander('View confirmed requirements'):
+        for r in st.session_state.confirmed:
+            st.write(f"{r['id']}: {r['text']}" + (' [student-provided]' if r['student_added'] else ''))
     if st.button('3. Review my draft', type='primary', disabled=not allowed):
         st.session_state.pop('result', None)
         try:
-            with st.spinner('Reviewing rubric coverage and reasoning…'):
+            with st.spinner('Checking your draft against the requirements…'):
                 result, meta = evaluate(instructions, draft, st.session_state.confirmed)
             st.session_state.result = result
             st.session_state.review_meta = meta
         except ReviewError as exc:
-            st.error(str(exc))
+            show_request_error(exc)
 
 if 'result' in st.session_state:
     result = st.session_state.result
     st.header('Your review')
     st.caption('AI findings can be wrong. Check evidence before revising. Missing means evidence was not found.')
-    lookup = {r['id']: r['text'] for r in st.session_state.confirmed}
-    for f in result['findings']:
-        with st.expander(f"{f['requirement_id']} · {f['status']}", expanded=True):
-            st.text(lookup[f['requirement_id']])
-            st.text(f['explanation'])
-            if f['gap']:
-                st.text('Gap: ' + f['gap'])
-            for e in f['evidence']:
-                st.caption(f"Draft paragraph {e['paragraph']}")
-                st.text(e['quote'])
-    st.header('Your revision priorities')
+    counts = {status: sum(f['status'] == status for f in result['findings'])
+              for status in ('Met', 'Partially Met', 'Missing', 'Needs Review')}
+    with st.container(border=True):
+        st.subheader('Review summary')
+        for column, (status, count) in zip(st.columns(4), counts.items()):
+            column.metric(status, count)
+        gaps = counts['Partially Met'] + counts['Missing']
+        st.write(f"{gaps} of {len(result['findings'])} requirements have identified gaps. "
+                 f"{counts['Needs Review']} need manual review.")
+        st.caption('Open the details on any card to inspect the feedback and evidence.')
+
+    st.subheader('Your revision priorities')
     if not result['recommendations']:
         st.write('No verified priorities returned. Review any unresolved requirements manually.')
     for i, rec in enumerate(result['recommendations'], 1):
-        st.subheader(f"{i}. {rec['label']}")
-        st.text(rec['action'])
-        st.text('Why: ' + rec['why'])
-        st.text('Approach: ' + rec['approach'])
-        if rec['requirement_ids']:
-            st.caption('Requirements: ' + ', '.join(rec['requirement_ids']))
-    for limitation in result['limitations']:
-        st.warning(limitation)
+        with st.container(border=True):
+            st.caption(f"Priority {i} · {rec['label']}")
+            st.write(rec['action'])
+            if rec['requirement_ids']:
+                st.caption('Requirements: ' + ', '.join(rec['requirement_ids']))
+            with st.expander('Why this matters and how to approach it'):
+                st.write('Why: ' + rec['why'])
+                st.write('Approach: ' + rec['approach'])
+
+    st.subheader('Requirement details')
+    lookup = {r['id']: r for r in st.session_state.confirmed}
+    for f in result['findings']:
+        requirement = lookup[f['requirement_id']]
+        with st.container(border=True):
+            st.caption(f"{f['requirement_id']} · {f['status']}")
+            st.write(requirement['text'])
+            st.write(f['explanation'])
+            with st.expander('View gaps, evidence, and rubric source'):
+                if f['gap']:
+                    st.write('Gap: ' + f['gap'])
+                if not f['evidence']:
+                    st.caption('No verified draft quotes are available for this finding.')
+                for e in f['evidence']:
+                    st.caption(f"Draft paragraph {e['paragraph']}")
+                    st.write(e['quote'])
+                if requirement['source']:
+                    st.caption('Assignment source')
+                    st.write(requirement['source'])
+                if requirement['student_added']:
+                    st.caption('Student-provided requirement; check it against the assignment.')
+
+    if result['limitations']:
+        with st.expander('Limitations and items to check'):
+            for limitation in result['limitations']:
+                st.write(limitation)
     st.write('Revise in your own editor, then paste your updated draft above for a fresh review. '
              'Reviews are not saved or automatically compared.')
     with st.expander('Run details (no assignment text)'):

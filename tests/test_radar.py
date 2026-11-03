@@ -6,12 +6,12 @@ from unittest.mock import patch, MagicMock
 from urllib.error import HTTPError, URLError
 
 from radar import (ReviewError, check_inputs, confirmed_requirements, validate_evaluation,
-                   validate_requirements, call_model, EXTRACTION, DRAFT_LIMIT)
+                   validate_requirements, call_model, EXTRACTION, DRAFT_LIMIT, evaluate)
 
 INSTRUCTIONS = 'Compare two alternatives. Justify a recommendation.'
 DRAFT = 'Option A is cheaper. Option B offers better reach.\n\nI recommend A because our budget is limited.'
-ORIGINALS = [{'text': 'Compare two alternatives.', 'source': 'Compare two alternatives.', 'ambiguity': ''},
-             {'text': 'Justify a recommendation.', 'source': 'Justify a recommendation.', 'ambiguity': ''}]
+ORIGINALS = [{'text': 'Compare two alternatives.', 'source': 'Compare two alternatives.'},
+             {'text': 'Justify a recommendation.', 'source': 'Justify a recommendation.'}]
 REQS = confirmed_requirements('\n'.join(r['text'] for r in ORIGINALS), ORIGINALS)
 REPORT = {'findings': [
     {'requirement_id': 'R1', 'status': 'Met', 'explanation': 'Compares cost and reach.', 'gap': '',
@@ -29,6 +29,21 @@ class ContractTests(unittest.TestCase):
     def test_requirement_sources_must_exist(self):
         bad = copy.deepcopy(ORIGINALS); bad[0]['source'] = 'Invented rubric'
         with self.assertRaises(ReviewError): validate_requirements({'requirements': bad}, INSTRUCTIONS)
+
+    def test_requirement_sources_accept_whitespace_and_preserve_original(self):
+        instructions = 'Compare\u00a0two\n  alternatives. Justify a recommendation.'
+        data = {'requirements': copy.deepcopy(ORIGINALS)}
+        checked = validate_requirements(data, instructions)
+        self.assertEqual(checked[0]['source'], 'Compare\u00a0two\n  alternatives.')
+        self.assertIn(checked[0]['source'], instructions)
+
+    def test_requirement_sources_reject_changed_wording(self):
+        for source in ('Compare three alternatives.', 'Compare two options.',
+                       'Compare two alternatives. Justify an invented recommendation.'):
+            data = {'requirements': copy.deepcopy(ORIGINALS)}
+            data['requirements'][0]['source'] = source
+            with self.assertRaises(ReviewError):
+                validate_requirements(data, INSTRUCTIONS)
 
     def test_student_changes_are_traceable_and_duplicates_blocked(self):
         reqs = confirmed_requirements('Compare two alternatives.\nDiscuss risks.', ORIGINALS)
@@ -75,6 +90,51 @@ class ContractTests(unittest.TestCase):
     def test_missing_key_is_actionable(self):
         with self.assertRaisesRegex(ReviewError, 'not configured'): call_model('Task', {}, EXTRACTION)
 
+    @patch.dict(os.environ, {'OPENROUTER_REVIEW_MAX_TOKENS': ''})
+    @patch('radar.call_model', return_value=(copy.deepcopy(REPORT), {}))
+    def test_review_budget_default_and_override(self, model):
+        for setting, expected in [('', 16000), ('24000', 24000)]:
+            with patch.dict(os.environ, {'OPENROUTER_REVIEW_MAX_TOKENS': setting}):
+                evaluate(INSTRUCTIONS, DRAFT, REQS)
+                self.assertEqual(model.call_args.kwargs['max_tokens'], expected)
+
+    @patch('radar.call_model')
+    def test_invalid_review_budget_is_blocked_before_request(self, model):
+        for setting in ('abc', '0', '-1', '32001'):
+            with patch.dict(os.environ, {'OPENROUTER_REVIEW_MAX_TOKENS': setting}):
+                with self.assertRaisesRegex(ReviewError, 'OPENROUTER_REVIEW_MAX_TOKENS'):
+                    evaluate(INSTRUCTIONS, DRAFT, REQS)
+        model.assert_not_called()
+
+    @patch.dict(os.environ, {'OPENROUTER_API_KEY': 'synthetic-test-key'})
+    @patch('radar.request.urlopen')
+    def test_incomplete_responses_explain_the_stop_reason(self, urlopen):
+        for reason, message in [('length', 'output token limit'),
+                                ('content_filter', 'content filter'),
+                                ('error', 'provider stopped'),
+                                (None, 'provider stopped'),
+                                ('secret-provider-detail', 'provider stopped')]:
+            with self.subTest(reason=reason):
+                response = MagicMock()
+                response.__enter__.return_value.read.return_value = json.dumps({
+                    'choices': [{'finish_reason': reason,
+                                 'message': {'content': 'private assignment response'}}],
+                    'usage': {'prompt_tokens': 200, 'completion_tokens': 7000,
+                              'completion_tokens_details': {'reasoning_tokens': 6500},
+                              'private': 'private assignment response'}}).encode()
+                urlopen.return_value = response
+                with self.assertRaisesRegex(ReviewError, message) as ctx:
+                    call_model('Task', {}, EXTRACTION)
+                self.assertEqual(ctx.exception.diagnostics['requested_max_tokens'], 7000)
+                self.assertEqual(ctx.exception.diagnostics['reasoning_tokens'], 6500)
+                self.assertEqual(ctx.exception.diagnostics['output_tokens'], 7000)
+                self.assertNotIn('private assignment response', json.dumps(ctx.exception.diagnostics))
+                self.assertNotIn('secret-provider-detail', json.dumps(ctx.exception.diagnostics))
+                self.assertNotIn('private assignment response', str(ctx.exception))
+                self.assertNotIn('secret-provider-detail', str(ctx.exception))
+                if reason != 'length':
+                    self.assertNotIn('shorter', str(ctx.exception))
+
     @patch.dict(os.environ, {'OPENROUTER_API_KEY': 'synthetic-test-key'})
     @patch('radar.request.urlopen')
     def test_request_privacy_and_provider_errors(self, urlopen):
@@ -87,6 +147,9 @@ class ContractTests(unittest.TestCase):
         body = json.loads(urlopen.call_args.args[0].data)
         self.assertEqual(body['provider'], {'data_collection': 'deny', 'zdr': True, 'require_parameters': True})
         self.assertEqual(meta['cost_usd'], 0.001)
+        self.assertEqual(body['max_tokens'], 7000)
+        call_model('Task', {}, EXTRACTION, max_tokens=16000)
+        self.assertEqual(json.loads(urlopen.call_args.args[0].data)['max_tokens'], 16000)
         for exc in [HTTPError('url', 401, 'secret response', {}, None), URLError('secret response')]:
             urlopen.side_effect = exc
             with self.assertRaises(ReviewError) as ctx: call_model('Task', {}, EXTRACTION)

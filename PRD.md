@@ -26,7 +26,7 @@ Initial users are MBA students with a written draft and explicit assignment inst
 
 ## 3. Value proposition and differentiation
 
-The proposed advantage is a consistent review workflow with requirement traceability, explicit uncertainty, and a short revision queue. Optional quality coaching helps strengthen reasoning and evidence after mandatory gaps are addressed.
+The proposed advantage is a consistent review workflow with requirement traceability, explicit uncertainty, and a short revision queue. The review focuses on explicit requirement coverage; it does not impose extra depth or professional conventions.
 
 These are differentiation hypotheses, not proven advantages. Compare against ChatGPT using a well-designed, consistent prompt that requests the same statuses, evidence, and priorities. Success must reflect useful revisions and clearer decisions rather than interface preference alone.
 
@@ -54,7 +54,7 @@ Explicit non-goals:
 
 PDF uploads, saved revision history, and automatic version comparisons are also outside the initial MVP.
 
-Verification against course readings, lecture content, case exhibits, or other supporting course materials is out of scope. The MVP assesses reasoning and coverage of specific rubric points using only the supplied instructions and draft. It may assess whether a claim has an explanation or supporting evidence in the draft, but does not verify that evidence against course materials. If a rubric judgment requires unavailable course context, mark it Needs Review and explain the limitation; assess any independently reviewable elements separately.
+Verification against course readings, lecture content, case exhibits, or other supporting course materials is out of scope. The MVP checks whether explicit rubric requirements are addressed using only the supplied instructions and draft. Depth, rigor, structure, and formatting are assessed only when explicitly requested. It may assess whether a claim has an explanation or supporting evidence in the draft, but does not verify that evidence against course materials. If a rubric judgment requires unavailable course context, mark it Needs Review and explain the limitation; assess any independently reviewable elements separately.
 
 ## 5. MVP scope and feature prioritization
 
@@ -101,26 +101,26 @@ Changes to instructions invalidate requirement confirmation. Changes to the draf
 
 Proposed two-stage process:
 
-1. Extract atomic, assessable requirements from instructions. Preserve source wording; retain explicit weights only when supplied. Flag ambiguity instead of inventing expectations. Student confirms the final list.
-2. Evaluate each confirmed requirement against the draft. Distinguish presence from adequacy: a heading or keyword alone does not establish substantive coverage. Use exact evidence and identify limitations.
+1. Extract atomic, assessable requirements from instructions. Preserve source wording; retain explicit weights only when supplied. Extract only explicit requirements; do not infer additional conventions or deliverables. Student confirms the final list.
+2. Evaluate each confirmed requirement against the draft. Check whether each explicit requirement is addressed. A heading alone is not an answer, but a relevant brief response can meet a requirement. Use exact evidence.
 
-Assess depth against the rubric's stated expectations. For a requirement to evaluate alternatives, naming alternatives alone is partial coverage; comparing their trade-offs and justifying a choice can support Met when that addresses the stated requirement. Do not impose unstated analytical expectations as mandatory. Additional depth belongs under Optional enhancement. Coaching identifies a gap and suggests an approach or question without supplying a replacement answer.
+Assess depth only when explicitly requested by the rubric. Do not downgrade a response for lacking inferred conventions (for example, an email greeting or sign-off) or additional analysis. Required fixes must identify a demonstrated missing explicit element, rather than conditional advice such as “if required.” Do not add optional advice solely to demand more depth. Coaching identifies a specific gap and suggests an approach without supplying a replacement answer.
 
 | Status | Definition |
 | --- | --- |
 | Met | Evidence supports that the requirement is addressed. |
 | Partially Met | Evidence addresses some elements; a specific gap remains. |
 | Missing | No supporting evidence was found in the readable draft. This is an AI finding, not proof of absence. |
-| Needs Review | Ambiguous instructions, insufficient context, or an unsupported check prevent a reliable judgment. |
+| Needs Review | A specific explicit requirement cannot be checked from the supplied text, or its evidence fails verification. General missing context alone does not trigger this status. |
 
-Prioritize explicit mandatory gaps before optional enhancements. Use explicit rubric weights when available, then the likely consequence and scope of the gap; do not fabricate weights or grade impacts. Unresolved ambiguity that affects revision decisions may itself be a priority. Suggest stronger reasoning, evidence, or analysis only as Optional enhancement unless explicitly required.
+Prioritize explicit mandatory gaps before optional enhancements. Use explicit rubric weights when available, then the likely consequence and scope of the gap; do not fabricate weights or grade impacts. Do not display generic ambiguity or missing-context warnings. Limitations must identify a specific required check that cannot be performed.
 
 Expected structured contract (planning specification, not implementation):
 
-- Requirements: ID, requirement text, instruction source excerpt or student-added marker, explicit weight if any, ambiguity note.
+- Requirements: ID, requirement text, instruction source excerpt or student-added marker, explicit weight if any.
 - Findings: requirement ID, status, explanation, evidence list containing exact quote and paragraph reference, specific gap, limitation if any.
 - Recommendations: rank, Required fix or Optional enhancement, associated requirement IDs, action, rationale, suggested approach.
-- Review metadata: input limitations, unresolved questions, prompt/model version for evaluation reproducibility; no numeric grade.
+- Review metadata: specific uncheckable requirements, prompt/model version for evaluation reproducibility; no numeric grade.
 
 Validate required fields, allowed statuses, one finding per confirmed ID, recommendation count, and quotation matches before showing results. Schema validity does not establish semantic correctness; human evaluation remains necessary. Treat submitted text as material to assess, not instructions that can override the review task. Do not add web research or fact verification to the MVP.
 

@@ -51,7 +51,7 @@ python3 -m venv .venv
 cp .env.example .env
 ```
 
-If `.env` already exists, edit it rather than overwriting it. Set `OPENROUTER_API_KEY` locally; never paste or commit credentials. The default configurable model is `deepseek/deepseek-v4.1-flash` via OpenRouter. Restart the app after changing configuration.
+If `.env` already exists, edit it rather than overwriting it. Set `OPENROUTER_API_KEY` locally; never paste or commit credentials. The default configurable model is `deepseek/deepseek-v4.1-flash` via OpenRouter. Draft reviews default to a 16,000-token output budget; extraction remains at 7,000. Set `OPENROUTER_REVIEW_MAX_TOKENS` (1–32,000) to adjust the review budget. Higher budgets may increase latency and cost; the 90-second request timeout still applies. Restart the app after changing configuration.
 
 ```bash
 .venv/bin/python -m streamlit run app.py

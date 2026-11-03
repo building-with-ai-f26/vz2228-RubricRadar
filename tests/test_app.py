@@ -39,6 +39,21 @@ class AppTests(unittest.TestCase):
         self.assertEqual(app.text_area(key='draft').value, '')
         self.assertFalse(app.exception)
 
+    @patch('radar.extract', return_value=(ORIGINALS, META))
+    @patch('radar.evaluate', side_effect=ReviewError('Token limit.', diagnostics={
+        'requested_max_tokens': 16000, 'output_tokens': 16000, 'reasoning_tokens': None}))
+    def test_review_failure_displays_diagnostics_and_preserves_inputs(self, evaluate, extract):
+        app = self.fill()
+        button(app, '1. Extract requirements').click().run()
+        button(app, 'Confirm requirements').click().run()
+        button(app, '3. Review my draft').click().run()
+        self.assertFalse(app.exception)
+        self.assertEqual(app.text_area(key='draft').value, DRAFT)
+        self.assertIn('confirmed', app.session_state)
+        self.assertNotIn('result', app.session_state)
+        self.assertTrue(app.json)
+        self.assertIn('16000', app.json[0].value)
+
     @patch('radar.extract', side_effect=ReviewError('Provider unavailable.'))
     def test_failure_preserves_inputs(self, extract):
         app = self.fill()
