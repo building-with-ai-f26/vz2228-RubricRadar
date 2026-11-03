@@ -157,8 +157,8 @@
     <section id="live-demo">
       <h2>Product Showcase (Prototype / Live App / 2-Min Video)</h2>
       <p>
-        <strong>Current Status:</strong> Local text-only prototype implemented · Live synthetic smoke check completed · November 2, 2026<br />
-        <strong>Demo:</strong> Run locally with the README instructions. One live synthetic review completed. Browser visual verification and screenshot/GIF evidence remain outstanding.
+        <strong>Current Status:</strong> Local MVP tested by builder · 18 automated tests pass · November 3, 2026<br />
+        <strong>Demo:</strong> Run locally with the README instructions. Multiple live reviews completed; the builder confirmed the compact summary, cards, and revised requirement checks work. Outside-user testing and screenshot/GIF evidence remain outstanding.
       </p>
       <p class="meta">
         Ask your coding agent to embed a screenshot or GIF of your local prototype for Build 1. Keep this evidence current, then add your cloud app link and two-minute video in Build 5.
@@ -192,21 +192,24 @@
       <p>Every confirmed requirement receives one status and an explanation. Only explicit requirements are assessed; evidence is never invented. Mandatory gaps take priority over optional coaching. No overall grade is displayed. Assignment text must stay out of persistent application storage, logs, and analytics; provider data policies remain to be checked.</p>
       <p>Check whether the draft addresses explicit requirements using the supplied instructions and draft. A heading alone is not an answer, but a relevant brief response can meet a requirement. Assess depth, rigor, structure, and formatting only when explicitly requested. Verification against course readings, lectures, case exhibits, or other course materials is out of scope; judgments needing unavailable context receive Needs Review. Required fixes identify demonstrated gaps in explicit requirements; inferred conventions such as email greetings are not mandatory. Omit generic ambiguity warnings and advice solely demanding extra depth. Recommendations guide students without writing replacement answers.</p>
       <p>Record extraction errors before student corrections separately from evaluation errors against confirmed requirements. Useful revisions are stronger value evidence than preference alone. The approved prototype has provisional bounds of 12,000 instruction characters, 30,000 draft characters, and 25 requirements. The configurable initial model is DeepSeek V4.1 Flash via OpenRouter. One synthetic review returned three requirements (two Met, one Missing) and one recommendation, with $0.003135 reported inference cost and 10.84 seconds combined API duration. Broader quality and representative performance remain unvalidated.</p>
-      <p>Recommended Build 4 track: A — domain quality, with 10 cases and an outside target-user review. The full 12-section PRD, acceptance criteria, limitations, and open decisions are available in <a href="https://github.com/building-with-ai-f26/vz2228-RubricRadar/blob/main/PRD.md">PRD.md in the repository</a> after the documentation is pushed. This page and the PRD must be kept aligned.</p>
+      <p>Recommended Build 4 track: A — domain quality, with 10 cases and an outside target-user review. The full 12-section PRD, acceptance criteria, limitations, and open decisions are available in <a href="https://github.com/building-with-ai-f26/vz2228-RubricRadar/blob/main/PRD.md">PRD.md in the repository</a> in the repository. This page and the PRD must be kept aligned.</p>
 
       <h3>4. Unit Economics & Analytics Snapshot (Updated Weekly)</h3>
       <div class="grid-2">
         <div class="stat-box">
           <div class="stat-label">Cumulative Build Spend</div>
-          <div class="stat-value">Not recorded</div>
+          <div class="stat-value">$0.02957 recorded API costs</div>
+          <p class="meta">Partial total; excludes unrecorded requests. Codex via ChatGPT Plus; subscription allocation not recorded. Builder time: approximately 2 hours this session.</p>
         </div>
         <div class="stat-box">
           <div class="stat-label">Est. Cost Per User Run</div>
-          <div class="stat-value">$0.003135 · one synthetic run</div>
+          <div class="stat-value">$0.01225–$0.01419</div>
+          <p class="meta">Two recorded builder runs; not a representative average. Original synthetic run: $0.003135.</p>
         </div>
         <div class="stat-box">
           <div class="stat-label">User Evidence (Analytics from Build 2)</div>
-          <div class="stat-value">No user tests yet</div>
+          <div class="stat-value">Builder testing completed</div>
+          <p class="meta">Multiple live runs and manual interface checks. No outside-user testing or analytics yet.</p>
         </div>
         <div class="stat-box">
           <div class="stat-label">Sponsor Call (Week 6)</div>
@@ -223,10 +226,12 @@
       <div class="log-entry">
         <h3>Build 1 · Intent.md & Throwaway Prototype (Due Nov 9)</h3>
         <ul>
-          <li><strong>What shipped:</strong> Implemented a local Streamlit prototype with pasted inputs, editable requirement confirmation, evidence-checked feedback, and revision priorities. Twelve deterministic tests passed, including a mocked UI flow; one live synthetic run also completed; broad model accuracy remains unvalidated. Public publication is not verified.</li>
-          <li><strong>Things learned with AI:</strong> Product planning separated requirement compliance from optional quality coaching. Terminus completion and related learning are not yet recorded.</li>
-          <li><strong>What broke / changed in PRD:</strong> PDF/history deferred. Invalid evidence becomes Needs Review. Configured DeepSeek V4.1 Flash; a live synthetic review completed. Fixed local Python certificate verification using a CA bundle. Browser capture was blocked by unavailable browser access and computer-use permission. User-value and model-quality assumptions remain untested.</li>
-          <li><strong>Cost & time this week:</strong> Successful synthetic run: $0.003135 runtime inference. Other request costs, coding-agent spend, and builder hours not fully recorded</li>
+          <li><strong>What shipped (updated Nov 3):</strong> Local Streamlit workflow with editable requirement confirmation, evidence-checked feedback, a review summary, compact cards, and expandable details. All 18 deterministic tests pass, up from 12. Changes pushed in <a href="https://github.com/building-with-ai-f26/vz2228-RubricRadar/commit/e69f770">e69f770</a>. Public app deployment is not verified.</li>
+          <li><strong>Live and manual checks:</strong> Original synthetic smoke check plus two successful builder reviews with recorded usage: technology trends (77.30 seconds combined API time, $0.01418914) and a project-update email (55.22 seconds, $0.012247078; 5 Met, 1 Partially Met). Builder confirmed the cards and summary worked, then confirmed a subsequent run worked with prompt v1.2; that final run's usage was not supplied. These checks do not establish broad model accuracy. No assignment text is retained in this log.</li>
+          <li><strong>What failed and how it changed the product:</strong> Source matching rejected formatting differences; now whitespace differences are tolerated and original excerpts retained. Reviews hit the initial 7,000-token budget; the configurable review default is now 16,000. Safe diagnostics distinguish token limits and other incomplete responses. The server needed restarting to load backend changes. Inferred email conventions were overclassified as required fixes; v1.2 focuses on explicit requirement coverage and removes ambiguity notes. Depth is assessed only when explicitly requested.</li>
+          <li><strong>Things learned with AI:</strong> Requirement coverage must remain separate from invented expectations. Mocked tests check contracts and UI behavior; live builder checks reveal feedback quality and usability issues. High token usage is observed, but reasoning-token consumption is not yet confirmed. Terminus completion is not recorded.</li>
+          <li><strong>Cost and time:</strong> Builder reports approximately 2 hours for this session. Coding agent: Codex through a ChatGPT Plus subscription; no project-specific subscription allocation or separate agent charge reported. Two recorded Nov 3 runs total $0.026436218; including the original $0.003135 smoke check, recorded API costs total $0.029571218. Failed requests, the final confirmation run, and other unrecorded usage are excluded; this is not a full spending total.</li>
+          <li><strong>Still outstanding:</strong> Screenshot/GIF evidence, outside-classmate testing, the ten-case Build 4 evaluation, full cost reconciliation, and public deployment verification. Builder visually checked the browser interface; agent browser access remained unavailable.</li>
         </ul>
       </div>
 

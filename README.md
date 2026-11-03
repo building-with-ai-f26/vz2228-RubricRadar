@@ -7,7 +7,7 @@ An AI-powered pre-submission coach for MBA students reviewing written reports an
 - **Builder:** `@victor-zu-97` (display name to confirm)
 - **Pod:** 12
 - **Product Page & Living PRD:** [Local page](./docs/index.html); GitHub Pages deployment has not been verified.
-- **Status:** PRD v1 reviewed; local text-only prototype implemented. One live synthetic DeepSeek review passed structural checks; no user tests or public deployment yet.
+- **Status:** PRD v1 reviewed; local text-only prototype implemented. 18 deterministic tests pass. Builder completed live reviews and confirmed the compact interface and revised requirement checks work; outside-user tests and public app deployment remain outstanding.
 - **Full PRD:** [PRD.md](./PRD.md)
 
 The MVP uses pasted instructions and draft text, student-confirmed requirements, evidence-backed findings, and up to three prioritized improvements. PDF uploads and saved revision comparisons are deferred.
@@ -66,7 +66,7 @@ Open **http://127.0.0.1:8501**. The app binds to localhost. Paste instructions a
 .venv/bin/python -m pip check
 ```
 
-The 12 deterministic tests cover evidence checks, output coverage, input bounds, API failures, privacy request settings, and the Streamlit workflow with mocked responses. They do not establish model accuracy.
+The 18 deterministic tests cover evidence checks, output coverage, input bounds, API failures, privacy request settings, and the Streamlit workflow with mocked responses. They do not establish model accuracy.
 
 For a live synthetic feasibility check (two billable model calls):
 
@@ -86,4 +86,19 @@ It prints operational metadata and statuses, not assignment text. Review the int
 
 ## Build 1 evidence status
 
-Local implementation and mocked-flow tests are complete. One live synthetic review completed using DeepSeek V4.1 Flash: 3 requirements, 2 Met, 1 Missing, and 1 recommendation. Reported inference cost was $0.003135; API durations totaled 10.84 seconds. This is one small feasibility result, not a quality evaluation or performance guarantee. Browser visual verification, a screenshot/GIF, and classmate feedback remain outstanding. Browser capture was blocked by unavailable browser access and computer-use permission. No prototype screenshot or broad model-quality result is claimed. Actual builder time and coding-agent costs have not been supplied.
+Updated November 3, 2026. All 18 deterministic tests pass, including mocked UI flows, whitespace-tolerant source verification, output-budget configuration, and safe failure diagnostics. These tests verify application behavior, not model accuracy.
+
+Live testing includes the original synthetic smoke check (3 requirements, $0.003135, 10.84 seconds combined API time) and two additional successful builder-run reviews with recorded usage:
+
+| Run | Combined API time | Reported API cost | Evidence |
+| --- | --- | --- | --- |
+| Technology trends | 77.30 seconds | $0.01418914 | Builder confirmed review and priorities displayed. Feedback informed stricter rules against inferred requirements. |
+| Project-update email | 55.22 seconds | $0.012247078 | 6 findings: 5 Met, 1 Partially Met. Builder confirmed summary, cards, and expandable details worked. |
+
+The builder also confirmed a subsequent live run worked after prompt v1.2 removed ambiguity notes and focused judgments on explicit requirements; usage for that run was not supplied. These are builder checks, not independent target-user evaluation or evidence of broad model accuracy. Assignment text is not retained in this log.
+
+Failures and changes: exact source matching rejected formatting differences; matching now tolerates whitespace while retaining original excerpts. Draft reviews exhausted the initial 7,000-token budget; a configurable 16,000-token default allowed the recorded reviews to complete. Incomplete responses now show safe diagnostics. Manual feedback prompted compact cards, a summary, expandable evidence, and removal of inferred conventions such as mandatory email greetings. Provider reasoning-token consumption remains unconfirmed.
+
+Builder time: approximately 2 hours for this session, self-reported. Coding agent: Codex through a ChatGPT Plus subscription; no project-specific subscription cost allocation or separate agent charge was reported. Recorded API costs total $0.029571218 across the original smoke check and the two tabulated runs; today's two tabulated runs total $0.026436218. These are partial totals, excluding failed attempts, the final confirmation run, and any other unrecorded requests. Full project spending is not yet reconciled.
+
+The builder visually checked the interface in the browser; agent browser access remained unavailable. Screenshot/GIF evidence, outside-classmate feedback, the ten-case Build 4 evaluation, and public deployment verification remain outstanding.
