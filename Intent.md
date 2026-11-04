@@ -5,7 +5,7 @@ Use this as a scratchpad if helpful. Publish the required PRD and Build 1 log on
 **Build 1 due:** Monday, Nov 9, 2026 at noon, New York time  
 **Builder:** victor-zu-97 · Pod 12
 
-**Updated:** November 3, 2026
+**Updated:** November 4, 2026 · aligned with PRD v1.1
 
 **Product:** Rubric Radar — Know what's missing. Understand what matters. Submit stronger work.
 
@@ -21,12 +21,12 @@ Use this as a scratchpad if helpful. Publish the required PRD and Build 1 log on
 *Describe the concrete recurring problem from work, school, or life, and what "done" looks like for the user.*
 
 - **Current painful workflow (before):** Students manually compare a draft with assignment instructions or ask a general-purpose AI assistant for feedback, then decide which suggestions matter. The working hypothesis is that requirements get overlooked and feedback can be difficult to verify or prioritize; outside-user testing has not yet validated this problem.
-- **New workflow with this product (after):** Paste the instructions and draft, review and correct extracted requirements, confirm them, then inspect a finding for each requirement with supporting draft evidence and up to three revision priorities. Revise in an external editor and paste the updated draft for a fresh review. Done means the student can identify a specific gap and decide what to revise while retaining authorship.
+- **New workflow with this product (after):** Paste the instructions and draft, review and correct extracted requirements, click Confirm & review my draft, then inspect a finding for each requirement with supporting draft evidence and up to three revision priorities. Revise in an external editor and paste the updated draft for a fresh review. Done means the student can identify a specific gap and decide what to revise while retaining authorship.
 - **Why this is useful** *(used weekly / saves real time / worth paying for)*: The intended value is a repeatable pre-submission check that makes omissions easier to find and revision decisions easier to explain. Requirement-linked evidence and a short priority list are the proposed advantages. Time savings, repeat usage, willingness to pay, and an advantage over a strong ChatGPT prompt have not been demonstrated.
 
 ## 3. What is in and out of scope?
 
-- **One core workflow:** Pasted instructions + written draft → editable requirement extraction → student confirmation → evidence-backed requirement review → up to three prioritized improvements → external revision and fresh review.
+- **One core workflow:** Pasted instructions + written draft → editable requirement extraction → combined confirmation and review → evidence-backed requirement review → up to three prioritized improvements → external revision and fresh review.
 *You have six weeks. List the features, integrations, and polish you are deliberately NOT building.*
 
 - [ ] Not building: Assignment generation, automatic rewriting, official grade predictions, or completeness guarantees.

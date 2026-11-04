@@ -1,6 +1,6 @@
-# Rubric Radar — PRD v1
+# Rubric Radar — PRD v1.1
 
-Version: 1.0 · November 2, 2026
+Version: 1.1 · November 4, 2026
 
 Status: Product review complete; local prototype implemented. One live synthetic model smoke check completed; broader quality validation, visual verification, and user testing remain outstanding.
 
@@ -75,9 +75,9 @@ Excellence Coach is initially optional quality guidance within the same report, 
 1. Student sees what the tool does, its limitations, and how text is processed.
 2. Student pastes assignment instructions/rubric and draft into labeled text fields.
 3. App checks required inputs and supported length before sending them for analysis.
-4. AI extracts requirements with source excerpts. Student reviews and corrects the list, then confirms it.
-5. AI evaluates the draft against the confirmed requirements.
-6. Student sees the requirement checklist, uncertainty warnings, and up to three priorities.
+4. Student clicks **Extract requirements**. AI extracts requirements with source excerpts available in an expander. Student reviews and corrects the list.
+5. Student clicks **Confirm & review my draft**, which confirms the edited list and immediately evaluates the draft. There is no separate confirmation button or ready-to-review screen.
+6. Student sees a compact summary, up to three priorities, and requirement cards colored by status: green for Met, amber for Partially Met, red for Missing, and blue for Needs Review. Each card retains a written status; evidence and source details remain expandable.
 7. Student revises outside the app and starts another review. Previous findings are not automatically compared or saved.
 
 Changes to instructions invalidate requirement confirmation. Changes to the draft invalidate the previous evaluation. Preserve pasted inputs during recoverable failures in the current session.
@@ -88,7 +88,7 @@ Changes to instructions invalidate requirement confirmation. Changes to the draf
 | --- | --- | --- |
 | FR1 | Text input | Both fields are labeled and required; empty/whitespace-only inputs are blocked with a useful message. Explain that pasted text cannot preserve visual formatting. |
 | FR2 | Input bounds | Publish and enforce text limits before requests; never silently truncate. Prototype limits are 12,000 instruction characters and 30,000 draft characters; reassess during live feasibility testing. |
-| FR3 | Confirmation | Show extracted requirements and their instruction excerpts; support correction, addition, removal, and explicit confirmation before evaluation. Student additions are identified as such. |
+| FR3 | Confirmation | Show extracted requirements and their instruction excerpts; support correction, addition, removal, and explicit confirmation through a single Confirm & review my draft action that starts evaluation. After consent, reaching feedback requires two primary button clicks: Extract requirements, then Confirm & review my draft. Student additions are identified as such. |
 | FR4 | Coverage | Every confirmed requirement has exactly one result with a valid status and explanation; no unconfirmed requirement is presented as mandatory. |
 | FR5 | Evidence | Met and Partially Met judgments include exact draft excerpts with paragraph locations where feasible. Missing has no fabricated quote and explains that evidence was not found. Invalid evidence is withheld and flagged Needs Review. |
 | FR6 | Uncertainty | Ambiguous or conflicting instructions and unsupported checks receive Needs Review with a reason. Visual layout and external-source validity are not inferred from pasted text. |
@@ -128,7 +128,7 @@ Validate required fields, allowed statuses, one finding per confirmed ID, recomm
 
 - **Privacy:** No application database or persistent storage of assignment text. Do not put text in URLs, application logs, analytics, or replay recordings. Retention by the selected API provider must be checked and disclosed before real-user testing. Participants share only work they are permitted and comfortable to share.
 - **Security:** API credentials stay on the server in environment variables. Escape user/model text when rendering. Bound inputs and requests; define a spending limit before an exposed deployment.
-- **Usability:** Keyboard-operable controls, visible labels and focus, readable errors, and status text that does not rely on color alone.
+- **Usability:** Keyboard-operable controls, visible labels and focus, readable errors, and status text that does not rely on color alone. Use pale status-colored requirement cards with readable text in light and dark themes; show privacy and review details in an expander while keeping sharing consent visible.
 - **Reliability:** Validate outputs and evidence; show uncertainty rather than authoritative unsupported claims. Formatting, calculations, citations, and external facts may not be verifiable from pasted text.
 - **Performance and cost:** Measure end-to-end latency and per-review inference cost in the feasibility spike. Set numerical budgets before implementation sign-off; one synthetic smoke check is recorded below; representative performance remains unverified.
 - **Academic use:** Students retain responsibility for their work and applicable course AI rules. No grade or completeness guarantees.
@@ -184,3 +184,9 @@ The separately approved prototype uses Python/Streamlit and OpenRouter, with `de
 Provisional bounds are 12,000 instruction characters, 30,000 draft characters, 25 requirements, and a 90-second timeout per API call. Each complete review normally requires two calls. Routing requests deny data collection and require ZDR and parameter support; account-level logging settings still require verification. Twelve deterministic tests passed, including a UI flow with synthetic provider responses. A live synthetic smoke-check script is supplied; live quality, cost and latency have not yet been measured because no API key was configured at verification time. Browser visual inspection and screenshot capture were blocked by unavailable browser access and computer-use permission. Do not treat this checkpoint as pilot validation or completed Build 1 submission evidence.
 
 Sources checked for this prototype: [OpenRouter structured outputs](https://openrouter.ai/docs/guides/features/structured-outputs), [provider routing](https://openrouter.ai/docs/guides/routing/provider-selection), [data collection](https://openrouter.ai/docs/guides/privacy/data-collection), [model catalog](https://openrouter.ai/api/v1/models), and [Streamlit session state](https://docs.streamlit.io/develop/api-reference/caching-and-state/st.session_state). Recheck provider/model compatibility before a live run.
+
+### PRD v1.1 — Simpler frontend (November 4, 2026)
+
+Approved change: reduce the three-button extraction → confirmation → evaluation flow to two buttons by combining confirmation and evaluation. Preserve editable requirements, explicit consent, source inspection, input invalidation, evidence validation, and recoverable errors. Move supporting privacy/limitation details into an expander; retain the visible consent checkbox and short grade disclaimer.
+
+Use green / amber / red / blue requirement cards for Met / Partially Met / Missing / Needs Review respectively, with written status labels and expandable evidence. No provider, prompt, storage, or evaluation-contract changes are included. This is a frontend revision within Build 1, not completion of the course's Build 2 milestone. Mocked UI tests verify behavior; visual checks and outside-user evidence are recorded separately and do not establish model accuracy or measured usability improvement.

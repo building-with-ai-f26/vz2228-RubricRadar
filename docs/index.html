@@ -157,7 +157,7 @@
     <section id="live-demo">
       <h2>Product Showcase (Prototype / Live App / 2-Min Video)</h2>
       <p>
-        <strong>Current Status:</strong> Local MVP tested by builder · 18 automated tests pass · November 3, 2026<br />
+        <strong>Current Status:</strong> Local MVP · PRD v1.1 frontend implemented · 20 automated tests pass · November 4, 2026<br />
         <strong>Demo:</strong> Run locally with the README instructions. Multiple live reviews completed; the builder confirmed the compact summary, cards, and revised requirement checks work. Outside-user testing and screenshot/GIF evidence remain outstanding.
       </p>
       <p class="meta">
@@ -168,12 +168,14 @@
     <!-- LIVING PRD (Updated every week!) -->
     <section id="prd">
       <h2>Living PRD (Product Requirements Document)</h2>
-      <p class="meta">Updated every week as we test with real users and learn what works.</p>
+      <p class="meta">PRD v1.1 · November 4, 2026. Frontend simplification approved; outside-user validation remains outstanding.</p>
 
       <h3>1. Target User & The Job to Be Done</h3>
       <p><strong>Who is this for?</strong> MBA students reviewing written reports and project submissions. The builder can recruit 2–3 MBA classmates; testing has not occurred.</p>
       <p><strong>The painful "Before" workflow:</strong> Hypothesis: students manually compare drafts with instructions or use general-purpose AI feedback, then struggle to verify findings and prioritize revisions.</p>
-      <p><strong>The "After" workflow with this product:</strong> Paste instructions and draft → confirm extracted requirements → inspect evidence-backed feedback → act on up to three priorities. Revise externally and reassess.</p>
+      <p><strong>The "After" workflow with this product:</strong> Paste instructions and draft → Extract requirements → edit requirements and click Confirm &amp; review my draft → inspect evidence-backed feedback → act on up to three priorities. Revise externally and reassess.</p>
+
+      <p><strong>v1.1 frontend:</strong> Two primary buttons replace the previous three: extraction, then combined confirmation and review. Supporting privacy and review-limit details are expandable; sharing consent stays visible. Compact requirement cards use green (Met), amber (Partially Met), red (Missing), and blue (Needs Review), always with written labels and expandable evidence. This change does not establish measured usability improvement.</p>
 
       <h3>2. Scope & Explicit Non-Goals</h3>
       <ul>
@@ -226,6 +228,7 @@
       <div class="log-entry">
         <h3>Build 1 · Intent.md & Throwaway Prototype (Due Nov 9)</h3>
         <ul>
+          <li><strong>PRD v1.1 update (Nov 4):</strong> Combined confirmation and review into one action after extraction; moved supporting disclosures into an expander; added status colors to compact requirement cards with written labels. All 20 deterministic tests pass, including edited requirements, consent gating, empty-requirement rejection, input invalidation, and provider-error recovery. No billable live calls were run for this revision. Builder tested the revised local app and reported that the simpler flow worked well and the card colors worked well. Systematic light/dark-theme checks and outside-user validation remain outstanding; reduced completion time has not been measured.</li>
           <li><strong>What shipped (updated Nov 3):</strong> Local Streamlit workflow with editable requirement confirmation, evidence-checked feedback, a review summary, compact cards, and expandable details. All 18 deterministic tests pass, up from 12. Changes pushed in <a href="https://github.com/building-with-ai-f26/vz2228-RubricRadar/commit/e69f770">e69f770</a>. Public app deployment is not verified.</li>
           <li><strong>Live and manual checks:</strong> Original synthetic smoke check plus two successful builder reviews with recorded usage: technology trends (77.30 seconds combined API time, $0.01418914) and a project-update email (55.22 seconds, $0.012247078; 5 Met, 1 Partially Met). Builder confirmed the cards and summary worked, then confirmed a subsequent run worked with prompt v1.2; that final run's usage was not supplied. These checks do not establish broad model accuracy. No assignment text is retained in this log.</li>
           <li><strong>What failed and how it changed the product:</strong> Source matching rejected formatting differences; now whitespace differences are tolerated and original excerpts retained. Reviews hit the initial 7,000-token budget; the configurable review default is now 16,000. Safe diagnostics distinguish token limits and other incomplete responses. The server needed restarting to load backend changes. Inferred email conventions were overclassified as required fixes; v1.2 focuses on explicit requirement coverage and removes ambiguity notes. Depth is assessed only when explicitly requested.</li>

@@ -9,12 +9,13 @@ st.set_page_config(page_title='Rubric Radar', page_icon='📡', layout='centered
 st.title('Rubric Radar')
 st.subheader('Know what’s missing. Understand what matters. Submit stronger work.')
 st.caption('A pre-submission coach for MBA written reports and projects. Feedback is not an official grade.')
-st.info('Paste text only. Layout, course materials, factual accuracy, and source validity are not verified. '
-        'You remain responsible for your work and your course’s AI rules.')
-st.caption('Text is held in this browser session’s server memory, with no application storage or analytics. '
-           'Live reviews send text to OpenRouter and a model provider using restricted privacy routing. '
-           'Before real coursework, verify account logging settings and provider policies. '
-           'Only share work you have permission to share.')
+with st.expander('Before you share: privacy and review limits'):
+    st.info('Paste text only. Layout, course materials, factual accuracy, and source validity are not verified. '
+            'You remain responsible for your work and your course’s AI rules.')
+    st.caption('Text is held in this browser session’s server memory, with no application storage or analytics. '
+               'Live reviews send text to OpenRouter and a model provider using restricted privacy routing. '
+               'Before real coursework, verify account logging settings and provider policies. '
+               'Only share work you have permission to share.')
 
 
 def invalidate_inputs():
@@ -49,7 +50,7 @@ draft = st.text_area('Your written draft', key='draft', height=260,
                      on_change=invalidate_inputs)
 st.caption(f'Instructions: {len(instructions):,}/{INSTRUCTION_LIMIT:,} · Draft: {len(draft):,}/{DRAFT_LIMIT:,} characters')
 allowed = st.checkbox('I am permitted to share this text and understand it will be sent to AI providers.', key='consent')
-if st.button('1. Extract requirements', type='primary', disabled=not allowed):
+if st.button('Extract requirements', type='primary', disabled=not allowed):
     try:
         check_inputs(instructions, draft)
         invalidate_inputs()
@@ -62,9 +63,9 @@ if st.button('1. Extract requirements', type='primary', disabled=not allowed):
         show_request_error(exc)
 
 if 'originals' in st.session_state:
-    st.header('2. Check the requirements')
+    st.header('Check requirements & review')
     st.write('Correct, add, or remove requirements below. Use one requirement per line, up to 25. '
-             'Changed and new items are marked as student-provided; confirm that they reflect the assignment.')
+             'Then confirm and review your draft in one step. Changed and new items are marked as student-provided.')
     with st.expander('Inspect extracted sources'):
         for i, r in enumerate(st.session_state.originals, 1):
             st.write(f'Requirement {i}')
@@ -72,21 +73,12 @@ if 'originals' in st.session_state:
             st.text('Instruction excerpt: ' + r['source'])
     text = st.text_area('Requirements to confirm', key='requirement_text', height=220,
                         on_change=invalidate_confirmation)
-    if st.button('Confirm requirements'):
-        try:
-            st.session_state.confirmed = confirmed_requirements(text, st.session_state.originals)
-            st.session_state.pop('result', None)
-        except ReviewError as exc:
-            show_request_error(exc)
-
-if 'confirmed' in st.session_state:
-    st.success('Requirements confirmed. Ready to review your draft.')
-    with st.expander('View confirmed requirements'):
-        for r in st.session_state.confirmed:
-            st.write(f"{r['id']}: {r['text']}" + (' [student-provided]' if r['student_added'] else ''))
-    if st.button('3. Review my draft', type='primary', disabled=not allowed):
+    if st.button('Confirm & review my draft', type='primary', disabled=not allowed):
         st.session_state.pop('result', None)
+        st.session_state.pop('review_meta', None)
         try:
+            check_inputs(instructions, draft)
+            st.session_state.confirmed = confirmed_requirements(text, st.session_state.originals)
             with st.spinner('Checking your draft against the requirements…'):
                 result, meta = evaluate(instructions, draft, st.session_state.confirmed)
             st.session_state.result = result
@@ -122,12 +114,24 @@ if 'result' in st.session_state:
                 st.write('Why: ' + rec['why'])
                 st.write('Approach: ' + rec['approach'])
 
+    # Static CSS only: assignment/model text stays in Streamlit's escaped text widgets.
+    st.markdown("""
+    <style>
+    [class*="st-key-finding_met_"] {background-color: #edf7ee; border-left: 5px solid #287a3e; color: #172b1c;}
+    [class*="st-key-finding_partial_"] {background-color: #fff6df; border-left: 5px solid #946200; color: #382900;}
+    [class*="st-key-finding_missing_"] {background-color: #fff0ee; border-left: 5px solid #b43c32; color: #3b1915;}
+    [class*="st-key-finding_review_"] {background-color: #edf4ff; border-left: 5px solid #3168ad; color: #172b46;}
+    [class*="st-key-finding_"] p {color: inherit;}
+    </style>
+    """, unsafe_allow_html=True)
+    status_colors = {'Met': 'met', 'Partially Met': 'partial',
+                     'Missing': 'missing', 'Needs Review': 'review'}
     st.subheader('Requirement details')
     lookup = {r['id']: r for r in st.session_state.confirmed}
     for f in result['findings']:
         requirement = lookup[f['requirement_id']]
-        with st.container(border=True):
-            st.caption(f"{f['requirement_id']} · {f['status']}")
+        with st.container(border=True, key=f"finding_{status_colors[f['status']]}_{f['requirement_id']}"):
+            st.write(f"**{f['requirement_id']} · {f['status']}**")
             st.write(requirement['text'])
             st.write(f['explanation'])
             with st.expander('View gaps, evidence, and rubric source'):
