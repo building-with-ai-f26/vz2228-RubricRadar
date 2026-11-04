@@ -2,7 +2,7 @@
 
 Version: 1.1 · November 4, 2026
 
-Status: Product review complete; local prototype implemented. One live synthetic model smoke check completed; broader quality validation, visual verification, and user testing remain outstanding.
+Status: Local PRD v1.1 frontend implemented; 20 deterministic tests pass. One original live synthetic smoke check and subsequent builder reviews are recorded. On November 4, the builder confirmed the simpler flow and status colors worked well. Screenshot/GIF capture, systematic visual checks, broader model-quality evaluation, and outside-user testing remain outstanding. See the current evidence summary below and the Build 1 log in docs/index.html.
 
 Repository: building-with-ai-f26/vz2228-RubricRadar
 
@@ -177,7 +177,9 @@ Record extraction errors separately from evaluation errors. Measure extraction a
 - GitHub Pages activation and public deployment status; not verified in this planning phase.
 - Builder display name, pod, actual costs/hours, and prototype evidence for the public page.
 
-### Build 1 implementation checkpoint
+### Historical Build 1 implementation checkpoint — initial prototype
+
+This records the initial verification only; the November 4 evidence summary below supersedes its current-status statements.
 
 The separately approved prototype uses Python/Streamlit and OpenRouter, with `deepseek/deepseek-v4.1-flash` as a configurable initial candidate, not a quality-validated model choice. It implements pasted input, editable requirement confirmation, schema validation, evidence matching, priorities, fresh reviews, and error recovery. No database, accounts, or analytics are added.
 
@@ -190,3 +192,11 @@ Sources checked for this prototype: [OpenRouter structured outputs](https://open
 Approved change: reduce the three-button extraction → confirmation → evaluation flow to two buttons by combining confirmation and evaluation. Preserve editable requirements, explicit consent, source inspection, input invalidation, evidence validation, and recoverable errors. Move supporting privacy/limitation details into an expander; retain the visible consent checkbox and short grade disclaimer.
 
 Use green / amber / red / blue requirement cards for Met / Partially Met / Missing / Needs Review respectively, with written status labels and expandable evidence. No provider, prompt, storage, or evaluation-contract changes are included. This is a frontend revision within Build 1, not completion of the course's Build 2 milestone. Mocked UI tests verify behavior; visual checks and outside-user evidence are recorded separately and do not establish model accuracy or measured usability improvement.
+
+### Current Build 1 evidence — November 4, 2026
+
+PRD v1.1 frontend code was committed as `89aabf8`. The recorded automated verification before that commit initially had 19 passes and one failure in `test_combined_action_uses_edits_and_requires_consent`: the mocked report still referenced requirements removed by the test input. Correcting the fixture to preserve the requirement IDs produced 20 passes. This was a test-data correction, not a provider or production-logic fix.
+
+The local server initially failed to bind port 8501 because of sandbox permissions. After execution approval, Streamlit started and its health endpoint returned `ok`. The builder then opened the app and reported that both the simpler flow and card colors worked well. This supports the local frontend behavior; it does not establish model accuracy, independent usability, or measured time savings. No agent-run billable live evaluations were performed for v1.1; usage/cost and elapsed time for the builder's latest test were not supplied.
+
+Earlier recorded API costs remain $0.029571218 across three runs with supplied usage; this is not a full spending total. Screenshot/GIF evidence, systematic light/dark-theme, keyboard and responsive checks, outside-classmate testing, the ten-case Build 4 evaluation, full cost reconciliation, and public deployment verification remain outstanding. Detailed test outcomes are recorded in `tests/README.md`; the public Build 1 summary is in `docs/index.html`.

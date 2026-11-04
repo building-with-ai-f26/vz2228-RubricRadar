@@ -21,6 +21,8 @@
 5. **Zero secrets in code:** Never hardcode API keys, tokens, or credentials. Always read from environment variables (`.env`) and update `.env.example` when new variables are needed.
 6. **Stop when looping:** If a fix fails twice in a row, stop, summarize what failed, and ask the human before trying a third approach.
 
+7. **Evidence check before every commit:** Review the Build 1 evidence status in `docs/index.html` before staging or committing. Record every automated test run, live evaluation, and builder/user manual test, including failures and recovery, in `tests/README.md`; summarize new evidence and outstanding items in the Build 1 log. Include the date, version/commit under test when known, method, outcome, limitations, and reported cost/time (mark unknown values as unreported). A suite run may be recorded as one entry with counts and failed test names; do not omit failed runs. Keep current evidence summaries in `Intent.md` and `PRD.md` consistent, preserving explicitly labeled historical checkpoints. Never store assignment text or secrets in evidence. Before committing, tell the user what evidence was updated, or explicitly state that no new test evidence exists; do not imply tests were rerun. Keep checking Build 1 status on every commit unless the user changes this instruction.
+
 ## 4. Prototype boundaries
 - `app.py`: session-only UI; `radar.py`: provider requests and output/evidence validation.
 - Keep API keys in `.env`; never log or persist assignment text. Do not add analytics text capture or replay recording.
