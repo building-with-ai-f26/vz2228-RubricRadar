@@ -6,8 +6,8 @@ An AI-powered pre-submission coach for MBA students reviewing written reports an
 
 - **Builder:** `@victor-zu-97` (display name to confirm)
 - **Pod:** 12
-- **Product Page & Living PRD:** [Local page](./docs/index.html); GitHub Pages deployment has not been verified.
-- **Status:** PRD v1 reviewed; local text-only prototype implemented. 18 deterministic tests pass. Builder completed live reviews and confirmed the compact interface and revised requirement checks work; outside-user tests and public app deployment remain outstanding.
+- **Product Page & Living PRD:** [Published Product Page](https://building-with-ai-f26.github.io/vz2228-RubricRadar/) · [Local source](./docs/index.html). GitHub Pages verified November 8.
+- **Status:** PRD v1 reviewed; local text-only prototype implemented. The latest recorded suite passed 20 deterministic tests on November 4. Builder completed live reviews and confirmed the compact interface and revised requirement checks work; outside-user tests and public app deployment remain outstanding.
 - **Full PRD:** [PRD.md](./PRD.md)
 
 The MVP uses pasted instructions and draft text, student-confirmed requirements, evidence-backed findings, and up to three prioritized improvements. PDF uploads and saved revision comparisons are deferred.
@@ -66,7 +66,7 @@ Open **http://127.0.0.1:8501**. The app binds to localhost. Paste instructions a
 .venv/bin/python -m pip check
 ```
 
-The 18 deterministic tests cover evidence checks, output coverage, input bounds, API failures, privacy request settings, and the Streamlit workflow with mocked responses. They do not establish model accuracy.
+The 20 deterministic tests cover evidence checks, output coverage, input bounds, API failures, privacy request settings, and the Streamlit workflow with mocked responses. They do not establish model accuracy.
 
 For a live synthetic feasibility check (two billable model calls):
 
@@ -84,7 +84,11 @@ It prints operational metadata and statuses, not assignment text. Review the int
 - Met/Partially Met evidence is checked against exact paragraph text. Unverified evidence becomes Needs Review and linked recommendations are withheld. Semantic correctness still requires human review.
 - No grade predictions, course-material verification, PDF input, saved history, or automatic comparisons.
 
-## Build 1 evidence status
+## Current Build 1 evidence status
+
+On November 8, the builder completed a synthetic campus-coffee-shop review on application commit `0bd20d6` and supplied screenshots: 4 requirements, 3 Met, 1 Missing, and one required fix to add the omitted success metric. Screenshots are embedded in the Product Page. API cost and elapsed time were unreported; the recorded cost total remains partial. This single builder check does not establish broad model accuracy or independent usability. GitHub Pages was verified reachable and matched the then-current local page; the screenshot assets and embeds are included in this delivery update. The application remains local. The last recorded automated suite had 20 passes on November 4; it was not rerun today.
+
+## Historical Build 1 evidence — November 3
 
 Updated November 3, 2026. All 18 deterministic tests pass, including mocked UI flows, whitespace-tolerant source verification, output-budget configuration, and safe failure diagnostics. These tests verify application behavior, not model accuracy.
 

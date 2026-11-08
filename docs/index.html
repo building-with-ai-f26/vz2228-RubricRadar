@@ -158,11 +158,21 @@
       <h2>Product Showcase (Prototype / Live App / 2-Min Video)</h2>
       <p>
         <strong>Current Status:</strong> Local MVP · PRD v1.1 frontend implemented · 20 automated tests pass · November 4, 2026<br />
-        <strong>Demo:</strong> Run locally with the README instructions. Multiple live reviews completed; the builder confirmed the compact summary, cards, and revised requirement checks work. Outside-user testing and screenshot/GIF evidence remain outstanding.
+        <strong>Demo:</strong> Run locally with the README instructions. Multiple live reviews completed; the builder confirmed the compact summary, cards, and revised requirement checks work. Screenshots below document a successful synthetic review on November 8. Outside-user testing remains outstanding.
       </p>
       <p class="meta">
-        Ask your coding agent to embed a screenshot or GIF of your local prototype for Build 1. Keep this evidence current, then add your cloud app link and two-minute video in Build 5.
+        Builder-captured local prototype · November 8, 2026 · Synthetic example, not private coursework. The review identified the intentionally omitted success metric. API cost and elapsed time were not reported. Click either screenshot to view it at full size.
       </p>
+      <div class="grid-2">
+        <figure style="margin:0">
+          <a href="images/prototype-review-summary.png"><img src="images/prototype-review-summary.png" alt="Local synthetic review showing three Met requirements, one Missing requirement, and a priority to add a success metric" style="display:block;width:100%;height:auto;border-radius:8px" /></a>
+          <figcaption class="meta">Review summary and revision priority.</figcaption>
+        </figure>
+        <figure style="margin:0">
+          <a href="images/prototype-requirement-details.png"><img src="images/prototype-requirement-details.png" alt="Four requirement cards: customer segment, two reasons, and risk are Met; success metric is Missing" style="display:block;width:100%;height:auto;border-radius:8px" /></a>
+          <figcaption class="meta">Requirement details with the omitted metric flagged.</figcaption>
+        </figure>
+      </div>
     </section>
 
     <!-- LIVING PRD (Updated every week!) -->
@@ -228,6 +238,7 @@
       <div class="log-entry">
         <h3>Build 1 · Intent.md & Throwaway Prototype (Due Nov 9)</h3>
         <ul>
+          <li><strong>Nov 8 evidence:</strong> Builder screenshots document a synthetic review: 4 requirements, 3 Met, 1 Missing, and one required fix for the omitted success metric. Screenshot evidence is now embedded above. Cost and elapsed time were unreported. Local server readiness was verified after restart; a sandboxed health request failed, then an approved request returned ok. GitHub Pages was verified reachable and matching the pre-update page; the screenshot assets and embeds are included in this delivery update. Application tests were not rerun; the latest recorded suite remains 20 passes on Nov 4. This is builder evidence, not outside-user validation.</li>
           <li><strong>PRD v1.1 update (Nov 4):</strong> Combined confirmation and review into one action after extraction; moved supporting disclosures into an expander; added status colors to compact requirement cards with written labels. All 20 deterministic tests pass, including edited requirements, consent gating, empty-requirement rejection, input invalidation, and provider-error recovery. No agent-run billable live calls were made for this revision; usage/cost and elapsed time for the latest builder test were not supplied. Builder tested the revised local app and reported that the simpler flow worked well and the card colors worked well. Systematic light/dark-theme checks and outside-user validation remain outstanding; reduced completion time has not been measured.</li>
           <li><strong>Nov 4 test failures and recovery:</strong> The first automated run had 19 passes and one failure caused by a mocked report referencing a requirement removed by the test input. Correcting that fixture produced 20 passes. The first local server launch was blocked by sandbox permissions and the builder could not open the app; after execution approval, Streamlit started, an approved health request returned ok, and the builder successfully tested the flow and colors. Detailed outcomes are in tests/README.md. No assignment text is retained.</li>
           <li><strong>Evidence maintenance:</strong> Before every commit, check this Build 1 status and record every new automated, live, and manual test outcome, including failures and recovery. Keep Intent.md and PRD.md current while labeling historical checkpoints. This documentation reconciliation passed diff and consistency checks; application tests were not rerun.</li>
@@ -236,7 +247,7 @@
           <li><strong>What failed and how it changed the product:</strong> Source matching rejected formatting differences; now whitespace differences are tolerated and original excerpts retained. Reviews hit the initial 7,000-token budget; the configurable review default is now 16,000. Safe diagnostics distinguish token limits and other incomplete responses. The server needed restarting to load backend changes. Inferred email conventions were overclassified as required fixes; v1.2 focuses on explicit requirement coverage and removes ambiguity notes. Depth is assessed only when explicitly requested.</li>
           <li><strong>Things learned with AI:</strong> Requirement coverage must remain separate from invented expectations. Mocked tests check contracts and UI behavior; live builder checks reveal feedback quality and usability issues. High token usage is observed, but reasoning-token consumption is not yet confirmed. Terminus completion is not recorded.</li>
           <li><strong>Cost and time:</strong> Builder reports approximately 2 hours for this session. Coding agent: Codex through a ChatGPT Plus subscription; no project-specific subscription allocation or separate agent charge reported. Two recorded Nov 3 runs total $0.026436218; including the original $0.003135 smoke check, recorded API costs total $0.029571218. Failed requests, the final confirmation run, and other unrecorded usage are excluded; this is not a full spending total.</li>
-          <li><strong>Still outstanding:</strong> Screenshot/GIF evidence, outside-classmate testing, the ten-case Build 4 evaluation, full cost reconciliation, and public deployment verification. Builder visually checked the browser interface; agent browser access remained unavailable.</li>
+          <li><strong>Still outstanding:</strong> Outside-classmate testing, the ten-case Build 4 evaluation, full cost reconciliation, and public application deployment. Product Page publishing is verified; screenshot evidence is included in this delivery update. Builder screenshots support the local interface check.</li>
         </ul>
       </div>
 
