@@ -11,7 +11,19 @@
 - **Install dependencies:** `python3 -m venv .venv` then `.venv/bin/python -m pip install -r requirements.txt`
 - **Run locally:** `.venv/bin/python -m streamlit run app.py` (http://127.0.0.1:8501)
 - **Run deterministic tests:** `.venv/bin/python -m unittest discover -s tests -v`
+- **Run analytics tests:** `node --test tests/test_analytics.cjs` (Node.js required only for this check)
+- **Preview Product Page locally:** `python3 -m http.server 8765 --bind 127.0.0.1 --directory docs`
 - **Run model evals:** `.venv/bin/python tests/smoke_live.py` (synthetic, two billable API calls; full Build 4 eval not yet implemented)
+
+### Structure and setup
+- `app.py`: Streamlit inputs, session state, requirement confirmation, and feedback UI.
+- `radar.py`: OpenRouter requests, structured contracts, input bounds, and evidence checks.
+- `docs/index.html` and `docs/images/`: Product Page, living PRD summary, build log, and synthetic screenshots; published via GitHub Pages from `main` `/docs`.
+- `docs/posthog.js`: Shared browser analytics and masked replay configuration, embedded by `app.py` and loaded by the Product Page. Initialization is guarded against Streamlit reruns.
+- `tests/`: Mocked Python checks, analytics checks, synthetic live smoke script, and evidence log in `tests/README.md`.
+- `PRD.md`, `Intent.md`, `README.md`, and `journal/`: Product definition, historical discovery, local launch guidance, and build notes.
+
+Use Python 3.14.4 for the verified environment. After installing dependencies, copy `.env.example` to `.env` and set `OPENROUTER_API_KEY` locally. Keep `.env` untracked. Run Streamlit from the repo root and open `http://127.0.0.1:8501`. Model calls are billable; Python and analytics tests use mocks and do not call the model. The browser needs internet access to send analytics to the configured US PostHog project. Product Page edits take effect publicly only after publishing.
 
 ## 3. Non-Negotiable Engineering Rules
 1. **Plan before coding:** Before touching multiple files, propose a brief plan and wait for approval.
@@ -25,7 +37,7 @@
 
 ## 4. Prototype boundaries
 - `app.py`: session-only UI; `radar.py`: provider requests and output/evidence validation.
-- Keep API keys in `.env`; never log or persist assignment text. Do not add analytics text capture or replay recording.
+- Keep secret API keys in `.env`; never log or persist assignment text. The public PostHog browser project token in `docs/posthog.js` is intentionally client-visible; never put a personal API key there. Build 2 explicitly authorizes masked replay: keep all inputs and replay text masked, console/network-body capture off, and click events limited to fixed control names. Never send coursework in analytics.
 - Require privacy-compatible provider routing; do not silently relax it if a provider is unavailable.
 - Use mocked tests for UI and contracts; model accuracy requires separate live/human evaluation.
 - Current limits: 12,000 instruction characters, 30,000 draft characters, 25 requirements, 90-second timeout per request. These are provisional bounds, not measured performance targets.

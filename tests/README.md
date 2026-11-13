@@ -20,6 +20,22 @@ Run `.venv/bin/python -m unittest discover -s tests -v` from the repository root
 
 Run `.venv/bin/python tests/smoke_live.py` with a configured local `.env` for a synthetic live review. It makes two billable provider calls and prints metadata/statuses without draft text. This is a feasibility check, not completion of Track A. No classmate coursework is included in the repository.
 
+### Build 2 PostHog checks — November 13, 2026
+
+Version: uncommitted working tree based on `95c64a0`; Python 3.14.4, Streamlit 1.66.1, Node.js 24.21.0. Scope: analytics installation only; no new model calls or independent user sessions.
+
+| Method | Outcome | Limits / recovery |
+| --- | --- | --- |
+| `.venv/bin/python -m unittest discover -s tests -v` | 20 passed, zero failures; 1.613 seconds. | Mocked UI/provider behavior; does not execute browser JavaScript or validate model quality. Expected bare-mode Streamlit warnings appeared. |
+| `node --check docs/posthog.js` | Passed, no syntax errors. | Syntax only. |
+| `node --test tests/test_analytics.cjs` | Three passed, zero failures; 0.145 seconds. | Mock browser verifies one initialization/pageview/listener across reruns, masking settings, rejection of network capture, and fixed-name clicks without arbitrary DOM text. Does not test PostHog's recorder implementation. |
+| Start local previews | Streamlit started on `127.0.0.1:8501`. Product Page initially failed with `PermissionError` when binding port 8765 in sandbox; approved rerun started successfully. | Only `docs/` is served by the static preview, not the repository or `.env`. |
+| Browser access | Browser extension host unavailable; native Chrome automation worked. | Browser extension failure did not prevent inspection. An unexpected local-device-access permission prompt from the replay viewer was blocked. |
+| Pageview/click ingestion | PostHog Activity displayed four initial events: one Pageview and one `ui_clicked` from each of ports 8765 and 8501. Refresh was needed for all four to appear. | Expanded local click properties showed `action=clear_session`, `surface=local_app`; no assignment text in inspected event properties. Product Page interaction was Read the Living PRD. These are agent-generated checks, not outside users or successful AI reviews. |
+| Masked app replay | Opened the recorded session and inspected actual replay: both synthetic instruction/draft values and rendered text appeared as asterisks; app navigation/controls remained visible. | Only initial app/input state tested; complete extraction/feedback replay and a payload-level privacy audit remain pending. After refreshing the replay viewer, the Product Page was also visibly rendered with masked text. Both local surfaces are confirmed in replay; public GitHub Pages update has not been deployed or verified. |
+
+New inference cost: $0. PostHog billing and total builder/agent time: unreported. Historical recorded inference cost remains $0.029571218 (partial). PRD v2, fresh AI workflow evidence, public analytics verification, and two genuine Build 2 commit dates remain pending.
+
 ### PRD v1.1 frontend check — November 4, 2026
 
 All 20 deterministic tests pass. UI coverage includes the two-button path, edited requirements reaching evaluation, consent gating, empty-requirement rejection, stale-result invalidation, clearing, and recoverable provider errors. No agent-run live model calls were made; usage/cost and elapsed time for the builder’s latest test were not supplied. The builder tested the local app and confirmed that the simpler flow and card colors worked well. Systematic checks for card contrast in light/dark themes, keyboard navigation, and responsive layout remain outstanding; mocked tests do not verify CSS appearance or model quality. Track A remains recommended and incomplete.
@@ -51,3 +67,5 @@ On November 8, the builder completed a synthetic campus-coffee-shop review on ap
 Manual inspection of the supplied screenshots confirms the displayed counts and priority. No assignment text or credentials are included in this evidence log; screenshots show only the authorized synthetic example. Repository API checks confirmed public visibility, class-template origin, and GitHub Pages configured from main /docs with status built. An HTTP fetch succeeded and matched the pre-update local HTML. Seven remote commits span November 2–4. A common credential-pattern scan across seven local commits found zero matches, and .env was untracked; this is not an exhaustive security audit. Initial sandbox GitHub checks failed because of network restrictions; approved network checks succeeded. Audit cost/time: unreported; no agent-run model calls.
 
 Documentation verification for this screenshot update: `git diff --check` passed. A local HTML-parser/file check passed: exactly two embedded images, both with alt text, existing relative targets, and valid PNG signatures; all four Markdown summaries contain the November 8 update. Application tests were not rerun. Browser rendering of the updated Product Page has not been checked. Cost/time: unreported.
+
+Build 2 documentation verification (November 13): `git diff --check` passed after implementation/evidence updates and again after the final replay evidence reconciliation. This is a whitespace check; no additional application suite rerun.

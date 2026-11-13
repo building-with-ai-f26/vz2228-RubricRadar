@@ -1,18 +1,25 @@
 """Local Streamlit UI; assignment text lives only in the current session."""
 from dotenv import load_dotenv
+from pathlib import Path
 import streamlit as st
 from radar import (extract, evaluate, confirmed_requirements, check_inputs, ReviewError,
                    INSTRUCTION_LIMIT, DRAFT_LIMIT)
 
 load_dotenv()
 st.set_page_config(page_title='Rubric Radar', page_icon='📡', layout='centered')
+# Trusted static code only; st.html executes in the app document, not an iframe.
+analytics = (Path(__file__).parent / 'docs' / 'posthog.js').read_text()
+st.html('<script>window.RUBRIC_RADAR_SURFACE = "local_app";\n' + analytics + '</script>',
+        unsafe_allow_javascript=True)
 st.title('Rubric Radar')
 st.subheader('Know what’s missing. Understand what matters. Submit stronger work.')
 st.caption('A pre-submission coach for MBA written reports and projects. Feedback is not an official grade.')
 with st.expander('Before you share: privacy and review limits'):
     st.info('Paste text only. Layout, course materials, factual accuracy, and source validity are not verified. '
             'You remain responsible for your work and your course’s AI rules.')
-    st.caption('Text is held in this browser session’s server memory, with no application storage or analytics. '
+    st.caption('Text is held in this browser session’s server memory, with no application storage. '
+               'PostHog measures pageviews and named button clicks and records a masked session replay. '
+               'Replay text and inputs are masked; coursework is not included in click events. '
                'Live reviews send text to OpenRouter and a model provider using restricted privacy routing. '
                'Before real coursework, verify account logging settings and provider policies. '
                'Only share work you have permission to share.')

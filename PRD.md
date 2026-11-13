@@ -4,6 +4,8 @@ Version: 1.1 · November 4, 2026
 
 Status: Local PRD v1.1 frontend implemented; 20 deterministic tests pass. One original live synthetic smoke check and subsequent builder reviews are recorded. On November 4, the builder confirmed the simpler flow and status colors worked well. November 8 builder screenshots document a successful synthetic review; systematic visual checks, broader model-quality evaluation, and outside-user testing remain outstanding. See the current evidence summary below and the Build 1 log in docs/index.html.
 
+Build 2 analytics checkpoint · November 13, 2026 (working tree based on `95c64a0`): PostHog is installed on the Product Page and local Streamlit app using a shared browser script. Pageviews and named button clicks from both local surfaces were observed in PostHog. The replay displayed both local surfaces; synthetic app input values and rendered text appeared as asterisks. This verifies basic instrumentation, not a complete privacy audit or outside-user behavior. All 20 Python tests and three analytics checks pass; no new live model calls were made. Public deployment of this update, full workflow replay with feedback, PRD v2, and Build 2's two-day commit requirement remain pending.
+
 Repository: building-with-ai-f26/vz2228-RubricRadar
 
 ## 1. Product overview and problem statement
@@ -141,7 +143,7 @@ Browser text interface → server input validation → existing LLM API for requ
 
 Use a simple web application with no accounts, database, retrieval system, model training, or integrations in the MVP. Keep current-session inputs available for recovery; do not persist assignment content. API key is read from the environment. The existing repository contains an OpenRouter placeholder; the implementation checkpoint below records the prototype choices; deployment and broader live quality validation remain open. Implementation now uses Streamlit 1.66.1, python-dotenv 1.2.4, jsonschema 4.26.0, and certifi 2026.10.23; the PRD review itself added no dependencies.
 
-Record operational metadata such as duration, token usage, estimated cost, and error category without assignment content. Course-required PostHog installation is planned for Build 2 on the product page and local app, with text capture and sensitive replays excluded and verified.
+Record operational metadata such as duration, token usage, estimated cost, and error category without assignment content. Build 2 adds PostHog pageviews, fixed-name click events, and masked replay to the Product Page and local app. Autocapture is disabled; all replay inputs and text are masked, and console/network-body capture is disabled. Use the `surface` property (`product_page` or `local_app`) to distinguish traffic. Clicks express intent, not successful AI completion. Verify masking on a complete synthetic review before real-coursework testing; analytics does not measure model accuracy.
 
 ## 11. Validation and testing plan
 

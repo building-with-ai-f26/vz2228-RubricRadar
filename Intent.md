@@ -7,6 +7,8 @@ Use this as a scratchpad if helpful. Publish the required PRD and Build 1 log on
 
 **Updated:** November 8, 2026 · aligned with PRD v1.1
 
+**Build 2 analytics checkpoint · November 13, 2026:** Shared PostHog browser instrumentation now tracks pageviews, fixed-name clicks, and masked replay on the Product Page and local app. Both local surfaces sent pageview/click events observed in PostHog; replay showed both local surfaces and masked synthetic app inputs and rendered text. Twenty Python tests and three analytics checks pass. No new live AI calls were made. Public publishing, complete feedback replay verification, PRD v2, and two Build 2 workday commits remain pending. Earlier Build 1 checkpoints below are historical.
+
 **Product:** Rubric Radar — Know what's missing. Understand what matters. Submit stronger work.
 
 ---

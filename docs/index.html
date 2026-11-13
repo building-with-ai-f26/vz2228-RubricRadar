@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rubric Radar · Building with AI (Fall 2026)</title>
 
-  <!-- Week 1: create your PostHog account only.
-       Build 2: paste your project's current PostHog web snippet here,
-       then install analytics in the local app and verify events. -->
+  <script defer src="posthog.js"></script>
 
   <style>
     :root {
@@ -147,7 +145,7 @@
       <h1>Rubric Radar</h1>
       <p class="tagline">Know what’s missing. Understand what matters. Submit stronger work.</p>
       <div class="cta-row">
-        <a class="btn" href="#live-demo" onclick="window.posthog && posthog.capture('clicked_try_product')">Project Status →</a>
+        <a class="btn" href="#live-demo">Project Status →</a>
         <a class="btn btn-secondary" href="#prd">Read the Living PRD</a>
         <a class="btn btn-secondary" href="#build-log">Weekly Build Log</a>
       </div>
@@ -221,7 +219,7 @@
         <div class="stat-box">
           <div class="stat-label">User Evidence (Analytics from Build 2)</div>
           <div class="stat-value">Builder testing completed</div>
-          <p class="meta">Multiple live runs and manual interface checks. No outside-user testing or analytics yet.</p>
+          <p class="meta">PostHog pageviews and clicks verified on both local surfaces Nov 13; replay verified for both local surfaces, with synthetic app inputs and text masked. Outside-user testing remains pending.</p>
         </div>
         <div class="stat-box">
           <div class="stat-label">Sponsor Call (Week 6)</div>
@@ -238,6 +236,7 @@
       <div class="log-entry">
         <h3>Build 1 · Intent.md & Throwaway Prototype (Due Nov 9)</h3>
         <ul>
+          <li><strong>Nov 13 evidence maintenance:</strong> Build 1 outcomes below remain historical. The unchanged review logic passes all 20 Python tests with Build 2 analytics installed; three analytics checks also pass. PostHog received local pageviews and clicks; replay covers both local surfaces with synthetic app inputs/text masked. No new model evaluation was run; broad model quality and outside-user testing remain outstanding.</li>
           <li><strong>Nov 8 evidence:</strong> Builder screenshots document a synthetic review: 4 requirements, 3 Met, 1 Missing, and one required fix for the omitted success metric. Screenshot evidence is now embedded above. Cost and elapsed time were unreported. Local server readiness was verified after restart; a sandboxed health request failed, then an approved request returned ok. GitHub Pages was verified reachable and matching the pre-update page; the screenshot assets and embeds are included in this delivery update. Application tests were not rerun; the latest recorded suite remains 20 passes on Nov 4. This is builder evidence, not outside-user validation.</li>
           <li><strong>PRD v1.1 update (Nov 4):</strong> Combined confirmation and review into one action after extraction; moved supporting disclosures into an expander; added status colors to compact requirement cards with written labels. All 20 deterministic tests pass, including edited requirements, consent gating, empty-requirement rejection, input invalidation, and provider-error recovery. No agent-run billable live calls were made for this revision; usage/cost and elapsed time for the latest builder test were not supplied. Builder tested the revised local app and reported that the simpler flow worked well and the card colors worked well. Systematic light/dark-theme checks and outside-user validation remain outstanding; reduced completion time has not been measured.</li>
           <li><strong>Nov 4 test failures and recovery:</strong> The first automated run had 19 passes and one failure caused by a mocked report referencing a requirement removed by the test input. Correcting that fixture produced 20 passes. The first local server launch was blocked by sandbox permissions and the builder could not open the app; after execution approval, Streamlit started, an approved health request returned ok, and the builder successfully tested the flow and colors. Detailed outcomes are in tests/README.md. No assignment text is retained.</li>
@@ -254,9 +253,11 @@
       <div class="log-entry">
         <h3>Build 2 · Smallest Local Version & PostHog (Due Nov 16)</h3>
         <ul>
-          <li><strong>What shipped:</strong> [Local working slice, PostHog verified on this page and the local app, PRD v2, and local setup in AGENTS.md]</li>
-          <li><strong>What broke / changed in PRD:</strong> [Fill in]</li>
-          <li><strong>Cost & time this week:</strong> $[0.00] · [0] hours</li>
+          <li><strong>Nov 13 progress:</strong> Added shared PostHog browser instrumentation to the Product Page and local Streamlit app, plus project structure/setup in AGENTS.md. PostHog received pageviews and named clicks from both local surfaces; replay displayed both local surfaces, with synthetic app input values and rendered text masked as asterisks. Public publishing of this update remains pending.</li>
+          <li><strong>Lessons and problems:</strong> Replay must cover the app document, so the local app uses Streamlit's st.html JavaScript support. A browser guard prevents duplicate initialization on reruns. Autocapture is off; clicks use fixed action names. Product Page preview initially failed to bind in the sandbox, then started with execution approval. Browser extension access was unavailable; native Chrome controls allowed event/replay inspection. Full synthetic feedback replay verification remains pending.</li>
+          <li><strong>Checks:</strong> 20 Python tests passed (1.613 seconds); three analytics checks passed (0.145 seconds). SDK syntax check passed. These checks do not establish model quality or independent user success. Details and limitations are in tests/README.md.</li>
+          <li><strong>Still to complete:</strong> PRD v2, fresh full AI workflow evidence/cost measurement, published-page analytics verification, and commits on two actual Build 2 workdays.</li>
+          <li><strong>Cost &amp; time:</strong> No model calls in this analytics step ($0 new inference cost). PostHog billing, subscription allocation, and builder hours are unreported. Historical recorded inference spending remains $0.029571218, a partial total.</li>
         </ul>
       </div>
 
