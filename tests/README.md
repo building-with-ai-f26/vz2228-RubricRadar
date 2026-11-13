@@ -22,7 +22,7 @@ Run `.venv/bin/python tests/smoke_live.py` with a configured local `.env` for a 
 
 ### Build 2 PostHog checks — November 13, 2026
 
-Version: uncommitted working tree based on `95c64a0`; Python 3.14.4, Streamlit 1.66.1, Node.js 24.21.0. Scope: analytics installation only; no new model calls or independent user sessions.
+Version tested: working tree based on `95c64a0`, subsequently committed as `698d2ee`; Python 3.14.4, Streamlit 1.66.1, Node.js 24.21.0. Scope: analytics installation only; no new model calls or independent user sessions.
 
 | Method | Outcome | Limits / recovery |
 | --- | --- | --- |
@@ -69,3 +69,7 @@ Manual inspection of the supplied screenshots confirms the displayed counts and 
 Documentation verification for this screenshot update: `git diff --check` passed. A local HTML-parser/file check passed: exactly two embedded images, both with alt text, existing relative targets, and valid PNG signatures; all four Markdown summaries contain the November 8 update. Application tests were not rerun. Browser rendering of the updated Product Page has not been checked. Cost/time: unreported.
 
 Build 2 documentation verification (November 13): `git diff --check` passed after implementation/evidence updates and again after the final replay evidence reconciliation. This is a whitespace check; no additional application suite rerun.
+
+### PostHog checkpoint publishing preparation — November 13, 2026
+
+Reviewed the Build 1 status and Build 2 log before this documentation commit. Added checkpoint `698d2ee` and the observed 09:35–09:43 a.m. America/New_York verification/checkpoint window (at least 8 minutes / 0.13 hours). This excludes earlier setup and final publishing; total builder hours, PostHog billing, and subscription allocation remain unreported. No new application or analytics suites or live AI calls were run. `git diff --check` passed for this documentation update; inference cost $0. Public Product Page analytics verification remains pending.
