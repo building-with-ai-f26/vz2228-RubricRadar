@@ -7,10 +7,12 @@ An AI-powered pre-submission coach for MBA students reviewing written reports an
 - **Builder:** `@victor-zu-97` (display name to confirm)
 - **Pod:** 12
 - **Product Page & Living PRD:** [Published Product Page](https://building-with-ai-f26.github.io/vz2228-RubricRadar/) · [Local source](./docs/index.html). GitHub Pages verified November 8.
-- **Status:** PRD v1 reviewed; local text-only prototype implemented. The latest recorded suite passed 20 deterministic tests on November 4. Builder completed live reviews and confirmed the compact interface and revised requirement checks work; outside-user tests and public app deployment remain outstanding.
+- **Status:** PRD v2 documented November 15; local text-only prototype and shared PostHog instrumentation implemented. The latest recorded checks passed 20 deterministic Python tests and three analytics checks on November 13. Builder completed live reviews and confirmed the compact interface and revised requirement checks work; outside-user tests and public app deployment remain outstanding.
 - **Full PRD:** [PRD.md](./PRD.md)
 
 The MVP uses pasted instructions and draft text, student-confirmed requirements, evidence-backed findings, and up to three prioritized improvements. PDF uploads and saved revision comparisons are deferred.
+
+**Planned, not implemented:** An initial **Continue as guest** button and optional **Class → Assignment → Saved reviews** archive. See [Plan.md](./Plan.md) and PRD section 13. The current app remains session-only.
 
 The app is planned to run locally through Week 4; add a cloud URL in Build 5.
 
@@ -33,7 +35,7 @@ Create your PostHog account in Week 1. Install it on the Product Page and local 
 | File / folder | Purpose |
 | --- | --- |
 | [`docs/index.html`](./docs/index.html) | Required public pitch, living PRD, and weekly build log. Update with actual work and evidence. |
-| [`PRD.md`](./PRD.md) | Full PRD v1, acceptance criteria, evaluation plan, and proposed architecture. |
+| [`PRD.md`](./PRD.md) | Full PRD v2, acceptance criteria, evaluation plan, current architecture, analytics, and cost evidence. |
 | [`Intent.md`](./Intent.md), [`Plan.md`](./Plan.md), [`journal/`](./journal/) | Optional drafting aids. No duplicate submission is required. |
 | [`AGENTS.md`](./AGENTS.md) | Local run commands, project context, and agent rules. Build 2 onward. |
 | [`tests/`](./tests/) | Verification guidance. Build 4 offers Track A domain evals **or** Track B user replays. |
@@ -78,13 +80,13 @@ It prints operational metadata and statuses, not assignment text. Review the int
 
 ## Data handling and limitations
 
-- Assignment text lives in current-session server memory; no database, text logs, caching, or analytics are configured. Use **Clear this session** to reset inputs and results. Do not expose this development server publicly.
+- Assignment text lives in current-session server memory; no database, text logs, or caching are configured. PostHog tracks pageviews and fixed-name clicks and records masked replay on the Product Page and local app. Inputs and replay text are configured to be masked; console and network-body capture are off. Initial synthetic replay masking was observed November 13; complete feedback replay verification remains pending. Use **Clear this session** to reset inputs and results. Do not expose this development server publicly.
 - Requests send text to OpenRouter and a model provider. They require `data_collection: deny`, `zdr: true`, and parameter-compatible routing. If no eligible provider exists, the review fails rather than relaxing these controls.
 - OpenRouter account logging and data-use settings must still be verified before real coursework. These routing settings are not a blanket guarantee about every intermediary. See [data collection](https://openrouter.ai/docs/guides/privacy/data-collection) and [provider routing](https://openrouter.ai/docs/guides/routing/provider-selection).
 - Met/Partially Met evidence is checked against exact paragraph text. Unverified evidence becomes Needs Review and linked recommendations are withheld. Semantic correctness still requires human review.
 - No grade predictions, course-material verification, PDF input, saved history, or automatic comparisons.
 
-## Current Build 1 evidence status
+## Historical Build 1 evidence — November 8
 
 On November 8, the builder completed a synthetic campus-coffee-shop review on application commit `0bd20d6` and supplied screenshots: 4 requirements, 3 Met, 1 Missing, and one required fix to add the omitted success metric. Screenshots are embedded in the Product Page. API cost and elapsed time were unreported; the recorded cost total remains partial. This single builder check does not establish broad model accuracy or independent usability. GitHub Pages was verified reachable and matched the then-current local page; the screenshot assets and embeds are included in this delivery update. The application remains local. The last recorded automated suite had 20 passes on November 4; it was not rerun today.
 

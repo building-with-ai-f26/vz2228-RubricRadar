@@ -5,7 +5,8 @@
 ## 1. Project Overview
 - **What this repo builds:** Rubric Radar coaches MBA students reviewing written reports/projects against pasted instructions or rubrics. It provides requirement-linked evidence and up to three revision priorities.
 - **Primary user & core workflow:** [See the living PRD in `docs/index.html`]
-- **Tech stack:** Python 3.14.4 (verified), Streamlit, OpenRouter API, jsonschema, python-dotenv, certifi; no database.
+- **Current tech stack:** Python 3.14.4 (verified), Streamlit, OpenRouter API, jsonschema, python-dotenv, certifi; no database.
+- **Planned scope:** Optional local Class → Assignment → Saved reviews archive and initial Continue as guest entry; see PRD.md section 13 and Plan.md. SQLite storage, archive controls, and the guest entry button are not implemented. Planning approval does not authorize implementation.
 
 ## 2. Commands
 - **Install dependencies:** `python3 -m venv .venv` then `.venv/bin/python -m pip install -r requirements.txt`
@@ -36,8 +37,8 @@ Use Python 3.14.4 for the verified environment. After installing dependencies, c
 7. **Evidence check before every commit:** Review the Build 1 evidence status in `docs/index.html` before staging or committing. Record every automated test run, live evaluation, and builder/user manual test, including failures and recovery, in `tests/README.md`; summarize new evidence and outstanding items in the Build 1 log. Include the date, version/commit under test when known, method, outcome, limitations, and reported cost/time (mark unknown values as unreported). A suite run may be recorded as one entry with counts and failed test names; do not omit failed runs. Keep current evidence summaries in `Intent.md` and `PRD.md` consistent, preserving explicitly labeled historical checkpoints. Never store assignment text or secrets in evidence. Before committing, tell the user what evidence was updated, or explicitly state that no new test evidence exists; do not imply tests were rerun. Keep checking Build 1 status on every commit unless the user changes this instruction.
 
 ## 4. Prototype boundaries
-- `app.py`: session-only UI; `radar.py`: provider requests and output/evidence validation.
-- Keep secret API keys in `.env`; never log or persist assignment text. The public PostHog browser project token in `docs/posthog.js` is intentionally client-visible; never put a personal API key there. Build 2 explicitly authorizes masked replay: keep all inputs and replay text masked, console/network-body capture off, and click events limited to fixed control names. Never send coursework in analytics.
+- **Implemented boundary:** `app.py` is a session-only UI; `radar.py` owns provider requests and output/evidence validation. No archive writes are currently allowed.
+- Keep secret API keys in `.env`; never log assignment text. The current implementation must not persist coursework. In the planned archive, explicit Save assignment / Save review actions may persist only the selected content locally after implementation approval; guest checks must remain free of archive writes. Exclude databases and sidecar files from Git before creating them, disclose local storage, and implement confirmed deletion and context isolation. The public PostHog browser project token in `docs/posthog.js` is intentionally client-visible; never put a personal API key there. Build 2 explicitly authorizes masked replay: keep all inputs and replay text masked, console/network-body capture off, and click events limited to fixed control names. Never send coursework in analytics.
 - Require privacy-compatible provider routing; do not silently relax it if a provider is unavailable.
 - Use mocked tests for UI and contracts; model accuracy requires separate live/human evaluation.
 - Current limits: 12,000 instruction characters, 30,000 draft characters, 25 requirements, 90-second timeout per request. These are provisional bounds, not measured performance targets.

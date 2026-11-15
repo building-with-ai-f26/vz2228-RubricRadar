@@ -1,10 +1,10 @@
-# Rubric Radar — PRD v1.1
+# Rubric Radar — PRD v2
 
-Version: 1.1 · November 4, 2026
+Version: 2 · November 15, 2026
 
-Status: Local PRD v1.1 frontend implemented; 20 deterministic tests pass. One original live synthetic smoke check and subsequent builder reviews are recorded. On November 4, the builder confirmed the simpler flow and status colors worked well. November 8 builder screenshots document a successful synthetic review; systematic visual checks, broader model-quality evaluation, and outside-user testing remain outstanding. See the current evidence summary below and the Build 1 log in docs/index.html.
+Status: Local text-only MVP with the two-button review flow and shared PostHog instrumentation implemented. PRD v2 documents the current architecture, analytics boundaries, evidence, and Build 2 completion criteria; it adds no application features. A November 15 planned extension adds an optional local class archive and an initial Continue as guest path; see section 13 and Plan.md. This extension is not implemented. Independent user testing and broad model-quality validation remain outstanding.
 
-Build 2 analytics checkpoint · November 13, 2026 (working tree based on `95c64a0`): PostHog is installed on the Product Page and local Streamlit app using a shared browser script. Pageviews and named button clicks from both local surfaces were observed in PostHog. The replay displayed both local surfaces; synthetic app input values and rendered text appeared as asterisks. This verifies basic instrumentation, not a complete privacy audit or outside-user behavior. All 20 Python tests and three analytics checks pass; no new live model calls were made. Public deployment of this update, full workflow replay with feedback, PRD v2, and Build 2's two-day commit requirement remain pending.
+Latest recorded verification · November 13, 2026: 20 mocked Python tests and three analytics checks passed. PostHog pageviews and named clicks from both local surfaces were observed; replay displayed both surfaces with synthetic app inputs and rendered text masked. These observations verify basic instrumentation, not a complete privacy audit or successful full-workflow replay. No application tests or live model calls were rerun for this November 15 documentation revision. Fresh full AI workflow evidence/cost measurement, complete feedback replay and published-page analytics verification remain pending. The November 13 analytics commits and this November 15 documentation checkpoint record work on two Build 2 dates; remote publication still needs verification.
 
 Repository: building-with-ai-f26/vz2228-RubricRadar
 
@@ -18,7 +18,7 @@ The problem hypothesis is that students overlook requirements during manual revi
 
 ## 2. Target user and jobs-to-be-done
 
-Initial users are MBA students with a written draft and explicit assignment instructions or a rubric. The builder can recruit 2–3 MBA classmates who are expected to test with their own assignments. Recruitment availability is reported by the builder; sessions have not occurred.
+Initial users are MBA students with a written draft and explicit assignment instructions or a rubric. The builder can recruit 2–3 MBA classmates who are expected to test with their own assignments. Recruitment availability is reported by the builder. On November 15 the builder reported classmate feedback requesting a class/professor archive; no structured observation sessions or usability outcomes have been recorded.
 
 **Job:** Before I submit my draft, help me identify overlooked requirements and prioritize improvements so I can submit stronger work.
 
@@ -54,7 +54,7 @@ Explicit non-goals:
 2. Predicting official grades or guaranteeing completeness.
 3. Supporting slides, spreadsheets, LMS integrations, or collaboration features.
 
-PDF uploads, saved revision history, and automatic version comparisons are also outside the initial MVP.
+PDF uploads and automatic version comparisons remain outside scope. Saved revision history was excluded from the initial MVP; it is now planned as an optional local class archive (section 13), not yet implemented.
 
 Verification against course readings, lecture content, case exhibits, or other supporting course materials is out of scope. The MVP checks whether explicit rubric requirements are addressed using only the supplied instructions and draft. Depth, rigor, structure, and formatting are assessed only when explicitly requested. It may assess whether a claim has an explanation or supporting evidence in the draft, but does not verify that evidence against course materials. If a rubric judgment requires unavailable course context, mark it Needs Review and explain the limitation; assess any independently reviewable elements separately.
 
@@ -68,7 +68,8 @@ Verification against course readings, lecture content, case exhibits, or other s
 | MVP | Provide zero to three prioritized recommendations, labeled Required fix or Optional enhancement. |
 | MVP | Allow a fresh review after external revision; no saved comparison required. |
 | Later | PDF input, after text extraction accuracy and user need are tested. |
-| Later | Saved history, automatic comparisons, richer Excellence Coach, and additional deliverable formats. |
+| Planned extension | Optional local Class → Assignment → Saved reviews archive, plus an initial Continue as guest button; not implemented. |
+| Later | Automatic comparisons, richer Excellence Coach, and additional deliverable formats. |
 
 Excellence Coach is initially optional quality guidance within the same report, not a separate product mode. Do not invent recommendations to fill three slots.
 
@@ -93,7 +94,7 @@ Changes to instructions invalidate requirement confirmation. Changes to the draf
 | FR3 | Confirmation | Show extracted requirements and their instruction excerpts; support correction, addition, removal, and explicit confirmation through a single Confirm & review my draft action that starts evaluation. After consent, reaching feedback requires two primary button clicks: Extract requirements, then Confirm & review my draft. Student additions are identified as such. |
 | FR4 | Coverage | Every confirmed requirement has exactly one result with a valid status and explanation; no unconfirmed requirement is presented as mandatory. |
 | FR5 | Evidence | Met and Partially Met judgments include exact draft excerpts with paragraph locations where feasible. Missing has no fabricated quote and explains that evidence was not found. Invalid evidence is withheld and flagged Needs Review. |
-| FR6 | Uncertainty | Ambiguous or conflicting instructions and unsupported checks receive Needs Review with a reason. Visual layout and external-source validity are not inferred from pasted text. |
+| FR6 | Uncertainty | Use Needs Review when a specific explicit requirement cannot be checked from the supplied text or its evidence fails verification, with a specific reason. General ambiguity alone does not trigger this status. Visual layout and external-source validity are not inferred from pasted text. |
 | FR7 | Priorities | Display no more than three recommendations, each with a label, relevant requirement IDs when applicable, what to improve, why it matters, and an approach that leaves authorship to the student. |
 | FR8 | Errors | Loading, provider failure, malformed output, and validation failure are visible; no failed evaluation appears successful. A retry does not erase current inputs. |
 | FR9 | Iteration | Student can replace the draft and run a fresh evaluation; stale findings are cleared or explicitly invalidated. No history or improvement claims are fabricated. |
@@ -101,7 +102,7 @@ Changes to instructions invalidate requirement confirmation. Changes to the draf
 
 ## 8. AI evaluation logic and expected output structure
 
-Proposed two-stage process:
+Implemented two-stage process:
 
 1. Extract atomic, assessable requirements from instructions. Preserve source wording; retain explicit weights only when supplied. Extract only explicit requirements; do not infer additional conventions or deliverables. Student confirms the final list.
 2. Evaluate each confirmed requirement against the draft. Check whether each explicit requirement is addressed. A heading alone is not an answer, but a relevant brief response can meet a requirement. Use exact evidence.
@@ -117,18 +118,18 @@ Assess depth only when explicitly requested by the rubric. Do not downgrade a re
 
 Prioritize explicit mandatory gaps before optional enhancements. Use explicit rubric weights when available, then the likely consequence and scope of the gap; do not fabricate weights or grade impacts. Do not display generic ambiguity or missing-context warnings. Limitations must identify a specific required check that cannot be performed.
 
-Expected structured contract (planning specification, not implementation):
+Current structured contract in `radar.py`:
 
-- Requirements: ID, requirement text, instruction source excerpt or student-added marker, explicit weight if any.
-- Findings: requirement ID, status, explanation, evidence list containing exact quote and paragraph reference, specific gap, limitation if any.
-- Recommendations: rank, Required fix or Optional enhancement, associated requirement IDs, action, rationale, suggested approach.
-- Review metadata: specific uncheckable requirements, prompt/model version for evaluation reproducibility; no numeric grade.
+- Extraction returns requirement text and an instruction source excerpt. The server assigns IDs; edited or added requirements without a retained source are identified as student-provided. There is no separate weight field.
+- Findings contain requirement ID, status, explanation, gap, and up to four evidence items with exact quotes and paragraph numbers.
+- Zero to three recommendations contain a label, associated requirement IDs, action, rationale (`why`), and suggested approach. Display order supplies priority; no numeric rank field is returned.
+- A separate limitations list identifies specific uncheckable requirements. Run details expose operational metadata without assignment text; the current prompt version is `v1.2`. No numeric grade is returned.
 
 Validate required fields, allowed statuses, one finding per confirmed ID, recommendation count, and quotation matches before showing results. Schema validity does not establish semantic correctness; human evaluation remains necessary. Treat submitted text as material to assess, not instructions that can override the review task. Do not add web research or fact verification to the MVP.
 
 ## 9. Non-functional requirements, limitations, and risks
 
-- **Privacy:** No application database or persistent storage of assignment text. Do not put text in URLs, application logs, analytics, or replay recordings. Retention by the selected API provider must be checked and disclosed before real-user testing. Participants share only work they are permitted and comfortable to share.
+- **Privacy:** The implemented app has no database or persistent storage of assignment text. Planned archive saves (section 13) will deliberately store selected assignment/review content locally, only through explicit save actions; guest checks must never write archive data. That extension is not implemented. Keep coursework out of URLs, application logs, analytics, unmasked replay content, public assets, and Git. Retention by the selected API provider must be checked and disclosed before real-user testing. Participants share only work they are permitted and comfortable to share.
 - **Security:** API credentials stay on the server in environment variables. Escape user/model text when rendering. Bound inputs and requests; define a spending limit before an exposed deployment.
 - **Usability:** Keyboard-operable controls, visible labels and focus, readable errors, and status text that does not rely on color alone. Use pale status-colored requirement cards with readable text in light and dark themes; show privacy and review details in an expander while keeping sharing consent visible.
 - **Reliability:** Validate outputs and evidence; show uncertainty rather than authoritative unsupported claims. Formatting, calculations, citations, and external facts may not be verifiable from pasted text.
@@ -137,13 +138,47 @@ Validate required fields, allowed statuses, one finding per confirmed ID, recomm
 
 Key failure risks are weak advantage over a strong ChatGPT prompt, incorrect judgments that misdirect revisions, and feedback that students cannot act on. Broad written-assignment coverage increases variation; include multiple assignment types in testing. Pasted text can lose tables and layout. Model output may vary across runs.
 
-## 10. Proposed technical architecture
+## 10. Current technical architecture
 
 Browser text interface → server input validation → existing LLM API for requirement extraction → student confirmation → server/LLM evaluation → schema and evidence validation → feedback interface.
 
-Use a simple web application with no accounts, database, retrieval system, model training, or integrations in the MVP. Keep current-session inputs available for recovery; do not persist assignment content. API key is read from the environment. The existing repository contains an OpenRouter placeholder; the implementation checkpoint below records the prototype choices; deployment and broader live quality validation remain open. Implementation now uses Streamlit 1.66.1, python-dotenv 1.2.4, jsonschema 4.26.0, and certifi 2026.10.23; the PRD review itself added no dependencies.
+`app.py` owns the Streamlit UI, consent, editable requirements, session state, and feedback rendering. `radar.py` owns input limits, OpenRouter calls, structured response validation, and quotation checks. Configuration is read from environment variables, with local `.env` loading; credentials stay server-side. There are no accounts, database, retrieval system, model training, or saved reviews. The app stays local through Week 4; the Product Page is served separately by GitHub Pages.
+
+A normal complete review makes two server-side model calls: extraction, then evaluation after student confirmation. The configurable default model is `deepseek/deepseek-v4.1-flash`, a candidate whose broad quality remains unvalidated. Each request has a 90-second timeout. Extraction allows 7,000 output tokens; review defaults to 16,000, configurable from 1 to 32,000. Requests require `data_collection: deny`, `zdr: true`, and parameter-compatible routing; unavailable compatible routing causes failure. Account logging and provider policies still need verification before real coursework.
+
+The recorded environment uses Python 3.14.4, Streamlit 1.66.1, python-dotenv 1.2.4, jsonschema 4.26.0, and certifi 2026.10.23. This PRD update adds no dependencies. `docs/posthog.js` is loaded by the Product Page and embedded into the Streamlit document, with a browser guard to prevent duplicate initialization across reruns.
 
 Record operational metadata such as duration, token usage, estimated cost, and error category without assignment content. Build 2 adds PostHog pageviews, fixed-name click events, and masked replay to the Product Page and local app. Autocapture is disabled; all replay inputs and text are masked, and console/network-body capture is disabled. Use the `surface` property (`product_page` or `local_app`) to distinguish traffic. Clicks express intent, not successful AI completion. Verify masking on a complete synthetic review before real-coursework testing; analytics does not measure model accuracy.
+
+### Build 2 analytics acceptance criteria
+
+| Criterion | Evidence / remaining check |
+| --- | --- |
+| Both surfaces send pageviews and fixed-name `ui_clicked` events, distinguished by `surface`. | Observed on local Product Page and local app November 13. Published-page ingestion remains unverified. |
+| Click properties contain only fixed control names and surface identifiers, without coursework. | Named controls are mapped in the shared script; inspected local event properties contained no assignment text. This is not a payload-level privacy audit. |
+| Replay masks all inputs and text; console and network-body capture stay off. | Configuration and mocked analytics checks cover these controls; initial synthetic app inputs and rendered text appeared masked in replay. Full extraction-to-feedback replay remains pending. |
+| Reruns do not duplicate initialization, pageviews, or listeners. | Covered by the November 13 mocked browser checks; these do not validate the PostHog recorder implementation. |
+| Analytics claims distinguish clicks from successful reviews and builder sessions from outside users. | No completion event is implemented. Do not infer a successful AI review, conversion rate, or independent adoption from button clicks. |
+
+### Build 2 documentation completion status — November 15
+
+Architecture/data flow, scope boundaries, recorded costs, and recovery are documented. AGENTS.md now distinguishes implemented session-only behavior from the planned explicit-save archive. The builder supplied three architecture reflection answers; original answers and separate agent clarifications are recorded in journal/build-02-plan.md. The third answer conflates clicking, completion, and saving; follow-up on that distinction remains pending. Reported archive feedback is recorded; podmate names, session date/method, and sign-off remain unreported. Proposed weekly API and engineering-time budgets await builder input. At the builder’s request, local session timestamps support about 40 minutes (0.67 hours) of elapsed Build 2 session time across November 13 and November 15 through 11:26:29.848 a.m. New York time on November 15; this includes gaps and is not verified active hands-on time. See journal/build-02-plan.md for the current delivery worksheet. This documentation work does not complete the outstanding workflow, replay, or published-page analytics evidence. The builder requested committing and pushing this November 15 checkpoint before pausing for a later test session.
+
+### Build 2 risk, cost, and recovery plan
+
+The central risk is that schema-valid feedback still misses an explicit requirement or falsely marks it Met. The smallest local version exposes extracted requirements for correction and shows verified quotes so the student can inspect each judgment. Those safeguards do not establish semantic accuracy. The next synthetic workflow should include a deliberately missing explicit requirement, compare results against a human reference, record API duration/cost, and inspect feedback masking in replay. Broader quality testing remains part of Build 4.
+
+| Item | Recorded basis and open decision |
+| --- | --- |
+| Inference per full review | Three historical recorded runs cost $0.003135, $0.01418914, and $0.012247078. These are observations, not a forecast or spending cap. Fresh Build 2 measurement remains pending. |
+| Runtime | The same runs reported 10.84, 77.30, and 55.22 seconds combined API time; these exclude user editing and are not end-to-end completion times. |
+| Product runtime spending | Builder-supplied OpenRouter screenshot November 15 shows $0.08 spend over the last 30 days for DeepSeek V4.1 Flash, rounded/account-level. Project attribution and exact per-review cost remain unreconciled. Earlier $0.029571218 is a historical partial subtotal, not an additional charge. |
+| Development, analytics, and hosting | Builder confirms Plus. Approximate API-equivalent development estimate: $14.21 for the two session snapshots at supplied $2/M input and $10/M output rates, charging cached input at the full rate. This is not actual spending; a cache discount would lower it. Project subscription allocation and PostHog billing remain unreported. No public app hosting has been deployed. |
+| Builder time and budgets | Historical builder session: approximately two hours; November 13 has a separate observed window of at least eight minutes. Local session windows total 39.964 minutes (0.67 hours) through the November 15 11:26:29.848 a.m. New York cutoff, including gaps; the eight-minute November 13 checkpoint is already included. Active hands-on hours, engineering time budget, and total spending cap remain unreported. |
+
+Session token breakdown, exact cutoffs, formula, and screenshot limitations are in journal/build-02-plan.md. The dashboard’s $0.01 average is not a measured cost per complete review. Keep hypothetical development value separate from actual subscription and product spending.
+
+Recoverable request errors preserve session inputs and expose safe diagnostics. Clear this session resets app state; it does not delete external analytics records. Git commits provide local code recovery; review changes before restoring files. Verify provider spending limits or alerts before exposing the application publicly, and define cloud rollback in Build 5. Do not silently relax routing privacy controls to recover from a provider failure.
 
 ## 11. Validation and testing plan
 
@@ -159,17 +194,33 @@ Record extraction errors separately from evaluation errors. Measure extraction a
 
 **Recommended Build 4 track — A, domain quality:** Define four output-quality rules: requirement coverage, evidence integrity, justified statuses/uncertainty, and actionable priorities. Run 10 cases: 5 normal, 3 messy, and 2 adversarial. Include omitted mandatory content, partial coverage, conflicting instructions, formatting-dependent requirements, and embedded attempts to override the reviewer. Record before/after results and obtain at least one outside target-user review. This track is recommended, not yet completed.
 
-**Later implementation checks:** Empty/oversize inputs, changed inputs invalidating results, confirmation behavior, malformed API output, missing/duplicate requirement IDs, invented quotations, recommendation limits, safe rendering, and provider failures. Keep deterministic checks separate from model-quality evaluations.
+**Deterministic verification scope:** Empty/oversize inputs, changed inputs invalidating results, confirmation behavior, malformed API output, missing/duplicate requirement IDs, invented quotations, recommendation limits, safe rendering, and provider failures. Keep deterministic checks separate from model-quality evaluations.
 
 **Course milestones:** Build 1 due Nov 9 at noon New York time requires a public product page, PRD v1, rough local prototype evidence, and an honest build log. Documentation alone does not complete Build 1. Build 2 adds the smallest local version and verified analytics; Build 3 the core workflow; Build 4 evaluation; Build 5 cloud launch and recovery evidence. Record actual costs and hours, never invented totals.
 
 ## 12. Future roadmap
 
-1. **Next feasibility phase, separately authorized:** Test requirement extraction and evidence validation on representative pasted inputs; choose model/provider, stack, input bounds, and cost/latency budgets. Planning and prototype implementation were subsequently approved; see the checkpoint below.
+1. **Complete Build 2 evidence:** Record a fresh synthetic AI workflow and its cost/time, inspect complete masked replay, verify published-page analytics, and verify remote publication of the November 13/15 checkpoints. Confirm provider policies and builder budgets before real-coursework or exposed deployment.
 2. **MVP validation:** Deliver the confirmed text-only workflow, run the classmate pilot, and revise scope using evidence.
 3. **PDF input:** Add only after validating demand and extraction quality; detect unreadable/scanned content rather than silently producing incomplete reviews.
-4. **Iteration support:** Consider saved history and automatic comparisons after repeated-review demand justifies storage and privacy complexity.
+4. **Optional class archive and guest entry (planned):** Implement the staged local archive plan in Plan.md after implementation approval; preserve an initial Continue as guest path. Automatic comparisons remain deferred.
 5. **Expanded coaching and formats:** Consider richer Excellence Coach, slides, spreadsheets, or team workflows only after core quality and differentiation are demonstrated.
+
+## 13. Planned extension — Class archive and guest mode
+
+Planning approved November 15, 2026; implementation has not started. The user selected an organized archive based on reported classmate feedback, with rubric checks inside each assignment, and explicitly requested a guest entry button. This feedback is discovery input, not verified usability or broad demand.
+
+**Entry:** Show **Continue as guest** and **My classes** before setup. Guest runs the existing consent → extraction → confirmation/review workflow without a class, account, or archive writes. Guest does not mean anonymous: masked analytics and provider processing still apply. Archive failure must not block guest checks.
+
+**Organization:** Class (course name, optional professor/semester) → Assignment (name, saved combined instructions/rubric) → Saved reviews. Save assignment deliberately stores its defaults; Save review deliberately appends an exact snapshot of instructions, draft, extracted/confirmed requirements, validated feedback, date, and available model/run metadata. Opening history makes no model calls. Checking a revised draft starts fresh confirmation and review, preserving the original snapshot. Switching contexts clears working state and consent, with an unsaved-work prompt when needed. Class/professor metadata provides organization, not inferred grading rules.
+
+**Persistence:** Proposed local SQLite via a new archive.py module; no extra runtime dependency. This will intentionally replace the session-only boundary for archive users while preserving it for guests. Exclude the database and sidecar files from Git before writing data. No secrets or coursework in analytics, logs, public assets, or test evidence. Disclose local unencrypted storage and single-installation access; this first version has no user isolation and is unsuitable for a shared/public archive service.
+
+**Deletion:** Confirm deletion of a review, assignment, or class; show affected counts and delete children transactionally. Clear this session does not delete saved records. Deletion affects the active archive, not backups or external systems; no secure-erasure claim. No undo UI in the first version.
+
+**Acceptance:** Guest checks write no archive data; saved snapshots survive restart and reopen identically without model calls; assignment edits do not rewrite prior reviews; repeated save clicks/reruns do not duplicate records; context switches do not leak stale text/results; deletion affects only selected descendants; storage failures preserve working results. Verify with temporary synthetic databases, mocked UI/provider tests, and manual navigation/replay inspection. These checks are planned, not passed.
+
+The implementation stages, data model, failure behavior, and verification plan are in [Plan.md](./Plan.md). Accounts, cloud sync, sharing, automatic comparisons, and AI memory across assignments remain deferred. Pending Build 2 evidence stays pending; planning this feature does not establish completion.
 
 ### Open decisions for implementation planning
 
@@ -203,7 +254,7 @@ The local server initially failed to bind port 8501 because of sandbox permissio
 
 Earlier recorded API costs remain $0.029571218 across three runs with supplied usage; this is not a full spending total. Screenshot/GIF evidence, systematic light/dark-theme, keyboard and responsive checks, outside-classmate testing, the ten-case Build 4 evaluation, full cost reconciliation, and public deployment verification remain outstanding. Detailed test outcomes are recorded in `tests/README.md`; the public Build 1 summary is in `docs/index.html`.
 
-### Current Build 1 evidence — November 8, 2026
+### Historical Build 1 evidence — November 8, 2026
 
 On November 8, the builder completed a synthetic campus-coffee-shop review on application commit `0bd20d6` and supplied screenshots: 4 requirements, 3 Met, 1 Missing, and one required fix to add the omitted success metric. Screenshots are embedded in the Product Page. API cost and elapsed time were unreported; the recorded cost total remains partial. This single builder check does not establish broad model accuracy or independent usability. GitHub Pages was verified reachable and matched the then-current local page; the screenshot assets and embeds are included in this delivery update. The application remains local. The last recorded automated suite had 20 passes on November 4; it was not rerun today.
 

@@ -5,9 +5,17 @@ Use this as a scratchpad if helpful. Publish the required PRD and Build 1 log on
 **Build 1 due:** Monday, Nov 9, 2026 at noon, New York time  
 **Builder:** victor-zu-97 · Pod 12
 
-**Updated:** November 8, 2026 · aligned with PRD v1.1
+**Updated:** November 15, 2026 · aligned with PRD v2
 
-**Build 2 analytics checkpoint · November 13, 2026:** Shared PostHog browser instrumentation now tracks pageviews, fixed-name clicks, and masked replay on the Product Page and local app. Both local surfaces sent pageview/click events observed in PostHog; replay showed both local surfaces and masked synthetic app inputs and rendered text. Twenty Python tests and three analytics checks pass. No new live AI calls were made. Public publishing, complete feedback replay verification, PRD v2, and two Build 2 workday commits remain pending. Earlier Build 1 checkpoints below are historical.
+**Build 2 analytics checkpoint · November 13, 2026:** Shared PostHog browser instrumentation now tracks pageviews, fixed-name clicks, and masked replay on the Product Page and local app. Both local surfaces sent pageview/click events observed in PostHog; replay showed both local surfaces and masked synthetic app inputs and rendered text. Twenty Python tests and three analytics checks pass. No new live AI calls were made. Published-page analytics verification, fresh full AI workflow evidence/cost measurement, complete feedback replay verification remain pending. The November 13 analytics commits and this November 15 documentation checkpoint record work on two Build 2 dates; remote publication still needs verification. PRD v2 was documented November 15, covering the current architecture, analytics acceptance criteria, risks, cost evidence, and recovery; this documentation step did not rerun application tests or make model calls. Earlier Build 1 checkpoints below are historical.
+
+**Planned extension · November 15, 2026:** The builder reported classmate feedback requesting an organized class/professor archive and selected Class → Assignment → Saved reviews, with checks inside each assignment. An initial Continue as guest button preserves checking without class setup or archive writes. Local persistence, explicit saves, snapshot history, context resets, and deletion are planned in Plan.md and PRD section 13; none are implemented. This is reported discovery feedback, not an observed usability outcome. Earlier session-only scope below describes the implemented prototype.
+
+**Documentation alignment · November 15:** AGENTS.md and PRD privacy wording now distinguish current session-only behavior from planned explicit archive saves; the PRD uncertainty criterion matches the implemented prompt. The Build 2 worksheet contains the actual review-request data flow, agent/builder roles, known costs, reported critique, and three questions presented for builder reflection. The builder supplied all three reflection answers; the originals are recorded with separate agent clarifications, and the third distinction still needs follow-up. Session logs support about 40 minutes (0.67 hours) elapsed across November 13 and November 15 through 11:26:29.848 a.m. New York time on November 15, including gaps, not verified hands-on hours. Proposed budgets and podmate/session/sign-off details await builder input. No application changes or fresh model-quality evidence are implied.
+
+**Cost evidence · November 15:** Builder confirms Plus and supplied an OpenRouter screenshot showing $0.08 account spending over the last 30 days for DeepSeek V4.1 Flash (rounded; project attribution remains unreconciled). The earlier $0.029571218 subtotal is not added again. For development, 6,971,121 tokens across the November 13 and November 15 snapshots imply approximately $14.21 at builder-supplied $2/M input and $10/M output rates with no cached-input discount. This is hypothetical API-equivalent value, not paid spending; Plus allocation remains unreported. About 96.7% of input was cached. See the Build 2 worksheet for token counts, distinct time/token cutoffs, and formula. The dashboard average does not establish per-review cost.
+
+**Delivery checkpoint · November 15:** Builder requested committing and pushing all documentation, deferring the fresh synthetic review, measured cost per complete review, and full replay check to the next session. Archive/guest functionality remains planned, not implemented. Pre-commit review checked Build 1 status; no application or analytics suites were rerun.
 
 **Product:** Rubric Radar — Know what's missing. Understand what matters. Submit stronger work.
 
@@ -33,7 +41,7 @@ Use this as a scratchpad if helpful. Publish the required PRD and Build 1 log on
 
 - [ ] Not building: Assignment generation, automatic rewriting, official grade predictions, or completeness guarantees.
 - [ ] Not building: PDF uploads, slides, spreadsheets, LMS integrations, or collaboration features in the initial MVP.
-- [ ] Not building: Saved review history, automatic version comparisons, or verification against course materials, external facts, or source documents. The prototype uses current-session memory with no database.
+- [ ] Not building: Automatic version comparisons or verification against course materials, external facts, or source documents. The implemented prototype uses current-session memory with no database; optional local saved history is now planned separately.
 
 ## 4. Rough Local Prototype
 *What did you spike this week to test the core idea, and what did you learn from throwing it at the problem?*
