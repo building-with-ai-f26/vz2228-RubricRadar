@@ -6,7 +6,7 @@
 - **What this repo builds:** Rubric Radar coaches MBA students reviewing written reports/projects against pasted instructions or rubrics. It provides requirement-linked evidence and up to three revision priorities.
 - **Primary user & core workflow:** [See the living PRD in `docs/index.html`]
 - **Current tech stack:** Python 3.14.4 (verified), Streamlit, OpenRouter API, jsonschema, python-dotenv, certifi; no database.
-- **Planned scope:** Optional local Class → Assignment → Saved reviews archive and initial Continue as guest entry; see PRD.md section 13 and Plan.md. SQLite storage, archive controls, and the guest entry button are not implemented. Planning approval does not authorize implementation.
+- **Build 3 plan:** Beginner lane; Streamlit Community Cloud + Supabase Auth/Postgres; private Class → Project → Saved reviews and Continue as guest. See PRD.md section 13 and Plan.md (resume point). Supersedes the local SQLite proposal. Batches 1–3 are approved/completed locally: backend modules, unexecuted SQL scripts, guest/auth/library UI and a read-only sample are present. Cloud sign-in/storage is gated off by default until isolation is verified; no cloud project is configured or app deployed. Batch 4 requires approval.
 
 ## 2. Commands
 - **Install dependencies:** `python3 -m venv .venv` then `.venv/bin/python -m pip install -r requirements.txt`
@@ -17,8 +17,12 @@
 - **Run model evals:** `.venv/bin/python tests/smoke_live.py` (synthetic, two billable API calls; full Build 4 eval not yet implemented)
 
 ### Structure and setup
-- `app.py`: Streamlit inputs, session state, requirement confirmation, and feedback UI.
+- `app.py`: guest/project review inputs, confirmation, result invalidation and Load demo example. `app_style.css` and `.streamlit/config.toml` own the minimal local presentation/theme; use trusted static CSS only, keep coursework in native widgets. Read DESIGN.md for the established visual system before aesthetic changes; preserve structure, minimal navigation and class identity colors.
+- `library_ui.py`: account forms, per-session navigation, cloud gate, private library/save/delete UI, unsaved-work and identity clearing.
+- `feedback_ui.py`: shared read-only feedback renderer; `sample_library.py`: fixed synthetic read-only walkthrough and demo texts. Sample mode cannot save or call models.
 - `radar.py`: OpenRouter requests, structured contracts, input bounds, and evidence checks.
+- `supabase_api.py`, `auth.py`, `archive.py`: stateless cloud HTTP, per-session auth, private archive foundation; UI calls are gated by RUBRIC_RADAR_ARCHIVE_ENABLED (false by default). Standard library + existing dependencies only.
+- `supabase/migrations/`, `supabase/tests_private_archive.sql`: unexecuted schema/RLS migration and rollback-only database security checks. Mocks do not prove SQL isolation. See `docs/setup/supabase.md` for setup and pending validation.
 - `docs/index.html` and `docs/images/`: Product Page, living PRD summary, build log, and synthetic screenshots; published via GitHub Pages from `main` `/docs`.
 - `docs/posthog.js`: Shared browser analytics and masked replay configuration, embedded by `app.py` and loaded by the Product Page. Initialization is guarded against Streamlit reruns.
 - `tests/`: Mocked Python checks, analytics checks, synthetic live smoke script, and evidence log in `tests/README.md`.
@@ -37,8 +41,27 @@ Use Python 3.14.4 for the verified environment. After installing dependencies, c
 7. **Evidence check before every commit:** Review the Build 1 evidence status in `docs/index.html` before staging or committing. Record every automated test run, live evaluation, and builder/user manual test, including failures and recovery, in `tests/README.md`; summarize new evidence and outstanding items in the Build 1 log. Include the date, version/commit under test when known, method, outcome, limitations, and reported cost/time (mark unknown values as unreported). A suite run may be recorded as one entry with counts and failed test names; do not omit failed runs. Keep current evidence summaries in `Intent.md` and `PRD.md` consistent, preserving explicitly labeled historical checkpoints. Never store assignment text or secrets in evidence. Before committing, tell the user what evidence was updated, or explicitly state that no new test evidence exists; do not imply tests were rerun. Keep checking Build 1 status on every commit unless the user changes this instruction.
 
 ## 4. Prototype boundaries
-- **Implemented boundary:** `app.py` is a session-only UI; `radar.py` owns provider requests and output/evidence validation. No archive writes are currently allowed.
-- Keep secret API keys in `.env`; never log assignment text. The current implementation must not persist coursework. In the planned archive, explicit Save assignment / Save review actions may persist only the selected content locally after implementation approval; guest checks must remain free of archive writes. Exclude databases and sidecar files from Git before creating them, disclose local storage, and implement confirmed deletion and context isolation. The public PostHog browser project token in `docs/posthog.js` is intentionally client-visible; never put a personal API key there. Build 2 explicitly authorizes masked replay: keep all inputs and replay text masked, console/network-body capture off, and click events limited to fixed control names. Never send coursework in analytics.
+- **Implemented boundary:** Guest inputs are session-only. Auth/archive UI is implemented but cloud access remains off until RUBRIC_RADAR_ARCHIVE_ENABLED is explicitly enabled after actual schema/RLS/two-account verification. Sample library is read-only synthetic data; Load demo example only replaces working inputs, resets consent and invalidates stale feedback. No real coursework archive writes before security verification. `radar.py` still owns provider calls/validation.
+- Keep secret API keys in `.env`; never log assignment text. The current implementation must not persist coursework. After implementation approval, explicit Save project / Save review actions may persist only selected content in the owner's Supabase archive; guest checks must remain free of coursework archive writes. Disclose cloud storage, enforce ownership in database policies and parent relationships, and implement confirmed deletion and context isolation. Exclude local secrets, database dumps, databases and sidecar files from Git before creating them. The public PostHog browser project token in `docs/posthog.js` is intentionally client-visible; never put a personal API key there. Build 2 explicitly authorizes masked replay: keep all inputs and replay text masked, console/network-body capture off, and click events limited to fixed control names. Never send coursework in analytics.
 - Require privacy-compatible provider routing; do not silently relax it if a provider is unavailable.
 - Use mocked tests for UI and contracts; model accuracy requires separate live/human evaluation.
 - Current limits: 12,000 instruction characters, 30,000 draft characters, 25 requirements, 90-second timeout per request. These are provisional bounds, not measured performance targets.
+
+## 5. Shipping
+
+- Selected lane: Beginner. Target Streamlit Community Cloud for the app; GitHub Pages remains the Product Page. Supabase Auth/Postgres is planned, not provisioned. Resume from Plan.md and inspect current status before continuing.
+- Before a release, run relevant Python/analytics checks and record every result, failure and recovery per section 3. Security-sensitive storage needs deployed two-account tests as well as mocked checks.
+- Never expose coursework tables before grants, RLS and same-owner parent constraints are verified. Use the publishable key plus user token for routine app queries, never a service-role bypass. Keep auth sessions and coursework out of shared caches.
+- Keep server credentials in host secrets. Verify runtime compatibility, HTTPS, phone workflow, cost controls, live PostHog events and fully masked replay. Record deployed revision/URL and a known-good code rollback; database migrations require a separate recovery plan.
+- Complete SECURITY.md with actual checks, findings, fixes and residual risks. Pending work must not appear as passing. Update PRD v3 and Product Page to distinguish plans from shipped behavior before reporting delivery.
+
+## 6. Ask me first
+
+- Obtain approval for each new multi-file implementation batch; batches 1–3 are approved; batch 4 deployment/audit still needs approval.
+- Ask before creating paid resources, choosing a paid plan, raising spending limits, or sending billable evaluation calls without session authorization.
+- Ask before public deployment/publishing, remote pushes, destructive migrations or deletion of real saved user data unless that specific action is already authorized. Prepare a concrete reviewable result first. Normal user-confirmed in-app deletion is part of the approved future feature.
+- Ask before changing explicit saves into automatic persistence, expanding sharing/retention/analytics, weakening privacy routing/RLS, or using real coursework for agent-run tests. Existing authorization persists; do not ask again for an already authorized action.
+
+## 7. Rule from a real agent mistake
+
+On November 15, an agent's PNG-only documentation check rejected a valid native JPEG screenshot; tests/README.md records the failure and recovery. **Inspect an artifact's actual format before validating or renaming it; never assume all screenshots use one format.** Preserve the original evidence bytes and update references consistently. This was a documentation validation mistake, not an application/model failure.

@@ -28,3 +28,16 @@ build/
 out/
 .DS_Store
 *.log
+
+# Private cloud/local archive artifacts (never commit coursework or tokens)
+.streamlit/secrets.toml
+.supabase/
+supabase/.temp/
+data/
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.dump
+*.backup

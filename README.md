@@ -17,14 +17,16 @@ An AI-powered pre-submission coach for MBA students reviewing written reports an
 - **Builder:** `@victor-zu-97` (display name to confirm)
 - **Pod:** 12
 - **Product Page & Living PRD:** [Published Product Page](https://building-with-ai-f26.github.io/vz2228-RubricRadar/) · [Local source](./docs/index.html). GitHub Pages verified November 8.
-- **Status:** PRD v2 documented November 15; local text-only prototype and shared PostHog instrumentation implemented. The latest recorded checks passed 20 deterministic Python tests and three analytics checks on November 13. Builder completed live reviews and confirmed the compact interface and revised requirement checks work; outside-user tests and public app deployment remain outstanding.
+- **Status:** PRD v3 / Beginner lane. Batch 3 local UI implemented: guest entry, gated auth/recovery and private library screens, read-only sample and Load demo example. Cloud sign-in/saves remain off until actual database verification. Latest checks: 61 mocked Python and four analytics tests passed; local Chrome sample/demo walkthrough verified. Supabase project setup, live security/email, phone/replay and deployment pending.
 - **Full PRD:** [PRD.md](./PRD.md)
 
 The MVP uses pasted instructions and draft text, student-confirmed requirements, evidence-backed findings, and up to three prioritized improvements. PDF uploads and saved revision comparisons are deferred.
 
-**Planned, not implemented:** An initial **Continue as guest** button and optional **Class → Assignment → Saved reviews** archive. See [Plan.md](./Plan.md) and PRD section 13. The current app remains session-only.
+**Local preview:** The November 17 minimal design pass adds a compact top bar, no sidebar, quiet secondary actions and neutral class/project cards. Existing 61 Python tests passed; Home/My classes checked in Chrome. Open http://127.0.0.1:8501 after launching. Choose **Explore sample library → Open class → Open project → Open saved review** for a read-only synthetic walkthrough. Choose **Continue as guest → Load demo example** to fill a synthetic rubric and draft; consent stays unchecked and no automatic model call/save occurs.
 
-The app is planned to run locally through Week 4; add a cloud URL in Build 5.
+**Cloud access gated:** Sign-in and real saves stay disabled until the database security checks pass. Builder creates the account/project using [Supabase account steps](./docs/setup/supabase-account.md); [technical setup](./docs/setup/supabase.md), [Plan.md](./Plan.md) and [SECURITY.md](./SECURITY.md) cover the next stages. No migration or real cloud saves have occurred.
+
+Build 3 targets Streamlit Community Cloud; the live app URL is pending. GitHub Pages hosts only the separate Product Page.
 
 ## Start here: Build 1
 
@@ -45,7 +47,7 @@ Create your PostHog account in Week 1. Install it on the Product Page and local 
 | File / folder | Purpose |
 | --- | --- |
 | [`docs/index.html`](./docs/index.html) | Required public pitch, living PRD, and weekly build log. Update with actual work and evidence. |
-| [`PRD.md`](./PRD.md) | Full PRD v2, acceptance criteria, evaluation plan, current architecture, analytics, and cost evidence. |
+| [`PRD.md`](./PRD.md) | Full PRD v3, acceptance criteria, evaluation plan, current architecture, analytics, and cost evidence. |
 | [`Intent.md`](./Intent.md), [`Plan.md`](./Plan.md), [`journal/`](./journal/) | Optional drafting aids. No duplicate submission is required. |
 | [`AGENTS.md`](./AGENTS.md) | Local run commands, project context, and agent rules. Build 2 onward. |
 | [`tests/`](./tests/) | Verification guidance. Build 4 offers Track A domain evals **or** Track B user replays. |
@@ -69,7 +71,7 @@ If `.env` already exists, edit it rather than overwriting it. Set `OPENROUTER_AP
 .venv/bin/python -m streamlit run app.py
 ```
 
-Open **http://127.0.0.1:8501**. The app binds to localhost. Paste instructions and a draft, consent to provider processing, extract and edit requirements, confirm, then review. Blank lines define draft paragraphs. Provisional limits: 12,000 instruction characters, 30,000 draft characters, 25 requirements, and 90 seconds per API request. Inputs are never silently truncated.
+Open **http://127.0.0.1:8501**. The app binds to localhost. Choose Continue as guest, then paste instructions and a draft, consent to provider processing, extract and edit requirements, confirm, then review. Blank lines define draft paragraphs. Provisional limits: 12,000 instruction characters, 30,000 draft characters, 25 requirements, and 90 seconds per API request. Inputs are never silently truncated.
 
 ## Verification
 
@@ -78,7 +80,7 @@ Open **http://127.0.0.1:8501**. The app binds to localhost. Paste instructions a
 .venv/bin/python -m pip check
 ```
 
-The 20 deterministic tests cover evidence checks, output coverage, input bounds, API failures, privacy request settings, and the Streamlit workflow with mocked responses. They do not establish model accuracy.
+The 61 deterministic tests cover the original review/evidence contracts, cloud transport/auth/archive, sample/demo, account/navigation/save/history and deletion UI contracts. Provider/cloud responses are mocked. They do not establish model accuracy, deployed RLS, email delivery or live API behavior. The unexecuted SQL security script and setup steps are in docs/setup/supabase.md.
 
 For a live synthetic feasibility check (two billable model calls):
 

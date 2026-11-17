@@ -58,3 +58,14 @@ test('clicks emit fixed names only; unknown text and disabled buttons emit nothi
   assert.equal(b.sent[2][0], 'ui_clicked');
   assert.equal(JSON.stringify(b.sent[2][1]), '{"action":"extract_requirements","surface":"local_app"}');
 });
+
+
+test('library controls emit fixed names without record titles or IDs', () => {
+  const b = browser('local_app');
+  for (const textContent of ['Explore sample library', 'Load demo example', 'Save review', 'Confirm deletion', 'Synthetic private class']) {
+    b.listeners[0]({ target: { closest: () => ({ textContent }) } });
+  }
+  const clicks = b.sent.filter(e => e[0] === 'ui_clicked');
+  assert.deepEqual(clicks.map(e => e[1].action), ['explore_sample', 'load_demo', 'save_review', 'confirm_deletion']);
+  for (const [, properties] of clicks) assert.deepEqual(Object.keys(properties).sort(), ['action', 'surface']);
+});

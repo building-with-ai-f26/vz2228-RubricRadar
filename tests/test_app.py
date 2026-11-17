@@ -16,10 +16,30 @@ def button(app, label):
 class AppTests(unittest.TestCase):
     def fill(self):
         app = AppTest.from_file('../app.py').run()
+        button(app, 'Continue as guest').click().run()
         app.text_area(key='instructions').input(INSTRUCTIONS)
         app.text_area(key='draft').input(DRAFT)
         app.checkbox(key='consent').check().run()
         return app
+
+    @patch('radar.extract')
+    @patch('radar.evaluate')
+    def test_demo_load_fills_both_inputs_resets_consent_and_invalidates_old_feedback(self, evaluate, extract):
+        from sample_library import DEMO_INSTRUCTIONS, DEMO_DRAFT
+        app = self.fill()
+        app.session_state['result'] = copy.deepcopy(REPORT)
+        app.session_state['confirmed'] = []
+        app.session_state['rr_save_token'] = 'stale-demo-token'
+        button(app, 'Load demo example').click().run()
+        self.assertEqual(app.text_area(key='instructions').value, DEMO_INSTRUCTIONS)
+        self.assertEqual(app.text_area(key='draft').value, DEMO_DRAFT)
+        self.assertFalse(app.checkbox(key='consent').value)
+        self.assertTrue(button(app, 'Extract requirements').disabled)
+        self.assertNotIn('result', app.session_state)
+        self.assertNotIn('confirmed', app.session_state)
+        self.assertNotIn('rr_save_token', app.session_state)
+        self.assertFalse(app.exception)
+        extract.assert_not_called(); evaluate.assert_not_called()
 
     @patch('radar.extract', return_value=(ORIGINALS, META))
     @patch('radar.evaluate', return_value=(copy.deepcopy(REPORT), META))

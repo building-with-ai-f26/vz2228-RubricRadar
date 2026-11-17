@@ -1,76 +1,92 @@
-# Rubric Radar — Class archive and guest mode implementation plan
+# Build 3 — Beginner lane: private saved reviews
 
-Prepared November 15, 2026 · Planning only; app implementation has not started.
+Updated November 17, 2026. This is the resume point for the next session.
 
-## Product decision
+## Resume here
 
-The builder reported classmate feedback requesting a repository organized by MBA class and professor. The user selected an organized archive with rubric checks inside each assignment, and requested an initial **Continue as guest** button. This is reported discovery feedback, not an observed usability test or evidence of demand across students.
+November 17 checkpoint: the builder requested committing and pushing all current project work to origin/main. This plan, code, setup guides, design rules, audit register and test evidence are included in that checkpoint. Actual commit/push success must be verified from Git; this text was prepared before the commit.
 
-The first version is local to one app installation. There are no accounts or separate user libraries, and no user isolation. Anyone using that installation can access its archive; do not use it as a shared or public service. Guest means no archive storage, not anonymous use: existing masked analytics and provider processing still apply.
+### What is ready
 
-## Navigation and journeys
+- Beginner lane selected; batches 1–3 approved and implemented locally: guest entry, gated email auth/recovery, private Class → Project → Saved reviews UI, explicit saves/deletion, history, pagination and context isolation.
+- Read-only synthetic sample: three classes, each with a project/review. Load demo example fills both editor fields, clears stale feedback/save state and unchecks consent; loading never calls the model or saves coursework.
+- Minimal aesthetics and class accents refined using Impeccable 4.9.2 guidance. Preserve the current structure and minimal navigation; read DESIGN.md before changing aesthetics.
+- Backend auth/archive modules and SQL migration/rollback-only security script are prepared. No database migration has run and no Supabase project is configured. RUBRIC_RADAR_ARCHIVE_ENABLED remains false.
+- Latest recorded Python suite: 61 passed in 5.543 seconds. Latest analytics suite: four passed in 215.334 ms, before styling-only edits. No application/analytics suite rerun for this commit preparation. Desktop, 400px and 768px Chrome previews were inspected; real-phone and full live replay checks remain pending.
 
-Start screen has two visible buttons: **Continue as guest** and **My classes**. Neither path requires sign-up. Guest must work even if archive storage is unavailable and must not create a database merely by opening or running a check.
+### Next session
 
-Guest path: Continue as guest → paste instructions and draft → consent → Extract requirements → edit → Confirm & review my draft → feedback. No assignment, class, draft, or review is written to archive storage. Clear this session clears working data. Saving guest reviews into a class is deferred for this first version.
+1. Read AGENTS.md, this resume point, DESIGN.md and SECURITY.md; inspect Git status so new user edits are preserved.
+2. Builder creates their Supabase account/project using [account setup](docs/setup/supabase-account.md), then confirms it is ready. Credentials go only in ignored local/host settings, not chat or Git.
+3. Follow [technical setup](docs/setup/supabase.md): review/apply the schema in the intended disposable/test environment, execute the SQL tests and real two-account direct API isolation checks, configure email confirmation/recovery, and document observed failures/results. Keep real coursework saves disabled until ownership isolation is verified.
+4. Batch 4 full audit/public deployment needs a brief plan and approval. Complete request/spend protection, live PostHog/replay checks, phone test and refused-security-test screenshot before submission. SECURITY.md remains an incomplete audit.
 
-Archive path: My classes → create/select a class → create/select an assignment → run the existing check → explicitly Save review → revisit that assignment's review history. Show a consistent Class / Assignment location and a Back to home control. Course name is required; professor and semester are optional to keep setup light. Assignment name is required; due date is deferred.
+Known follow-ups: native form fields produce empty-autocomplete warnings; dark override, exhaustive keyboard/screen-reader/long-content and real-device checks are not complete. SQL and real Auth/API/email behavior remain unverified. No automatic Impeccable detector/hooks were run. The skill is installed globally at ~/.codex/skills/impeccable on this Mac (launcher permission repaired); it is not vendored in this repository. New machines can install it from the official [Impeccable site](https://impeccable.style/).
 
-Creating or editing an assignment uses an explicit **Save assignment** action for its instructions/rubric, with a visible local-storage explanation. Assignment instructions and rubric use the existing combined input field. Inside an assignment, preload its current instructions; edits become assignment defaults only through Save assignment. A review always captures the exact instructions actually checked.
+### Reopen locally
 
-Changing class, assignment, mode, or opening a different review must clear working text, confirmation, results, and provider-sharing consent before loading the destination. If unsaved work exists, present Keep working / Discard and continue before switching. Never carry one assignment's draft or feedback into another.
+Run `.venv/bin/python -m streamlit run app.py`, then open http://127.0.0.1:8501. A server was left running at the last checkpoint, but it may need restarting after logging back in. Explore sample library → Open class → Open project → Open saved review; or Continue as guest → Load demo example. Consent and the two review actions are still required for a billable live review. Restart after imported-module changes if hot reload retains an old module.
 
-Opening a saved review is read-only and makes no model calls. **Check a revised draft** copies its instructions and draft into a new working check within the same assignment, clears old findings and confirmation, and requires fresh consent and extraction. New saves append a review; they never overwrite the opened record. No automatic comparison or improvement claim.
+Suggested resume message: **“Open Plan.md and continue Rubric Radar Build 3 from the next pending step.”** GitHub Pages hosts the separate Product Page; the Streamlit app has no public URL yet. Pushing this checkpoint does not deploy the Python app or apply database migrations.
 
-## Saved data
+## Decisions
 
-Use Python's standard-library SQLite support with a small `archive.py` module. Keep model calls and evidence validation in `radar.py`; app.py coordinates navigation and explicit storage actions. No new runtime package is proposed.
+- Public app: Streamlit Community Cloud; keep the Python/Streamlit review UI and OpenRouter backend. GitHub Pages continues to host the separate Product Page, not the Python app.
+- Accounts: Supabase Auth, initially email/password with email verification and password recovery. Supabase handles credentials; never store passwords in app tables or logs. Verify email delivery, redirects, token refresh, expiry, and logout before release.
+- Storage: Supabase Postgres with row-level security (RLS) on every exposed coursework table. This replaces the November 15 local SQLite proposal; do not implement a shared local archive on the public server.
+- Organization: each student's private Class → Project → Saved reviews. Project means assignment; there is no extra assignment level. Class name required; professor/semester optional. No shared class roster or collaboration.
+- Entry: Continue as guest or Sign in / My classes. Guests use the existing consent/review flow without archive writes. Guest requests still use provider processing and masked analytics.
+- Saving: explicit Save project and Save review actions; no automatic coursework persistence. Opening a saved review makes no model call. A fresh review of a revised draft creates a new immutable snapshot.
+- Beginner lane does not require preview deployments, automatic test-gated production merges, or separate dev/production databases. Use mocks and local/test infrastructure for development; use only synthetic records for deployed security checks. Never run destructive development checks on real saved coursework.
 
-| Entity | Stored fields |
+## Data and access design
+
+| Entity | Proposed fields |
 | --- | --- |
-| Class | Generated ID, course name, optional professor and semester, creation/update timestamps. |
-| Assignment | Generated ID, class ID, name, current combined instructions/rubric, creation/update timestamps. |
-| Review | Generated ID, assignment ID, save timestamp, snapshot of instructions and draft, extracted and confirmed requirements with sources/IDs, validated findings and priorities, limitations, available extraction/review operational metadata, model and prompt identifiers. |
+| Class | Generated ID, owner user ID, course name, optional professor/semester, creation timestamp |
+| Project | Generated ID, owner user ID, class ID, name, explicitly saved instructions/rubric, creation timestamp |
+| Saved review | Generated ID, owner user ID, project ID, unique save token, schema version, timestamp, exact instructions/draft snapshot, extracted and confirmed requirements, validated findings/priorities/limitations, available model/prompt/run metadata |
 
-Snapshots preserve exactly what was reviewed when assignment defaults later change. Store a schema version and use stable generated IDs rather than titles as keys. Store structured fields as JSON where appropriate, validate saved data on load, and never execute saved content as code. Missing historic metadata is displayed as unavailable, not invented. API keys, raw provider response bodies, and consent flags are never saved.
+Use database-enforced ownership for reads, inserts, updates, and deletes, based on the verified authenticated user. Enforce same-owner parent relationships so a student cannot attach a project/review to another student's class/project. Do not trust a user ID supplied by a form. Use the publishable client key plus the user's token; do not use a service-role/secret key in routine app data access because it bypasses RLS. No unauthenticated archive privileges.
 
-Proposed location: `data/rubric_radar.sqlite3`, relative to the app installation. Add `data/` and SQLite sidecar files to `.gitignore` before the first database creation. No coursework database goes into commits, docs/, screenshots, analytics, or test evidence. Archive storage is ordinary local disk storage, not encrypted by the app; anyone with access to the installation/files can read it. Update in-app disclosure, README, and AGENTS.md when implementing persistence.
+Keep authenticated clients/tokens isolated to the current session; never put them in a shared/global cache. Logout, account changes, guest transitions, and context switches clear coursework/results/consent before destination content loads. Offer Keep working / Discard for ordinary context switches with unsaved work, without delaying logout. Clear this session clears working data, not saved records.
 
-Use parameterized SQL, foreign keys, and transactions. Save review is available only for a successful, current validated result. Mark that result as saved in session state and guard repeated clicks/reruns with a unique save token so one result is not inserted twice. Failed model requests and incomplete work are not automatically archived. A storage failure preserves the working review and shows an error without claiming success or overwriting existing records.
+Save only a successful, current validated result. Enforce duplicate-save prevention in the database as well as the UI. Storage failures preserve working inputs/results without claiming success. Validate stored snapshot structure on load; do not execute saved content. Never save API keys, passwords, auth tokens, raw provider responses, or consent flags in review records.
 
-## Deletion and session clearing
-
-Provide Delete review, Delete assignment, and Delete class. Require a confirmation naming the selected item and showing affected review/assignment counts. Deleting an assignment deletes its reviews; deleting a class deletes its assignments and reviews in one transaction. Cancel changes nothing. Invalidate any open deleted record and return to its surviving parent or home.
-
-Clear this session resets transient data; it does not delete saved records. Application deletion removes records from the active archive; it does not promise forensic disk erasure, removal from device backups, or deletion of provider/analytics records. Export, backup UI, trash, and undo are deferred; state that deletion cannot be undone in this first version.
-
-## Acceptance and verification
-
-- Guest can complete the mocked two-button workflow without class creation or any storage writes, including with unavailable archive storage.
-- Class/assignment organization persists across process restarts; duplicate names do not mix records because IDs are distinct.
-- Saving and reopening returns an identical review snapshot without model calls; updated assignment defaults never rewrite history.
-- Revised-draft checks create new reviews; stale results cannot be saved; double clicks and reruns cannot duplicate a save.
-- Switching context prompts for unsaved work, resets consent, and does not expose another assignment's state.
-- Delete cancellation preserves data; confirmed cascade deletion removes exactly the selected descendants and clears affected session state.
-- Simulated storage failures preserve an existing archive and the current review; malformed stored content produces a recoverable message, not raw content in logs.
-- Tests use synthetic fixtures in temporary databases. Run Python and analytics checks and log every run and failure under tests/README.md; do not use live model calls for archive tests.
-- Manually inspect both paths, reopening after restart, deletion, and navigation. Verify archive titles, drafts, rubrics, and feedback stay masked in replay and absent from analytics properties. Only fixed action names may be added; no class/assignment titles or IDs in events. Record builder checks separately from outside-user results.
+Confirm deletion of a review/project/class, name the item, show affected counts, and delete descendants transactionally. No undo in this version. Disclose cloud storage, who operates it, and that deletion from active tables does not promise removal from backups/provider systems. Resolve retention and account-deletion handling before release. Class metadata organizes records; it is not extra grading criteria or cross-project AI memory.
 
 ## Small implementation batches
 
-1. **Storage foundation:** Add archive.py, synthetic storage tests, and ignore rules; implement schema, snapshot saving/loading, transactions, and deletion. Guest creates no storage. No UI integration yet.
-2. **Entry and organization:** Add Continue as guest / My classes, class and assignment forms, location display, context reset, and unsaved-work handling. Preserve existing guest review behavior and provider consent.
-3. **Review archive:** Integrate explicit Save review, saved-history viewer, revised-draft flow, duplicate-save prevention, and confirmed deletion. Update storage disclosures and AGENTS.md at the point persistence becomes accessible.
-4. **Verification and evidence:** Run relevant suites, inspect synthetic workflows and replay masking, reconcile documentation/evidence, and then assess readiness for classmate testing. Paid model checks remain a separate Build 2 evidence task.
+1. **Plan and PRD v3 — completed locally November 17.** Save this resume plan; document hosting, accounts, storage, security and guest choices; add Shipping / Ask me first / mistake-derived agent rule; create SECURITY.md as an explicitly pending audit register. Reconcile Product Page and evidence summaries. No application or infrastructure changes.
+2. **Authentication and secure storage — approved; foundation completed locally November 17.** Added supabase_api.py (stateless HTTPS, publishable key only), auth.py (per-object email/password/code/recovery/refresh/logout), archive.py (owner-scoped operations and validated snapshots), SQL migration with RLS/composite owner FKs and immutable reviews, rollback-only SQL security script, mocked tests and setup guidance. No new dependencies. No app.py integration, project provisioning or database execution. Local mocked checks do not prove deployed isolation; SQL/Auth/API tests remain pending before real saves.
+3. **Library UI — approved; completed locally November 17.** Implemented entry/auth/recovery forms, private classes/projects/history, explicit saves, duplicate-save prevention, fresh revised-draft flow, identity/context clearing, unsaved-work prompts, pagination and confirmed deletion with changed-count reconfirmation. Added read-only SampleArchive (no cloud/model writes) and Load demo example (no model call/save/auto-consent). Cloud feature gate defaults false. 61 mocked Python / four analytics tests passed; local Chrome walkthrough and demo fill verified. Live Supabase wiring/security remains pending before actual saves.
+4. **Audit, live deployment and evidence — pending approval.** Run and record the security audit, address findings, deploy, verify on phone and with two accounts, inspect live PostHog event payloads and masked replay, reconcile SECURITY.md/PRD/evidence and prepare submission. Verify deployed Python/dependency compatibility. No claim of completion until observed.
 
-Each batch gets a brief implementation plan and approval before changes across files, as required by AGENTS.md. This document authorizes planning only. Review implementation scope with the builder before coding. Account-based private archives and cloud isolation require a later design before hosting saved coursework publicly.
+## Acceptance and required security proof
 
-## Boundaries and Build 2 status
+- A student can register/verify/sign in, recover access, create a class/project, run the existing review, explicitly save, sign out/in, and reopen the same snapshot without a new model call.
+- Account B cannot list/read/update/delete A's synthetic records or create/reparent descendants under A's records, including direct API requests bypassing the UI. Forged owner IDs, expired tokens, and unauthenticated requests must not grant access. B can manage its own data; A's data remains unchanged after attacks.
+- Capture a labeled, refused cross-account write for the required screenshot. Blocked reads can return zero rows; do not invent an HTTP error. Include own-account positive controls, expected/observed results, date and deployed version in the evidence log. Screenshots must contain no tokens/passwords/real coursework.
+- Guest checks do not write coursework to the archive. Apply server-enforced request/concurrency and spend controls to public model actions; choose numeric limits before launch. With accounts, the assignment's required proof is the second-account test; the 30-call no-database alternative is not our lane's proof.
+- Test ownership/cascade deletion, duplicate saves, storage failure, context switches and logout. Automated mocked tests establish app contracts, not deployed RLS or model quality.
+- Inspect live phone layout, links, session expiry, and extraction-to-feedback flow. Verify live PostHog ingestion and replay masking of auth fields, class/project names, rubrics, drafts, feedback and saved history. Only fixed action names; no email, content, titles or record IDs in analytics. Current script labels the app local_app; resolve live labeling during implementation.
 
-This extension brings optional saved history into planned scope. Automatic revision comparisons, professor-style inference, cross-assignment AI memory, cloud sync, sharing, accounts, PDF uploads, and grade prediction remain deferred. Class/professor metadata organizes records and is not sent to the model as extra grading criteria.
+## Security audit and launch decisions still open
 
-November 15 resumed testing recorded a successful builder review at $0.00508071 / 38.39 seconds and a screenshot showing today’s replay entry, active recording, and masked text in the selected older replay. A documented synthetic reference check, full masked feedback replay, and published-page analytics verification remain pending. The November 13 analytics commits and November 15 documentation checkpoint record two work dates; verify remote publication separately. Historical recorded inference is $0.029571218, a partial total. No additional storage service is proposed for the local version; runtime/model costs depend on actual new reviews. Budget caps, full builder time, subscription allocation, and PostHog billing remain unreported.
+SECURITY.md tracks checks, actual findings, fixes and residual risks. Audit source/dependencies, Git secrets, auth/session isolation, all table privileges/RLS, parent ownership, guest bypass, injection/rendering, provider routing, analytics/log leakage, API abuse/cost, storage/deletion, hosting/secrets/HTTPS and recovery. A checklist or passing mocks alone does not establish a full audit.
 
-### Build 2 completion clarification — November 15
+Before launch verify service accounts/plans/quotas, hosting Python support, Supabase email delivery/redirects, provider logging/retention, database backup/retention/deletion terms, numeric model limits/budget, and the known-good rollback revision. No pricing or availability promise is made here. No service created, paid plan selected, migration applied, or real coursework stored by batch 1.
 
-Builder confirmation, November 15: published Product Page analytics and today’s complete replay through feedback/masking are completed. These are builder-reported checks; the agent did not independently replay today’s session or inspect public-page event properties in this step. The still screenshot remains evidence of session activity and the displayed masked replay. Budgets/account controls/pod details remain optional project follow-ups rather than stated Build 2 submission blockers. Archive implementation remains separately scoped. See the current delivery checklist in journal/build-02-plan.md.
+Official implementation references: [Streamlit deployment](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy), [Streamlit secrets](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management), [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [Supabase Python auth](https://supabase.com/docs/reference/python/auth-api).
+
+## Submission / classroom checklist
+
+- [ ] Working live app URL, usable by a classmate on a phone.
+- [ ] Note containing repository URL, Beginner lane, and repository SECURITY.md link.
+- [ ] Completed audit: checks, findings, fixes and remaining risks.
+- [ ] Screenshot of the refused two-account security test, linked to its evidence record.
+- [ ] Live PostHog events and full masked session replay verified.
+- [ ] PRD v3 and AGENTS.md reflect shipped behavior; unfinished items remain labeled.
+- [ ] Bring phone November 24 for pod testing at the live address (user-supplied brief).
+
+Existing journal lists November 23 at noon as the build deadline; this has not been reverified against the new brief. No assignment submission performed. Deferred: collaboration, shared classes, uploads, automatic comparisons, cross-project AI memory, and advanced-lane infrastructure.
