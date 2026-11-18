@@ -1,27 +1,33 @@
 # Build 3 — Beginner lane: private saved reviews
 
-Updated November 17, 2026. This is the resume point for the next session.
+Updated November 18, 2026. This is the resume point for the next session.
 
 ## Resume here
 
-November 17 checkpoint: the builder requested committing and pushing all current project work to origin/main. This plan, code, setup guides, design rules, audit register and test evidence are included in that checkpoint. Actual commit/push success must be verified from Git; this text was prepared before the commit.
+**Current checkpoint — November 18:** Google sign-in replaces email/password/code accounts. Google OAuth branding and a Web client are configured under the builder's NYU Google account in the existing My First Project (creation of a new project outside the school organization was refused). Allowed origins are localhost:8501 and 127.0.0.1:8501 only; audience is External/Testing with the builder's NYU account added as one test user. Supabase shows Google enabled and Email disabled; nonce checks were kept on. Hosted schema installation succeeded. Local ignored .env has the project URL, publishable key and Google client ID; existing provider key was preserved. Archive gate stays false. No live Google login, SQL-role/two-account security test, public app deployment or publication was performed. Earlier differing checkpoints below are historical. Setup: docs/setup/google-signin.md; evidence: tests/README.md.
+
+**Next session:** Read this checkpoint and preserve the working tree. Configuration is saved; builder requested stopping before further/live testing. First review the new Google component in Chrome, then run actual Google login/logout in an auth-only test harness without enabling archive writes. Run the prepared SQL security checks and two-account direct API proof before enabling the library. A second Google test account and the future deployed HTTPS origin are not configured. Batch 4 audit/deployment still needs separate approval. Builder subsequently requested a local checkpoint commit. Source/docs/evidence are being committed; no remote push is authorized. Ignored local .env configuration is not part of Git.
+
+
+Historical November 17 checkpoint: the builder requested committing and pushing all then-current project work to origin/main. This plan, code, setup guides, design rules, audit register and test evidence are included in that checkpoint. Actual commit/push success must be verified from Git; this text was prepared before the commit.
 
 ### What is ready
 
-- Beginner lane selected; batches 1–3 approved and implemented locally: guest entry, gated email auth/recovery, private Class → Project → Saved reviews UI, explicit saves/deletion, history, pagination and context isolation.
+- Beginner lane selected; batches 1–3 and the November 18 Google replacement batch approved: guest entry, gated Google sign-in, private Class → Project → Saved reviews UI, explicit saves/deletion, history, pagination and context isolation.
 - Read-only synthetic sample: three classes, each with a project/review. Load demo example fills both editor fields, clears stale feedback/save state and unchecks consent; loading never calls the model or saves coursework.
 - Minimal aesthetics and class accents refined using Impeccable 4.9.2 guidance. Preserve the current structure and minimal navigation; read DESIGN.md before changing aesthetics.
-- Backend auth/archive modules and SQL migration/rollback-only security script are prepared. No database migration has run and no Supabase project is configured. RUBRIC_RADAR_ARCHIVE_ENABLED remains false.
-- Latest recorded Python suite: 61 passed in 5.543 seconds. Latest analytics suite: four passed in 215.334 ms, before styling-only edits. No application/analytics suite rerun for this commit preparation. Desktop, 400px and 768px Chrome previews were inspected; real-phone and full live replay checks remain pending.
+- Supabase project is ready; SQL Editor reported Success for the private-archive migration November 18. Rollback-only SQL security tests and real two-account checks remain unexecuted. RUBRIC_RADAR_ARCHIVE_ENABLED remains false.
+- Google Identity Services popup and nonce-bound Supabase exchange replace email/password/code UI. No SMTP sender is required. Setup/configuration progress: docs/setup/google-signin.md and tests/README.md.
+- Latest Google-batch Python suite: 61 passed in 5.837 seconds after one recorded AppTest timeout/recovery. Combined Node checks: seven passed in 184.707 ms (four analytics + three Google protocol). Historical November 17 styling suites are in tests/README.md. Desktop, 400px and 768px Chrome previews were inspected; real-phone and full live replay checks remain pending.
 
 ### Next session
 
 1. Read AGENTS.md, this resume point, DESIGN.md and SECURITY.md; inspect Git status so new user edits are preserved.
-2. Builder creates their Supabase account/project using [account setup](docs/setup/supabase-account.md), then confirms it is ready. Credentials go only in ignored local/host settings, not chat or Git.
-3. Follow [technical setup](docs/setup/supabase.md): review/apply the schema in the intended disposable/test environment, execute the SQL tests and real two-account direct API isolation checks, configure email confirmation/recovery, and document observed failures/results. Keep real coursework saves disabled until ownership isolation is verified.
+2. Finish Google Web client/Supabase provider configuration following [Google setup](docs/setup/google-signin.md). Project and hosted migration already exist. Credentials go only in ignored local/host settings, not chat or Git. No SMTP setup is needed for Google-only accounts.
+3. Follow [technical setup](docs/setup/supabase.md): schema installation succeeded; execute the SQL tests and real two-account direct API isolation checks, verify Google login/logout, and document observed failures/results. Keep real coursework saves disabled until ownership isolation is verified.
 4. Batch 4 full audit/public deployment needs a brief plan and approval. Complete request/spend protection, live PostHog/replay checks, phone test and refused-security-test screenshot before submission. SECURITY.md remains an incomplete audit.
 
-Known follow-ups: native form fields produce empty-autocomplete warnings; dark override, exhaustive keyboard/screen-reader/long-content and real-device checks are not complete. SQL and real Auth/API/email behavior remain unverified. No automatic Impeccable detector/hooks were run. The skill is installed globally at ~/.codex/skills/impeccable on this Mac (launcher permission repaired); it is not vendored in this repository. New machines can install it from the official [Impeccable site](https://impeccable.style/).
+Known follow-ups: native form fields produce empty-autocomplete warnings; dark override, exhaustive keyboard/screen-reader/long-content and real-device checks are not complete. SQL security and real Google/Auth/API behavior remain unverified. No automatic Impeccable detector/hooks were run. The skill is installed globally at ~/.codex/skills/impeccable on this Mac (launcher permission repaired); it is not vendored in this repository. New machines can install it from the official [Impeccable site](https://impeccable.style/).
 
 ### Reopen locally
 
@@ -32,7 +38,7 @@ Suggested resume message: **“Open Plan.md and continue Rubric Radar Build 3 fr
 ## Decisions
 
 - Public app: Streamlit Community Cloud; keep the Python/Streamlit review UI and OpenRouter backend. GitHub Pages continues to host the separate Product Page, not the Python app.
-- Accounts: Supabase Auth, initially email/password with email verification and password recovery. Supabase handles credentials; never store passwords in app tables or logs. Verify email delivery, redirects, token refresh, expiry, and logout before release.
+- Accounts: Google Identity Services → Supabase Auth, approved November 18 in place of email/password/code signup and recovery. No app password or SMTP sender. Keep nonce checks enabled and basic identity only; verify Google browser flow, token refresh, expiry and logout.
 - Storage: Supabase Postgres with row-level security (RLS) on every exposed coursework table. This replaces the November 15 local SQLite proposal; do not implement a shared local archive on the public server.
 - Organization: each student's private Class → Project → Saved reviews. Project means assignment; there is no extra assignment level. Class name required; professor/semester optional. No shared class roster or collaboration.
 - Entry: Continue as guest or Sign in / My classes. Guests use the existing consent/review flow without archive writes. Guest requests still use provider processing and masked analytics.
@@ -64,7 +70,7 @@ Confirm deletion of a review/project/class, name the item, show affected counts,
 
 ## Acceptance and required security proof
 
-- A student can register/verify/sign in, recover access, create a class/project, run the existing review, explicitly save, sign out/in, and reopen the same snapshot without a new model call.
+- A student can sign in with Google (Google owns account recovery), create a class/project, run the existing review, explicitly save, sign out/in, and reopen the same snapshot without a new model call.
 - Account B cannot list/read/update/delete A's synthetic records or create/reparent descendants under A's records, including direct API requests bypassing the UI. Forged owner IDs, expired tokens, and unauthenticated requests must not grant access. B can manage its own data; A's data remains unchanged after attacks.
 - Capture a labeled, refused cross-account write for the required screenshot. Blocked reads can return zero rows; do not invent an HTTP error. Include own-account positive controls, expected/observed results, date and deployed version in the evidence log. Screenshots must contain no tokens/passwords/real coursework.
 - Guest checks do not write coursework to the archive. Apply server-enforced request/concurrency and spend controls to public model actions; choose numeric limits before launch. With accounts, the assignment's required proof is the second-account test; the 30-call no-database alternative is not our lane's proof.
@@ -75,7 +81,7 @@ Confirm deletion of a review/project/class, name the item, show affected counts,
 
 SECURITY.md tracks checks, actual findings, fixes and residual risks. Audit source/dependencies, Git secrets, auth/session isolation, all table privileges/RLS, parent ownership, guest bypass, injection/rendering, provider routing, analytics/log leakage, API abuse/cost, storage/deletion, hosting/secrets/HTTPS and recovery. A checklist or passing mocks alone does not establish a full audit.
 
-Before launch verify service accounts/plans/quotas, hosting Python support, Supabase email delivery/redirects, provider logging/retention, database backup/retention/deletion terms, numeric model limits/budget, and the known-good rollback revision. No pricing or availability promise is made here. No service created, paid plan selected, migration applied, or real coursework stored by batch 1.
+Before launch verify service accounts/plans/quotas, hosting Python support, Google OAuth origin/audience settings, provider logging/retention, database backup/retention/deletion terms, numeric model limits/budget, and the known-good rollback revision. No pricing or availability promise is made here. No service created, paid plan selected, migration applied, or real coursework stored by batch 1.
 
 Official implementation references: [Streamlit deployment](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy), [Streamlit secrets](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management), [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [Supabase Python auth](https://supabase.com/docs/reference/python/auth-api).
 

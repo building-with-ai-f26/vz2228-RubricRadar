@@ -13,7 +13,7 @@ rejects secret keys, legacy JWT keys and custom/self-hosted URLs in this first v
 The transport uses standard-library HTTPS with the existing certifi package; no new
 runtime dependencies. Supabase remains responsible for credentials and token verification.
 
-Local: add SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY to the ignored `.env` using
+Local: add SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY and GOOGLE_CLIENT_ID to the ignored `.env` using
 `.env.example` as the field reference. Do not overwrite an existing `.env`.
 `app.py` already loads dotenv; the foundation modules do not load configuration at import.
 For future hosting, place these fields and OPENROUTER_API_KEY in Streamlit host secrets.
@@ -21,7 +21,7 @@ For future hosting, place these fields and OPENROUTER_API_KEY in Streamlit host 
 `CloudConfig.from_settings()`. Never copy real values into docs or terminal output.
 `.streamlit/secrets.toml`, archive files/dumps and CLI state are ignored.
 
-## Schema installation (not performed)
+## Schema installation (performed November 18; security tests pending)
 
 1. Choose a disposable/test Supabase project first. Review
    `supabase/migrations/202611170001_private_archive.sql` before applying it with the
@@ -45,29 +45,14 @@ For future hosting, place these fields and OPENROUTER_API_KEY in Streamlit host 
    HTTP/PostgREST behavior. Perform the separate deployed two-account direct API test
    in SECURITY.md before connecting real coursework or claiming security proof.
 
-## Email confirmation and password recovery
+## Google sign-in (selected November 18)
 
-Enable email/password Auth and **Confirm email** in the dashboard. Set minimum password
-length to at least 12 (the app's registration/reset methods enforce 12–128 characters).
-Configure SMTP/delivery for classmate addresses, and verify current service quotas and
-SMTP costs before selecting a paid service. Choose allowed site/redirect URLs before
-release, even though this implementation does not consume tokens from URL callbacks.
-
-Set **Confirm signup** and **Reset password** email templates to show `{{ .Token }}`
-instead of a login link. Example body: `<p>Your Rubric Radar code: {{ .Token }}</p>`.
-Use the six-digit email code with `Auth.verify_code(email, code)` for confirmation,
-or `Auth.verify_code(email, code, recovery=True)` for recovery. Recovery must then call
-`Auth.reset_password(new_password)`; display its returned status message and sign in again afterwards. Test both email types
-on the configured project. No URL-token parsing is implemented, so default link-only
-emails will not provide the intended in-app flow. Never put codes in query strings,
-analytics, logs or screenshots. Do not log in automatically after registration.
-
-Supabase verifies identities via GET `/auth/v1/user`. A near-expired token is refreshed
-synchronously; rotated refresh tokens stay in the current Auth object. Auth objects
-must live only in the caller's `st.session_state`; never `st.cache_resource`, a module
-global or a shared client. Passwords and codes are only request arguments, not retained
-on Auth. Python/server memory is not a secure-erasure guarantee. Do not render session
-objects, tokens or raw API failures in diagnostics.
+Google replaces the earlier email/password/code plan; do not configure SMTP or
+email templates for this flow. Follow [Google setup](google-signin.md).
+The official Google popup supplies an ID token; Supabase verifies its nonce and
+returns the user/session used by RLS. The app has no password/reset forms.
+Google provider is enabled, Email disabled, nonce checks on. Local settings are
+saved; live browser/Google checks and deployed security proof remain pending.
 
 ## Batch 3 integration and verification boundary
 
@@ -105,8 +90,8 @@ cascade deletion; active-table deletion does not erase backups/provider records.
 
 ## What is verified versus pending
 
-Mocked tests exercise request construction/redaction, per-object auth, refresh and
-verification failures, recovery isolation, save validation/idempotency and safe storage
+Mocked tests exercise request construction/redaction, per-object auth, Google nonce binding/reuse/expiry, refresh and
+verification failures, save validation/idempotency and safe storage
 failures. They do not execute PostgreSQL or prove deployed isolation. No psql, Docker or
 Supabase CLI was available in the inspected environment; the SQL script remains unrun.
 See tests/README.md for actual suite outcomes and SECURITY.md for pending live tests.

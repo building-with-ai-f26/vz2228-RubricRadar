@@ -50,6 +50,9 @@ class LibraryUITests(unittest.TestCase):
         # Disable actual cloud configuration irrespective of a developer's .env.
         self.config_patch = patch('library_ui.cloud_config', return_value=None)
         self.config_patch.start(); self.addCleanup(self.config_patch.stop)
+        # AppTest cannot drive Google's browser popup; test that protocol in Node.
+        self.google_patch = patch('library_ui.google_button', return_value=None)
+        self.google_patch.start(); self.addCleanup(self.google_patch.stop)
 
     def app(self):
         return AppTest.from_file('../app.py').run()
@@ -89,45 +92,59 @@ class LibraryUITests(unittest.TestCase):
     @patch('supabase_api.CloudAPI.send')
     def test_unconfigured_sign_in_is_disabled_guest_remains_available(self, cloud):
         app = self.app(); button(app, 'Open my library').click().run()
-        self.assertTrue(next(b for b in app.button if b.label == 'Sign in' and b.key != 'nav_login').disabled)
+        self.assertTrue(next(b for b in app.button if b.label == 'Continue with Google').disabled)
         button(app, 'Continue as guest').click().run()
         self.assertIn('draft', app.session_state)
         cloud.assert_not_called(); self.assertFalse(app.exception)
 
-    def test_sign_in_clears_password_widgets_and_opens_library(self):
+    def google_login_app(self):
         archive = FakeArchive(); app = self.private_app(archive, screen='classes')
         button(app, 'Sign out').click().run()
+        self.google_id = patch('library_ui.google_client_id', return_value='synthetic.apps.googleusercontent.com')
+        self.google_id.start(); self.addCleanup(self.google_id.stop)
         button(app, 'Open my library').click().run()
+        return app
+
+    def test_google_sign_in_opens_library_and_clears_old_work_and_credentials(self):
+        app = self.google_login_app()
         auth, api = signed_in()
         from test_cloud import TOKEN
+        auth.session = None
+        app.session_state['instructions'] = 'Old synthetic work'
         api.send.side_effect = lambda method, path, **kwargs: TOKEN if 'token?' in path else USER
-        with patch('library_ui.Auth', return_value=auth):
-            app.text_input(key='auth_email').input('synthetic@example.test')
-            app.text_input(key='auth_password').input('synthetic-password')
-            next(b for b in app.button if b.label == 'Sign in' and b.key != 'nav_login').click().run()
+        def response(client_id, nonce): return {'credential': 'synthetic-id-token', 'challenge_id': nonce}
+        with patch('library_ui.Auth', return_value=auth), patch('library_ui.google_button', side_effect=response):
+            app.session_state['rr_auth'] = auth
+            app.run()
         self.assertEqual(app.session_state['rr_route']['screen'], 'classes')
-        self.assertNotIn('auth_password', app.session_state)
-        self.assertNotIn('auth_email', app.session_state)
+        self.assertEqual(app.session_state['rr_owner'], A)
+        for key in ('instructions', 'draft', 'auth_password', 'auth_email'):
+            self.assertNotIn(key, app.session_state)
         self.assertFalse(app.exception)
 
-    def test_recovery_form_requires_verified_code_then_new_sign_in(self):
-        archive = FakeArchive(); app = self.private_app(archive, screen='classes')
-        button(app, 'Sign out').click().run(); button(app, 'Open my library').click().run()
-        auth, api = signed_in()
-        from test_cloud import TOKEN
-        api.send.side_effect = lambda method, path, **kwargs: TOKEN if path.endswith('/verify') else USER
-        app.selectbox(key='auth_action').select('Verify recovery code').run()
-        with patch('library_ui.Auth', return_value=auth):
-            app.text_input(key='auth_email').input('synthetic@example.test')
-            app.text_input(key='auth_code').input('123456')
-            button(app, 'Verify recovery code').click().run()
-        self.assertEqual(app.session_state['rr_route']['screen'], 'login')
-        app.text_input(key='auth_new_password').input('new-synthetic-password')
-        button(app, 'Set new password').click().run()
+    @patch('supabase_api.CloudAPI.send')
+    def test_cancelled_google_login_has_no_identity_or_network_call(self, cloud):
+        app = self.google_login_app()
+        with patch('library_ui.google_button', return_value=None): app.run()
         self.assertNotIn('rr_owner', app.session_state)
-        self.assertNotIn('auth_new_password', app.session_state)
-        self.assertIsNone(auth.session)
-        self.assertFalse(app.exception)
+        self.assertEqual(app.session_state['rr_route']['screen'], 'login')
+        self.assertEqual(len(app.text_input), 0)
+        self.assertEqual(len(app.selectbox), 0)
+        button(app, 'Continue as guest').click().run()
+        self.assertNotIn('rr_auth', app.session_state)
+        self.assertIn('draft', app.session_state)
+        cloud.assert_not_called(); self.assertFalse(app.exception)
+
+    @patch('supabase_api.CloudAPI.send')
+    def test_google_load_failure_shows_safe_retry_and_no_private_session(self, cloud):
+        app = self.google_login_app()
+        with patch('library_ui.google_button', return_value={'error': 'unavailable'}): app.run()
+        self.assertTrue(app.error)
+        self.assertNotIn('rr_owner', app.session_state)
+        with patch('library_ui.google_button', return_value=None):
+            button(app, 'Try Google sign-in again').click().run()
+        self.assertFalse(app.error)
+        cloud.assert_not_called(); self.assertFalse(app.exception)
 
     def test_unsaved_navigation_can_keep_or_discard_inputs(self):
         app = self.app(); button(app, 'Continue as guest').click().run()

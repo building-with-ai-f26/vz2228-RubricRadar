@@ -7,6 +7,7 @@ from uuid import uuid4
 import streamlit as st
 from archive import Archive, make_snapshot
 from auth import Auth
+from google_signin import google_button, google_client_id
 from feedback_ui import render_feedback
 from sample_library import SampleArchive
 from supabase_api import CloudAPI, CloudConfig, CloudError
@@ -197,44 +198,37 @@ def login():
     enabled = config is not None
     if not enabled:
         st.info('Private accounts are not available yet. Try the sample library or continue as guest.')
-    auth = st.session_state.get('rr_auth')
-    if auth and auth.session and auth.session.recovery:
-        with st.form('password_reset', clear_on_submit=True):
-            password = st.text_input('New password', type='password', key='auth_new_password', max_chars=128)
-            submitted = st.form_submit_button('Set new password', disabled=not enabled)
-        if submitted:
-            try:
-                message = auth.reset_password(password)
-                leave_account(); st.session_state.rr_route = {'screen': 'login'}
-                st.session_state.rr_notice = message; st.rerun()
-            except CloudError as exc:
-                st.error(str(exc))
-        st.button('Cancel recovery', on_click=leave_account)
-        return
-    mode = st.selectbox('Account action', ['Sign in', 'Create account', 'Confirm email', 'Send recovery code', 'Verify recovery code'], key='auth_action')
-    with st.form('account', clear_on_submit=True):
-        email = st.text_input('Email', key='auth_email', max_chars=254, disabled=not enabled)
-        password = st.text_input('Password', key='auth_password', type='password', max_chars=128,
-                                 disabled=not enabled) if mode in ('Sign in', 'Create account') else None
-        code = st.text_input('Email code', key='auth_code', max_chars=6, disabled=not enabled) if mode in ('Confirm email', 'Verify recovery code') else None
-        if mode == 'Create account': st.caption('Use 12–128 characters. Check your email for a confirmation code.')
-        submitted = st.form_submit_button(mode, disabled=not enabled)
-    if submitted:
+    if enabled:
         try:
+            client_id = google_client_id(setting('GOOGLE_CLIENT_ID'))
+            auth = st.session_state.get('rr_auth')
             if not auth:
                 auth = Auth(CloudAPI(config)); st.session_state.rr_auth = auth
-            if mode == 'Create account': st.success(auth.sign_up(email, password))
-            elif mode == 'Send recovery code': st.success(auth.request_password_reset(email))
-            else:
-                session = auth.sign_in(email, password) if mode == 'Sign in' else auth.verify_code(email, code, recovery=mode == 'Verify recovery code')
-                if session.recovery: st.rerun()
+            response = google_button(client_id, auth.google_challenge())
+            if response is not None:
+                if not isinstance(response, dict) or response.get('error'):
+                    auth.cancel_google()
+                    raise CloudError('Google sign-in could not finish. Try again or continue as guest.')
+                session = auth.sign_in_google(response.get('credential'), response.get('challenge_id'))
+                clear_work()
                 st.session_state.rr_owner = session.user_id
                 transition({'screen': 'classes'}); st.rerun()
         except CloudError as exc:
             st.error(str(exc))
+        st.button('Try Google sign-in again', on_click=retry_google)
+        st.caption('If you close the Google window, you can try again or continue as guest.')
+    else:
+        st.button('Continue with Google', disabled=True)
     st.button('Explore sample library', on_click=begin_sample)
     st.button('Continue as guest', on_click=begin_guest)
-    st.caption('Passwords and email codes are not stored in your review library. Sessions end when this browser/server session is lost.')
+    st.caption('Google and Supabase process your sign-in identity. No Gmail or Drive access is requested. '
+               'This app does not collect a password. Sign out ends this app session; it does not sign you out of Google.')
+
+
+def retry_google():
+    auth = st.session_state.get('rr_auth')
+    if auth:
+        auth.cancel_google()
 
 
 def class_accent(class_id):

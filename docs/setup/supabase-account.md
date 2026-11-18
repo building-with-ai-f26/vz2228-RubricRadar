@@ -1,5 +1,7 @@
 # Create your Supabase account and project
 
+**November 18 update:** Account/project and hosted schema installation are complete. Google sign-in replaces email/password/code signup and recovery; use [Google setup](google-signin.md). Earlier creation steps below are a reusable guide, not pending work for the current project.
+
 For the builder · November 17, 2026. You create the account/project yourself;
 we will connect it after the security checks. The local sample works without it.
 

@@ -18,7 +18,7 @@ B = '10000000-0000-0000-0000-000000000002'
 P = '20000000-0000-0000-0000-000000000001'
 R = '30000000-0000-0000-0000-000000000001'
 T = '40000000-0000-0000-0000-000000000001'
-USER = {'id': A, 'email_confirmed_at': '2026-11-17T12:00:00Z'}
+USER = {'id': A, 'email_confirmed_at': '2026-11-17T12:00:00Z', 'identities': [{'provider': 'google'}]}
 TOKEN = {'access_token': 'private-access', 'refresh_token': 'private-refresh', 'expires_in': 3600}
 
 
@@ -89,7 +89,7 @@ class AuthTests(unittest.TestCase):
     def test_sign_in_uses_server_verified_identity_and_does_not_share_sessions(self):
         api = MagicMock(); api.send.side_effect = [TOKEN, USER]
         auth = Auth(api); other = Auth(api)
-        session = auth.sign_in('student@example.test', 'private-password')
+        session = auth.sign_in_google('synthetic-id-token', auth.google_challenge())
         self.assertEqual(session.user_id, A)
         self.assertIsNone(other.session)
         self.assertNotIn('private-', repr(session))
@@ -98,18 +98,28 @@ class AuthTests(unittest.TestCase):
     def test_failed_login_or_unconfirmed_email_clears_old_session(self):
         for response in ({**USER, 'email_confirmed_at': None}, {'id': B}):
             auth, api = signed_in(); api.send.side_effect = [TOKEN, response]
-            with self.assertRaises(CloudError): auth.sign_in('student@example.test', 'private-password')
+            with self.assertRaises(CloudError): auth.sign_in_google('synthetic-id-token', auth.google_challenge())
             self.assertIsNone(auth.session)
         auth, api = signed_in(); api.send.side_effect = CloudError('Refused', status=401)
-        with self.assertRaises(CloudError): auth.sign_in('student@example.test', 'private-password')
+        with self.assertRaises(CloudError): auth.sign_in_google('synthetic-id-token', auth.google_challenge())
         self.assertIsNone(auth.session)
 
-    def test_registration_has_no_implicit_login_and_keeps_no_password(self):
-        auth, api = signed_in(); api.send.return_value = TOKEN
-        auth.sign_up('student@example.test', 'long-private-password')
+    def test_google_nonce_is_hashed_for_browser_and_raw_for_supabase_once(self):
+        api = MagicMock(); api.send.side_effect = [TOKEN, USER]
+        auth = Auth(api); public_nonce = auth.google_challenge()
+        raw_nonce = auth._google.nonce
+        self.assertEqual(len(public_nonce), 64)
+        self.assertNotEqual(raw_nonce, public_nonce)
+        self.assertEqual(auth.google_challenge(), public_nonce)
+        auth.sign_in_google('synthetic-id-token', public_nonce)
+        self.assertEqual(api.send.call_args_list[0].args, ('POST', '/auth/v1/token?grant_type=id_token'))
+        self.assertEqual(api.send.call_args_list[0].kwargs['body'], {
+            'provider': 'google', 'id_token': 'synthetic-id-token', 'nonce': raw_nonce})
+        self.assertIsNone(auth._google)
+        api.send.reset_mock()
+        with self.assertRaises(CloudError): auth.sign_in_google('synthetic-id-token', public_nonce)
+        api.send.assert_not_called()
         self.assertIsNone(auth.session)
-        self.assertNotIn('password', auth.__dict__)
-        self.assertEqual(api.send.call_args.args, ('POST', '/auth/v1/signup'))
 
     def test_refresh_rotates_token_and_checks_identity(self):
         auth, api = signed_in(); auth.session.expires_at = 0
@@ -129,53 +139,47 @@ class AuthTests(unittest.TestCase):
             with self.assertRaises(CloudError): auth.verified_session()
             self.assertIsNone(auth.session)
 
-    def test_email_code_types_and_recovery_cannot_open_archive(self):
-        api = MagicMock(); auth = Auth(api)
-        for recovery, expected in [(False, 'email'), (True, 'recovery')]:
-            api.send.side_effect = [TOKEN, USER]
-            auth.verify_code('student@example.test', '123456', recovery=recovery)
-            self.assertEqual(api.send.call_args_list[-2].kwargs['body']['type'], expected)
-        with self.assertRaises(CloudError): Archive(auth).list_classes()
-        self.assertEqual(api.send.call_count, 4)
-        api.send.side_effect = None
-        auth.reset_password('new-private-password')
-        self.assertIsNone(auth.session)
-        self.assertEqual(api.send.call_args_list[-2].kwargs['body'], {'password': 'new-private-password'})
-        self.assertIn('logout', api.send.call_args.args[1])
+    def test_google_expired_cross_session_cancelled_and_invalid_attempts_fail_closed(self):
+        for invalid in ('expired', 'other-session', 'cancelled', 'empty', 'oversized', 'non-string'):
+            auth, api = signed_in(); challenge = auth.google_challenge()
+            credential = 'synthetic-id-token'
+            if invalid == 'expired': auth._google.expires_at = 0
+            elif invalid == 'other-session': challenge = Auth(api).google_challenge()
+            elif invalid == 'cancelled': auth.cancel_google()
+            elif invalid == 'empty': credential = ''
+            elif invalid == 'oversized': credential = 'x' * 16385
+            else: credential = {'credential': 'invalid'}
+            with self.subTest(invalid=invalid), self.assertRaises(CloudError):
+                auth.sign_in_google(credential, challenge)
+            api.send.assert_not_called()
+            self.assertIsNone(auth.session); self.assertIsNone(auth._google)
 
-    def test_password_change_success_is_not_misreported_when_logout_fails(self):
-        auth, api = signed_in(); auth.session.recovery = True
-        api.send.side_effect = [{}, CloudError('Network failure')]
-        message = auth.reset_password('new-private-password')
-        self.assertIn('Your password changed', message)
-        self.assertIn('could not be confirmed', message)
-        self.assertIsNone(auth.session)
+    def test_google_provider_and_verified_email_required(self):
+        for user in ({**USER, 'identities': [{'provider': 'email'}]}, {**USER, 'email_confirmed_at': None}):
+            auth, api = signed_in(); api.send.side_effect = [TOKEN, user]
+            with self.assertRaises(CloudError):
+                auth.sign_in_google('synthetic-id-token', auth.google_challenge())
+            self.assertIsNone(auth.session)
 
-    def test_password_change_failure_clears_recovery_and_preserves_original_error(self):
-        auth, api = signed_in(); auth.session.recovery = True
-        api.send.side_effect = [CloudError('Password change refused', status=422), CloudError('Logout failed')]
-        with self.assertRaisesRegex(CloudError, 'Password change refused'):
-            auth.reset_password('new-private-password')
-        self.assertIsNone(auth.session)
+    def test_google_refused_token_is_not_retried_and_challenge_is_consumed(self):
+        auth, api = signed_in(); api.send.side_effect = CloudError('Refused', status=401)
+        challenge = auth.google_challenge()
+        with self.assertRaises(CloudError): auth.sign_in_google('synthetic-id-token', challenge)
+        self.assertEqual(api.send.call_count, 1)
+        self.assertIsNone(auth._google); self.assertIsNone(auth.session)
+        self.assertNotEqual(auth.google_challenge(), challenge)
 
     def test_logout_clears_local_state_even_when_network_fails(self):
         auth, api = signed_in(); api.send.side_effect = CloudError('Network failure')
         with self.assertRaises(CloudError): auth.sign_out()
         self.assertIsNone(auth.session)
 
-    def test_invalid_credentials_or_codes_make_no_requests(self):
-        api = MagicMock(); auth = Auth(api)
-        for action in (lambda: auth.sign_up('bad-email', 'long-private-password'),
-                       lambda: auth.sign_up('student@example.test', 'short'),
-                       lambda: auth.verify_code('student@example.test', 'not-a-code')):
-            with self.assertRaises(CloudError): action()
-        api.send.assert_not_called()
-
-    def test_recovery_request_uses_generic_result_and_stores_no_email(self):
-        api = MagicMock(); auth = Auth(api)
-        self.assertIn('If an account exists', auth.request_password_reset('student@example.test'))
-        self.assertEqual(api.send.call_args.kwargs['body'], {'email': 'student@example.test'})
-        self.assertNotIn('email', auth.__dict__)
+    def test_malformed_google_session_response_never_creates_session(self):
+        for data in (None, {}, {**TOKEN, 'expires_in': True}, {**TOKEN, 'access_token': ''}):
+            auth, api = signed_in(); api.send.return_value = data
+            with self.subTest(data=data), self.assertRaises(CloudError):
+                auth.sign_in_google('synthetic-id-token', auth.google_challenge())
+            self.assertIsNone(auth.session)
 
 
 class ArchiveTests(unittest.TestCase):

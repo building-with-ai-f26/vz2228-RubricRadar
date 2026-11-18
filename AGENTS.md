@@ -6,23 +6,23 @@
 - **What this repo builds:** Rubric Radar coaches MBA students reviewing written reports/projects against pasted instructions or rubrics. It provides requirement-linked evidence and up to three revision priorities.
 - **Primary user & core workflow:** [See the living PRD in `docs/index.html`]
 - **Current tech stack:** Python 3.14.4 (verified), Streamlit, OpenRouter API, jsonschema, python-dotenv, certifi; no database.
-- **Build 3 plan:** Beginner lane; Streamlit Community Cloud + Supabase Auth/Postgres; private Class → Project → Saved reviews and Continue as guest. See PRD.md section 13 and Plan.md (resume point). Supersedes the local SQLite proposal. Batches 1–3 are approved/completed locally: backend modules, unexecuted SQL scripts, guest/auth/library UI and a read-only sample are present. Cloud sign-in/storage is gated off by default until isolation is verified; no cloud project is configured or app deployed. Batch 4 requires approval.
+- **Build 3 plan:** Beginner lane; Streamlit Community Cloud + Supabase Auth/Postgres; private Class → Project → Saved reviews and Continue as guest. See PRD.md section 13 and Plan.md (resume point). Supersedes the local SQLite proposal. Batches 1–3 are implemented locally. November 18 Google sign-in batch is approved: Google Identity Services popup replaces email/password UI and exchanges a nonce-bound ID token through Supabase. Hosted schema installation succeeded November 18; SQL-role and two-account isolation tests remain unexecuted. Cloud sign-in/storage stays gated off until isolation is verified. No public app deployment; batch 4 still requires approval. See tests/README.md for current configuration and evidence.
 
 ## 2. Commands
 - **Install dependencies:** `python3 -m venv .venv` then `.venv/bin/python -m pip install -r requirements.txt`
 - **Run locally:** `.venv/bin/python -m streamlit run app.py` (http://127.0.0.1:8501)
 - **Run deterministic tests:** `.venv/bin/python -m unittest discover -s tests -v`
-- **Run analytics tests:** `node --test tests/test_analytics.cjs` (Node.js required only for this check)
+- **Run analytics / Google component tests:** `node --test tests/test_analytics.cjs tests/test_google_signin.cjs` (Node.js required only for this check)
 - **Preview Product Page locally:** `python3 -m http.server 8765 --bind 127.0.0.1 --directory docs`
 - **Run model evals:** `.venv/bin/python tests/smoke_live.py` (synthetic, two billable API calls; full Build 4 eval not yet implemented)
 
 ### Structure and setup
 - `app.py`: guest/project review inputs, confirmation, result invalidation and Load demo example. `app_style.css` and `.streamlit/config.toml` own the minimal local presentation/theme; use trusted static CSS only, keep coursework in native widgets. Read DESIGN.md for the established visual system before aesthetic changes; preserve structure, minimal navigation and class identity colors.
-- `library_ui.py`: account forms, per-session navigation, cloud gate, private library/save/delete UI, unsaved-work and identity clearing.
+- `library_ui.py`: Google account entry, per-session navigation, cloud gate, private library/save/delete UI, unsaved-work and identity clearing.
 - `feedback_ui.py`: shared read-only feedback renderer; `sample_library.py`: fixed synthetic read-only walkthrough and demo texts. Sample mode cannot save or call models.
 - `radar.py`: OpenRouter requests, structured contracts, input bounds, and evidence checks.
-- `supabase_api.py`, `auth.py`, `archive.py`: stateless cloud HTTP, per-session auth, private archive foundation; UI calls are gated by RUBRIC_RADAR_ARCHIVE_ENABLED (false by default). Standard library + existing dependencies only.
-- `supabase/migrations/`, `supabase/tests_private_archive.sql`: unexecuted schema/RLS migration and rollback-only database security checks. Mocks do not prove SQL isolation. See `docs/setup/supabase.md` for setup and pending validation.
+- `supabase_api.py`, `auth.py`, `archive.py`: stateless cloud HTTP, per-session Google/Supabase auth, private archive foundation; `google_signin.py` and `google_signin/` render the official Google popup button with a server nonce. No automatic Google sign-in, browser token storage or app Google client secret; UI calls are gated by RUBRIC_RADAR_ARCHIVE_ENABLED (false by default). Standard library + existing dependencies only.
+- `supabase/migrations/`, `supabase/tests_private_archive.sql`: schema/RLS migration (hosted installation succeeded November 18) and unexecuted rollback-only database security checks. Mocks do not prove SQL isolation. See `docs/setup/supabase.md` for setup and pending validation.
 - `docs/index.html` and `docs/images/`: Product Page, living PRD summary, build log, and synthetic screenshots; published via GitHub Pages from `main` `/docs`.
 - `docs/posthog.js`: Shared browser analytics and masked replay configuration, embedded by `app.py` and loaded by the Product Page. Initialization is guarded against Streamlit reruns.
 - `tests/`: Mocked Python checks, analytics checks, synthetic live smoke script, and evidence log in `tests/README.md`.
@@ -49,7 +49,7 @@ Use Python 3.14.4 for the verified environment. After installing dependencies, c
 
 ## 5. Shipping
 
-- Selected lane: Beginner. Target Streamlit Community Cloud for the app; GitHub Pages remains the Product Page. Supabase Auth/Postgres is planned, not provisioned. Resume from Plan.md and inspect current status before continuing.
+- Selected lane: Beginner. Target Streamlit Community Cloud for the app; GitHub Pages remains the Product Page. Supabase Auth/Postgres project and schema are provisioned; live ownership proof remains pending. Resume from Plan.md and inspect current status before continuing.
 - Before a release, run relevant Python/analytics checks and record every result, failure and recovery per section 3. Security-sensitive storage needs deployed two-account tests as well as mocked checks.
 - Never expose coursework tables before grants, RLS and same-owner parent constraints are verified. Use the publishable key plus user token for routine app queries, never a service-role bypass. Keep auth sessions and coursework out of shared caches.
 - Keep server credentials in host secrets. Verify runtime compatibility, HTTPS, phone workflow, cost controls, live PostHog events and fully masked replay. Record deployed revision/URL and a known-good code rollback; database migrations require a separate recovery plan.

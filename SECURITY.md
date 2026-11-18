@@ -1,6 +1,9 @@
 # Security audit — Build 3 (pending)
 
-Updated November 17, 2026. **Full audit incomplete; no production readiness is claimed.** Batch 2 adds local auth/archive contracts and unexecuted SQL schema/security tests. The app has local guest/sample and gated library UI; Supabase Auth/Postgres are not provisioned and no live security proof exists. See Plan.md and PRD.md section 13.
+**Current checkpoint — November 18:** Google sign-in replaces email/password/code accounts. Google OAuth branding and a Web client are configured under the builder's NYU Google account in the existing My First Project (creation of a new project outside the school organization was refused). Allowed origins are localhost:8501 and 127.0.0.1:8501 only; audience is External/Testing with the builder's NYU account added as one test user. Supabase shows Google enabled and Email disabled; nonce checks were kept on. Hosted schema installation succeeded. Local ignored .env has the project URL, publishable key and Google client ID; existing provider key was preserved. Archive gate stays false. No live Google login, SQL-role/two-account security test, public app deployment or publication was performed. Earlier differing checkpoints below are historical. Setup: docs/setup/google-signin.md; evidence: tests/README.md.
+
+
+Updated November 17, 2026. **Full audit incomplete; no production readiness is claimed.** Batch 2 adds local auth/archive contracts and unexecuted SQL schema/security tests. The app has local guest/sample and gated library UI; Supabase Auth/Postgres are provisioned and schema installation succeeded November 18, but no live isolation proof exists. Earlier batch 2/3 auth findings below are historical; the Google batch supersedes email/password/recovery. See Plan.md and PRD.md section 13.
 
 ## Batch 3 local UI checkpoint — November 17
 
@@ -45,4 +48,10 @@ Result: **Pending.** Screenshot: **Pending.** Deployment URL/revision/date: **Pe
 
 ## Remaining risks and release gates
 
-All audit areas above remain unverified in a deployed cloud environment. Resolve auth email/recovery setup, actual access policies, rate/concurrency/spending limits, provider account privacy settings, cloud retention/backups/account deletion and runtime compatibility. Verify live PostHog ingestion and complete masking before real coursework. Document any remaining limitations after fixes; never infer a completed full audit from this register.
+All audit areas above remain unverified in a deployed cloud environment. Resolve live Google identity/session setup, actual access policies, rate/concurrency/spending limits, provider account privacy settings, cloud retention/backups/account deletion and runtime compatibility. Verify live PostHog ingestion and complete masking before real coursework. Document any remaining limitations after fixes; never infer a completed full audit from this register.
+
+## November 18 Google configuration checkpoint
+
+Hosted configuration: Google Web client created after explicit builder approval; Google provider saved without client secret for the ID-token flow, nonce checks on, no-email identities disallowed. Email provider disabled after approval. Anonymous sign-ins/manual linking remain off. Only local origins are authorized and one chosen NYU test user is configured. No service-role key used. Local .env stores only the intended project URL, publishable key and Google client ID alongside existing provider configuration; gate false. Client secret was not saved/downloaded or placed in app settings.
+
+Auth source now uses a five-minute, one-use server nonce and server-verified Supabase identity. Python recovery suite: 61 passed; one earlier AppTest timeout and recovery recorded. Four analytics plus three Google component Node tests passed. These mocks do not prove Google popup compatibility, live nonce enforcement, hosted JWT/session isolation or database policies. No new tests after the builder requested finishing configuration without testing; full audit remains incomplete. See tests/README.md for exact results and limitations.
