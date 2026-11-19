@@ -1,6 +1,8 @@
 # Security audit — Build 3 (pending)
 
-**Current checkpoint — November 18:** Google sign-in replaces email/password/code accounts. Google OAuth branding and a Web client are configured under the builder's NYU Google account in the existing My First Project (creation of a new project outside the school organization was refused). Allowed origins are localhost:8501 and 127.0.0.1:8501 only; audience is External/Testing with the builder's NYU account added as one test user. Supabase shows Google enabled and Email disabled; nonce checks were kept on. Hosted schema installation succeeded. Local ignored .env has the project URL, publishable key and Google client ID; existing provider key was preserved. Archive gate stays false. No live Google login, SQL-role/two-account security test, public app deployment or publication was performed. Earlier differing checkpoints below are historical. Setup: docs/setup/google-signin.md; evidence: tests/README.md.
+**Current checkpoint — November 19.** Google sign-in worked for both approved test accounts. Hosted SQL-role, anonymous access and authenticated two-account isolation checks passed. The archive stays disabled. Expired-token verification, full app testing and the release audit are pending. Earlier checkpoints below are historical. [Test evidence](tests/README.md#november-19--two-account-direct-api-isolation)
+
+**November 18 configuration.** Google sign-in replaced email/password/code accounts. The Google Web client was configured in the builder's existing My First Project after project creation outside the school organization was refused. OAuth origins were limited to localhost:8501 and 127.0.0.1:8501. Supabase Google was enabled with nonce checks on, and Email was disabled. Hosted schema installation succeeded. The ignored local `.env` retained the provider key and was configured for the Supabase project and Google client. [Google setup](docs/setup/google-signin.md)
 
 
 Updated November 17, 2026. **Full audit incomplete; no production readiness is claimed.** Batch 2 adds local auth/archive contracts and unexecuted SQL schema/security tests. The app has local guest/sample and gated library UI; Supabase Auth/Postgres are provisioned and schema installation succeeded November 18, but no live isolation proof exists. Earlier batch 2/3 auth findings below are historical; the Google batch supersedes email/password/recovery. See Plan.md and PRD.md section 13.
@@ -19,13 +21,13 @@ Audit the app, dependencies, repository/history, hosting/secrets, Supabase auth 
 | --- | --- | --- |
 | Secrets | Working tree + history; ignored local secrets; host secrets; no tokens/keys in UI/logs | Pending; no finding/fix recorded |
 | Dependencies | Installed versions, advisories, supported hosting runtime | pip check passed; advisory/runtime audit pending |
-| Authentication | Verification/recovery, redirects, expiry/refresh, logout, per-session clients, no global token cache | Mocked identity/refresh/recovery/logout checks passed; password-reset status issue fixed (below). Live email/JWT/session/UI checks pending |
-| Authorization | Grants + RLS for all operations; forged owner IDs; same-owner parents; direct API bypass attempts | SQL source reviewed: owner policies, restricted grants and composite parent FKs written. Not executed; direct API proof pending |
+| Authentication | Google identity, expiry/refresh, logout and per-session clients | Live sign-in and sign-out verified in the local test pages. Live expired-token and full app session checks pending |
+| Authorization | Grants and RLS, forged owner IDs, same-owner parents and direct API verification | Hosted SQL-role, anonymous access and two-account direct API checks passed on November 19. See evidence below |
 | Guest and account state | No guest coursework saves; logout/account/context changes clear private working state | Pending; no finding/fix recorded |
 | Input/output | Parameterized operations, bounds, escaped rendering, untrusted model/stored content, safe errors | Pending; no finding/fix recorded |
 | API and cost | Server-held provider key, privacy-compatible routing, request/concurrency controls and budget | Pending; numeric limits undecided |
 | Privacy/analytics | No coursework/credentials in logs/events/URLs; masked auth, names, drafts and history; console/network-body capture off | Pending live audit; earlier local checks are not Build 3 verification |
-| Storage/deletion | Immutable snapshots, duplicate-save guard, owned transactional deletion, retention/backup/account deletion disclosures | Mocked validation/idempotent retry/failure/count contracts passed; SQL uniqueness/cascades/immutability unexecuted. UI, retention/account deletion decisions pending |
+| Storage/deletion | Immutable snapshots, duplicate-save guard, owned transactional deletion, retention/backup/account deletion disclosures | Hosted SQL assertions passed for uniqueness, cascading deletion and immutability. Direct API checks verified own review deletion and fixture cleanup. Full app workflow and retention decisions pending |
 | Hosting/recovery | HTTPS, secrets, phone usability, deployed revision, code rollback + migration recovery | Pending; no live app deployed |
 
 ## Local checks, finding and fix — November 17
@@ -36,7 +38,7 @@ Other local checks cover HTTPS origin/publishable-key restrictions, redirect ref
 
 The migration and rollback-only SQL role tests are under supabase/; setup and limitations are in docs/setup/supabase.md. No psql, Docker or Supabase CLI is available in the inspected environment, so both scripts remain unrun. Future live tests must use real user tokens and bypass the UI; SQL-role simulation alone is insufficient. Access tokens can remain valid until JWT expiry after logout. UI state clearing, stale-save gating and pagination are now implemented and covered by mocked tests; real-service validation is pending. Guest model abuse/spend protection remains a pre-release gate.
 
-## Required two-account test (not executed)
+## Required two-account test — November 19
 
 1. A creates synthetic class/project/review records. Record fixture IDs privately during execution, never tokens or coursework in public evidence.
 2. B demonstrates successful operations on B's own fixtures (positive control).
@@ -44,11 +46,11 @@ The migration and rollback-only SQL role tests are under supabase/; setup and li
 4. Verify no A records are disclosed/changed and no unauthorized children are created. A can still read its unchanged fixtures. A denied read may return an empty result; do not label it a 403 unless observed.
 5. Capture a labeled refused write showing expected/observed outcome and deployed version without credentials. Link the screenshot and full evidence entry here, including failures and retests.
 
-Result: **Pending.** Screenshot: **Pending.** Deployment URL/revision/date: **Pending.** Mocked app tests cannot establish these deployed policies.
+**Result.** Hosted Supabase authorized each user's own synthetic operations. Cross-account access returned zero rows, the forged-owner insert was refused with HTTP 403, and cross-owner parent writes were refused with HTTP 409. A's records remained unchanged until fixture cleanup. Anonymous requests returned HTTP 401. Live expired-token behavior remains pending. The test ran from a localhost harness on revision `9688490` on November 19, 2026. Public app deployment remains pending. [Refused-write screenshot](tests/evidence/supabase-two-account-isolation-2026-11-19.png) · [Full record](tests/README.md#november-19--two-account-direct-api-isolation)
 
 ## Remaining risks and release gates
 
-All audit areas above remain unverified in a deployed cloud environment. Resolve live Google identity/session setup, actual access policies, rate/concurrency/spending limits, provider account privacy settings, cloud retention/backups/account deletion and runtime compatibility. Verify live PostHog ingestion and complete masking before real coursework. Document any remaining limitations after fixes; never infer a completed full audit from this register.
+Complete expired-token and full app session verification, rate/concurrency/spending limits, provider account privacy settings, cloud retention/backups/account deletion and runtime compatibility. Verify live PostHog ingestion and complete masking before real coursework. Document any remaining limitations after fixes.
 
 ## November 18 Google configuration checkpoint
 

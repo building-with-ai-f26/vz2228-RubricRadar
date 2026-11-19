@@ -66,6 +66,11 @@ remain valid until expiry. Lost Streamlit sessions require signing in again.
 
 ## Validation and pending work
 
+On November 19, both approved test accounts signed in and out through the local
+Chrome test page. Hosted Supabase passed the two-account API checks. Expired-token,
+full app workflow and deployed HTTPS origin checks remain pending.
+[Live test evidence](../../tests/README.md#november-19--two-account-direct-api-isolation)
+
 Python mocks cover nonce expiry, reuse, session binding, failure, Supabase-verified
 identity and UI state clearing. Node tests use synthetic Google/Streamlit messages
 to check origin/source filtering, one credential submission, library failure and

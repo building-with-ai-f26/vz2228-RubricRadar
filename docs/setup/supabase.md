@@ -21,7 +21,7 @@ For future hosting, place these fields and OPENROUTER_API_KEY in Streamlit host 
 `CloudConfig.from_settings()`. Never copy real values into docs or terminal output.
 `.streamlit/secrets.toml`, archive files/dumps and CLI state are ignored.
 
-## Schema installation (performed November 18; security tests pending)
+## Schema installation and verification
 
 1. Choose a disposable/test Supabase project first. Review
    `supabase/migrations/202611170001_private_archive.sql` before applying it with the
@@ -40,10 +40,9 @@ For future hosting, place these fields and OPENROUTER_API_KEY in Streamlit host 
    The script creates temporary synthetic fixtures in a transaction and rolls back.
    It uses administrator access to seed users, then switches to authenticated/anon
    roles to test actual permissions, RLS, same-owner constraints, duplicate saves,
-   immutable reviews, invoker counts and cascade deletion. It has **not been run**.
-5. SQL-role simulation does not test real Auth JWTs, token expiry, email delivery or
-   HTTP/PostgREST behavior. Perform the separate deployed two-account direct API test
-   in SECURITY.md before connecting real coursework or claiming security proof.
+   immutable reviews, invoker counts and cascade deletion. On November 19 it passed in the hosted test project SQL Editor after the builder approved the rollback-only run.
+5. The separate two-account HTTP check passed against hosted Supabase on November 19.
+   Live expired-token and full app workflow checks remain pending. [Security evidence](../../SECURITY.md#required-two-account-test--november-19)
 
 ## Google sign-in (selected November 18)
 
@@ -51,8 +50,8 @@ Google replaces the earlier email/password/code plan; do not configure SMTP or
 email templates for this flow. Follow [Google setup](google-signin.md).
 The official Google popup supplies an ID token; Supabase verifies its nonce and
 returns the user/session used by RLS. The app has no password/reset forms.
-Google provider is enabled, Email disabled, nonce checks on. Local settings are
-saved; live browser/Google checks and deployed security proof remain pending.
+Google is enabled, Email is disabled, and nonce checks are on. Both approved test
+accounts completed local Google sign-in and sign-out. The archive flag remains off.
 
 ## Batch 3 integration and verification boundary
 
@@ -92,9 +91,9 @@ cascade deletion; active-table deletion does not erase backups/provider records.
 
 Mocked tests exercise request construction/redaction, per-object auth, Google nonce binding/reuse/expiry, refresh and
 verification failures, save validation/idempotency and safe storage
-failures. They do not execute PostgreSQL or prove deployed isolation. No psql, Docker or
-Supabase CLI was available in the inspected environment; the SQL script remains unrun.
-See tests/README.md for actual suite outcomes and SECURITY.md for pending live tests.
+failures. Hosted SQL-role and direct two-account tests provide the database evidence.
+See the [test log](../../tests/README.md#november-19--two-account-direct-api-isolation)
+and [security audit](../../SECURITY.md) for results and remaining checks.
 
 Official references: [Auth HTTP API](https://supabase.com/docs/reference/self-hosting-auth/introduction),
 [email code templates](https://supabase.com/docs/guides/auth/auth-email-templates),

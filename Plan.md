@@ -1,39 +1,27 @@
 # Build 3 — Beginner lane: private saved reviews
 
-Updated November 18, 2026. This is the resume point for the next session.
+Updated November 19, 2026. Start here when you return.
 
 ## Resume here
 
-**Current checkpoint — November 18:** Google sign-in replaces email/password/code accounts. Google OAuth branding and a Web client are configured under the builder's NYU Google account in the existing My First Project (creation of a new project outside the school organization was refused). Allowed origins are localhost:8501 and 127.0.0.1:8501 only; audience is External/Testing with the builder's NYU account added as one test user. Supabase shows Google enabled and Email disabled; nonce checks were kept on. Hosted schema installation succeeded. Local ignored .env has the project URL, publishable key and Google client ID; existing provider key was preserved. Archive gate stays false. No live Google login, SQL-role/two-account security test, public app deployment or publication was performed. Earlier differing checkpoints below are historical. Setup: docs/setup/google-signin.md; evidence: tests/README.md.
+**Verified.** Both approved Google test accounts signed in and out through a local test page. Hosted Supabase passed the rollback-only SQL checks, four anonymous access checks and authenticated two-account API isolation on revision `9688490`. The test removed its synthetic fixtures. The latest suite rerun on the new Mac passed 61 Python and seven Node tests. [Test log](tests/README.md#november-19--two-account-direct-api-isolation) · [Refused-write screenshot](tests/evidence/supabase-two-account-isolation-2026-11-19.png)
 
-**Next session:** Read this checkpoint and preserve the working tree. Configuration is saved; builder requested stopping before further/live testing. First review the new Google component in Chrome, then run actual Google login/logout in an auth-only test harness without enabling archive writes. Run the prepared SQL security checks and two-account direct API proof before enabling the library. A second Google test account and the future deployed HTTPS origin are not configured. Batch 4 audit/deployment still needs separate approval. Builder subsequently requested a local checkpoint commit. Source/docs/evidence are being committed; no remote push is authorized. Ignored local .env configuration is not part of Git.
-
-
-Historical November 17 checkpoint: the builder requested committing and pushing all then-current project work to origin/main. This plan, code, setup guides, design rules, audit register and test evidence are included in that checkpoint. Actual commit/push success must be verified from Git; this text was prepared before the commit.
-
-### What is ready
-
-- Beginner lane selected; batches 1–3 and the November 18 Google replacement batch approved: guest entry, gated Google sign-in, private Class → Project → Saved reviews UI, explicit saves/deletion, history, pagination and context isolation.
-- Read-only synthetic sample: three classes, each with a project/review. Load demo example fills both editor fields, clears stale feedback/save state and unchecks consent; loading never calls the model or saves coursework.
-- Minimal aesthetics and class accents refined using Impeccable 4.9.2 guidance. Preserve the current structure and minimal navigation; read DESIGN.md before changing aesthetics.
-- Supabase project is ready; SQL Editor reported Success for the private-archive migration November 18. Rollback-only SQL security tests and real two-account checks remain unexecuted. RUBRIC_RADAR_ARCHIVE_ENABLED remains false.
-- Google Identity Services popup and nonce-bound Supabase exchange replace email/password/code UI. No SMTP sender is required. Setup/configuration progress: docs/setup/google-signin.md and tests/README.md.
-- Latest Google-batch Python suite: 61 passed in 5.837 seconds after one recorded AppTest timeout/recovery. Combined Node checks: seven passed in 184.707 ms (four analytics + three Google protocol). Historical November 17 styling suites are in tests/README.md. Desktop, 400px and 768px Chrome previews were inspected; real-phone and full live replay checks remain pending.
+**Current environment.** `RUBRIC_RADAR_ARCHIVE_ENABLED=false`. Google OAuth is External/Testing with the NYU and personal test accounts. The allowed origins are `http://localhost:8501` and `http://127.0.0.1:8501`. The hosted HTTPS origin is pending. The ignored `.env` contains working local configuration. The Streamlit app has no public URL.
 
 ### Next session
 
-1. Read AGENTS.md, this resume point, DESIGN.md and SECURITY.md; inspect Git status so new user edits are preserved.
-2. Finish Google Web client/Supabase provider configuration following [Google setup](docs/setup/google-signin.md). Project and hosted migration already exist. Credentials go only in ignored local/host settings, not chat or Git. No SMTP setup is needed for Google-only accounts.
-3. Follow [technical setup](docs/setup/supabase.md): schema installation succeeded; execute the SQL tests and real two-account direct API isolation checks, verify Google login/logout, and document observed failures/results. Keep real coursework saves disabled until ownership isolation is verified.
-4. Batch 4 full audit/public deployment needs a brief plan and approval. Complete request/spend protection, live PostHog/replay checks, phone test and refused-security-test screenshot before submission. SECURITY.md remains an incomplete audit.
+1. **Restore the local runtime.** Check `.venv/bin/python --version`. The copied environment points to a missing Python framework from the prior Mac. Build a fresh venv from native ARM64 Python 3.14.4 after moving the old venv aside outside the repo. Install `requirements.txt` and preserve the ignored `.env`. The November 19 test used a temporary environment and its servers were stopped.
+2. **Finish hosted auth verification.** Check that Supabase refuses a genuinely expired access token. Use a test session and hold the token only in memory until it expires. Keep the archive gate off during this check. Record the actual response.
+3. **Verify the full app with synthetic data.** After the auth check and explicit approval to turn on the local archive gate, exercise sign-in → class/project → explicit save → sign-out/in → reopen → confirmed deletion. Verify guest and context isolation and record any approval needed for billable review calls. Keep real coursework out of the test.
+4. **Approve Batch 4 before release work.** Finish the audit and request/concurrency/spend controls, settle retention and recovery, and get approval for Streamlit Community Cloud deployment. Configure the deployed Google HTTPS origin, verify the phone workflow and live PostHog event/replay masking, and prepare the submission note and live URL. [Audit register](SECURITY.md)
 
-Known follow-ups: native form fields produce empty-autocomplete warnings; dark override, exhaustive keyboard/screen-reader/long-content and real-device checks are not complete. SQL security and real Google/Auth/API behavior remain unverified. No automatic Impeccable detector/hooks were run. The skill is installed globally at ~/.codex/skills/impeccable on this Mac (launcher permission repaired); it is not vendored in this repository. New machines can install it from the official [Impeccable site](https://impeccable.style/).
+### What is ready locally
 
-### Reopen locally
+- Guest review and gated Google sign-in, private classes/projects/history, explicit save/delete controls, pagination and context clearing.
+- Read-only synthetic sample and Load demo example. Explore both with `.venv/bin/python -m streamlit run app.py` at `http://127.0.0.1:8501`.
+- Existing desktop and 400px/768px browser previews. Native form autocomplete warnings, broader accessibility testing and real-device checks remain open.
 
-Run `.venv/bin/python -m streamlit run app.py`, then open http://127.0.0.1:8501. A server was left running at the last checkpoint, but it may need restarting after logging back in. Explore sample library → Open class → Open project → Open saved review; or Continue as guest → Load demo example. Consent and the two review actions are still required for a billable live review. Restart after imported-module changes if hot reload retains an old module.
-
-Suggested resume message: **“Open Plan.md and continue Rubric Radar Build 3 from the next pending step.”** GitHub Pages hosts the separate Product Page; the Streamlit app has no public URL yet. Pushing this checkpoint does not deploy the Python app or apply database migrations.
+Suggested resume message: **“Open Plan.md and continue Build 3 from the first pending step.”**
 
 ## Decisions
 
@@ -66,7 +54,7 @@ Confirm deletion of a review/project/class, name the item, show affected counts,
 1. **Plan and PRD v3 — completed locally November 17.** Save this resume plan; document hosting, accounts, storage, security and guest choices; add Shipping / Ask me first / mistake-derived agent rule; create SECURITY.md as an explicitly pending audit register. Reconcile Product Page and evidence summaries. No application or infrastructure changes.
 2. **Authentication and secure storage — approved; foundation completed locally November 17.** Added supabase_api.py (stateless HTTPS, publishable key only), auth.py (per-object email/password/code/recovery/refresh/logout), archive.py (owner-scoped operations and validated snapshots), SQL migration with RLS/composite owner FKs and immutable reviews, rollback-only SQL security script, mocked tests and setup guidance. No new dependencies. No app.py integration, project provisioning or database execution. Local mocked checks do not prove deployed isolation; SQL/Auth/API tests remain pending before real saves.
 3. **Library UI — approved; completed locally November 17.** Implemented entry/auth/recovery forms, private classes/projects/history, explicit saves, duplicate-save prevention, fresh revised-draft flow, identity/context clearing, unsaved-work prompts, pagination and confirmed deletion with changed-count reconfirmation. Added read-only SampleArchive (no cloud/model writes) and Load demo example (no model call/save/auto-consent). Cloud feature gate defaults false. 61 mocked Python / four analytics tests passed; local Chrome walkthrough and demo fill verified. Live Supabase wiring/security remains pending before actual saves.
-4. **Audit, live deployment and evidence — pending approval.** Run and record the security audit, address findings, deploy, verify on phone and with two accounts, inspect live PostHog event payloads and masked replay, reconcile SECURITY.md/PRD/evidence and prepare submission. Verify deployed Python/dependency compatibility. No claim of completion until observed.
+4. **Audit, live deployment and evidence — pending approval.** Hosted two-account database/API proof is saved. Finish the remaining auth and app workflow checks, audit, request and spending controls, deployment, phone and live PostHog verification, and submission. Verify deployed Python and dependency compatibility.
 
 ## Acceptance and required security proof
 
@@ -90,7 +78,7 @@ Official implementation references: [Streamlit deployment](https://docs.streamli
 - [ ] Working live app URL, usable by a classmate on a phone.
 - [ ] Note containing repository URL, Beginner lane, and repository SECURITY.md link.
 - [ ] Completed audit: checks, findings, fixes and remaining risks.
-- [ ] Screenshot of the refused two-account security test, linked to its evidence record.
+- [x] [Refused two-account write screenshot](tests/evidence/supabase-two-account-isolation-2026-11-19.png) linked in the [security record](SECURITY.md#required-two-account-test--november-19).
 - [ ] Live PostHog events and full masked session replay verified.
 - [ ] PRD v3 and AGENTS.md reflect shipped behavior; unfinished items remain labeled.
 - [ ] Bring phone November 24 for pod testing at the live address (user-supplied brief).
