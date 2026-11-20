@@ -61,6 +61,23 @@ class AppTests(unittest.TestCase):
         self.assertFalse(app.exception)
 
     @patch('radar.extract', return_value=(ORIGINALS, META))
+    @patch('radar.evaluate')
+    def test_feedback_and_requirements_render_as_literal_text(self, evaluate, extract):
+        report = copy.deepcopy(REPORT)
+        report['findings'][0]['explanation'] = 'Use the **same terms** in both sections.'
+        report['limitations'] = ['Check the *appendix* manually.']
+        evaluate.return_value = report, META
+        app = self.fill()
+        button(app, 'Extract requirements').click().run()
+        button(app, 'Confirm & review my draft').click().run()
+        self.assertFalse(app.exception)
+        rendered_text = {element.value for element in app.text}
+        self.assertIn(report['findings'][0]['explanation'], rendered_text)
+        self.assertIn(report['findings'][0]['evidence'][0]['quote'], rendered_text)
+        self.assertIn(ORIGINALS[0]['text'], rendered_text)
+        self.assertIn(report['limitations'][0], rendered_text)
+
+    @patch('radar.extract', return_value=(ORIGINALS, META))
     @patch('radar.evaluate', side_effect=ReviewError('Token limit.', diagnostics={
         'requested_max_tokens': 16000, 'output_tokens': 16000, 'reasoning_tokens': None}))
     def test_review_failure_displays_diagnostics_and_preserves_inputs(self, evaluate, extract):

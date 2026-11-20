@@ -2,7 +2,9 @@
 (() => {
   if (window.__rubricRadarAnalytics) return; // Streamlit reruns must not duplicate listeners/pageviews.
   window.__rubricRadarAnalytics = true;
-  const surface = window.RUBRIC_RADAR_SURFACE === 'local_app' ? 'local_app' : 'product_page';
+  const surface = window.RUBRIC_RADAR_SURFACE === 'app'
+    ? (window.location.hostname.endsWith('.streamlit.app') ? 'live_app' : 'local_app')
+    : 'product_page';
   const sdk = document.createElement('script');
   sdk.src = 'https://us-assets.i.posthog.com/static/array.js';
   sdk.async = true;

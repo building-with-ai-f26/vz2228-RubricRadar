@@ -5,7 +5,7 @@ const { readFileSync } = require('node:fs');
 const vm = require('node:vm');
 const source = readFileSync('docs/posthog.js', 'utf8');
 
-function browser(surface) {
+function browser(surface, hostname = '127.0.0.1') {
   const sent = [], scripts = [], listeners = [];
   let config;
   const posthog = {
@@ -14,7 +14,7 @@ function browser(surface) {
     capture: (...args) => sent.push(args),
   };
   const context = vm.createContext({
-    window: { posthog, RUBRIC_RADAR_SURFACE: surface },
+    window: { posthog, RUBRIC_RADAR_SURFACE: surface, location: { hostname } },
     document: {
       createElement: () => ({}),
       head: { appendChild: script => scripts.push(script) },
@@ -27,12 +27,13 @@ function browser(surface) {
 }
 
 test('Streamlit reruns keep one SDK, one pageview, and one click listener', () => {
-  const b = browser('local_app');
+  const b = browser('app');
   vm.runInContext(source, b.context);
   assert.equal(b.scripts.length, 1);
   assert.equal(b.listeners.length, 1);
   assert.equal(b.sent.filter(e => e[0] === '$pageview').length, 1);
   assert.equal(b.sent[0][1].surface, 'local_app');
+  assert.equal(browser('app', 'rubric-radar.streamlit.app').sent[0][1].surface, 'live_app');
   assert.equal(browser().sent[0][1].surface, 'product_page');
 });
 
@@ -49,7 +50,7 @@ test('privacy config masks inputs and rendered text and rejects network capture'
 });
 
 test('clicks emit fixed names only; unknown text and disabled buttons emit nothing', () => {
-  const b = browser('local_app');
+  const b = browser('app');
   const click = control => b.listeners[0]({ target: { closest: () => control } });
   click({ textContent: 'PRIVATE COURSEWORK' });
   click({ textContent: 'Extract requirements', disabled: true });
@@ -61,7 +62,7 @@ test('clicks emit fixed names only; unknown text and disabled buttons emit nothi
 
 
 test('library controls emit fixed names without record titles or IDs', () => {
-  const b = browser('local_app');
+  const b = browser('app');
   for (const textContent of ['Explore sample library', 'Load demo example', 'Save review', 'Confirm deletion', 'Synthetic private class']) {
     b.listeners[0]({ target: { closest: () => ({ textContent }) } });
   }

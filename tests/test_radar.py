@@ -1,11 +1,15 @@
 import copy
+from concurrent.futures import ThreadPoolExecutor
 import json
 import os
+from threading import Event
 import unittest
 from unittest.mock import patch, MagicMock
 from urllib.error import HTTPError, URLError
 
-from radar import (ReviewError, check_inputs, confirmed_requirements, validate_evaluation,
+from supabase_api import NoRedirect
+
+from radar import (ReviewError, _RequestGate, check_inputs, confirmed_requirements, validate_evaluation,
                    validate_requirements, call_model, EXTRACTION, DRAFT_LIMIT, evaluate)
 
 INSTRUCTIONS = 'Compare two alternatives. Justify a recommendation.'
@@ -90,6 +94,43 @@ class ContractTests(unittest.TestCase):
     def test_missing_key_is_actionable(self):
         with self.assertRaisesRegex(ReviewError, 'not configured'): call_model('Task', {}, EXTRACTION)
 
+    @patch.dict(os.environ, {'OPENROUTER_API_KEY': 'synthetic-test-key'})
+    @patch('radar.request.build_opener')
+    def test_provider_gate_releases_failed_calls_and_limits_attempts_in_a_rolling_hour(self, build_opener):
+        urlopen = build_opener.return_value.open
+        entered, release = Event(), Event()
+
+        def fail_request(*args, **kwargs):
+            entered.set()
+            if not release.wait(timeout=5):
+                raise AssertionError('Timed out waiting to release the mocked provider request.')
+            raise URLError('synthetic network failure')
+
+        urlopen.side_effect = fail_request
+        with patch('radar._MODEL_REQUESTS', _RequestGate(max_starts=2, max_in_flight=1)), \
+                patch('radar.time.monotonic', return_value=10000) as clock, ThreadPoolExecutor() as pool:
+            active = pool.submit(call_model, 'Task', {}, EXTRACTION)
+            try:
+                self.assertTrue(entered.wait(timeout=5))
+                with self.assertRaisesRegex(ReviewError, 'handling other AI requests'):
+                    call_model('Task', {}, EXTRACTION)
+                self.assertEqual(urlopen.call_count, 1)
+            finally:
+                release.set()
+            with self.assertRaisesRegex(ReviewError, 'could not connect'):
+                active.result(timeout=5)
+            clock.return_value = 10001
+            with self.assertRaisesRegex(ReviewError, 'could not connect'):
+                call_model('Task', {}, EXTRACTION)
+            clock.return_value = 13599
+            with self.assertRaisesRegex(ReviewError, 'hourly AI request limit'):
+                call_model('Task', {}, EXTRACTION)
+            self.assertEqual(urlopen.call_count, 2)
+            clock.return_value = 13600
+            with self.assertRaisesRegex(ReviewError, 'could not connect'):
+                call_model('Task', {}, EXTRACTION)
+            self.assertEqual(urlopen.call_count, 3)
+
     @patch.dict(os.environ, {'OPENROUTER_REVIEW_MAX_TOKENS': ''})
     @patch('radar.call_model', return_value=(copy.deepcopy(REPORT), {}))
     def test_review_budget_default_and_override(self, model):
@@ -107,8 +148,9 @@ class ContractTests(unittest.TestCase):
         model.assert_not_called()
 
     @patch.dict(os.environ, {'OPENROUTER_API_KEY': 'synthetic-test-key'})
-    @patch('radar.request.urlopen')
-    def test_incomplete_responses_explain_the_stop_reason(self, urlopen):
+    @patch('radar.request.build_opener')
+    def test_incomplete_responses_explain_the_stop_reason(self, build_opener):
+        urlopen = build_opener.return_value.open
         for reason, message in [('length', 'output token limit'),
                                 ('content_filter', 'content filter'),
                                 ('error', 'provider stopped'),
@@ -136,8 +178,9 @@ class ContractTests(unittest.TestCase):
                     self.assertNotIn('shorter', str(ctx.exception))
 
     @patch.dict(os.environ, {'OPENROUTER_API_KEY': 'synthetic-test-key'})
-    @patch('radar.request.urlopen')
-    def test_request_privacy_and_provider_errors(self, urlopen):
+    @patch('radar.request.build_opener')
+    def test_request_privacy_and_provider_errors(self, build_opener):
+        urlopen = build_opener.return_value.open
         response = MagicMock()
         response.__enter__.return_value.read.return_value = json.dumps({
             'choices': [{'finish_reason': 'stop', 'message': {'content': '{"requirements": []}'}}],
@@ -148,6 +191,8 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(body['provider'], {'data_collection': 'deny', 'zdr': True, 'require_parameters': True})
         self.assertEqual(meta['cost_usd'], 0.001)
         self.assertEqual(body['max_tokens'], 7000)
+        self.assertEqual(urlopen.call_args.kwargs['timeout'], 90)
+        self.assertTrue(any(isinstance(handler, NoRedirect) for handler in build_opener.call_args.args))
         call_model('Task', {}, EXTRACTION, max_tokens=16000)
         self.assertEqual(json.loads(urlopen.call_args.args[0].data)['max_tokens'], 16000)
         for exc in [HTTPError('url', 401, 'secret response', {}, None), URLError('secret response')]:

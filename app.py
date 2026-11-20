@@ -13,7 +13,7 @@ load_dotenv()
 st.set_page_config(page_title='Rubric Radar', page_icon='📡', layout='centered')
 # Trusted static code only; st.html executes in the app document, not an iframe.
 analytics = (Path(__file__).parent / 'docs' / 'posthog.js').read_text()
-st.html('<script>window.RUBRIC_RADAR_SURFACE = "local_app";\n' + analytics + '</script>',
+st.html('<script>window.RUBRIC_RADAR_SURFACE = "app";\n' + analytics + '</script>',
         unsafe_allow_javascript=True)
 st.html('<style>' + (Path(__file__).parent / 'app_style.css').read_text() + '</style>')
 

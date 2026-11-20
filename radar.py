@@ -1,13 +1,17 @@
 """Review contracts, evidence checks, and a small OpenRouter client. No text logging."""
+from collections import deque
+from contextlib import contextmanager
 import json
 import os
 import re
 import ssl
+from threading import Lock
 import time
 from urllib import request, error
 
 from jsonschema import validate, ValidationError
 import certifi
+from supabase_api import NoRedirect
 
 MODEL = 'deepseek/deepseek-v4.1-flash'
 PROMPT_VERSION = 'v1.2'
@@ -22,6 +26,38 @@ class ReviewError(Exception):
     def __init__(self, message, *, diagnostics=None):
         super().__init__(message)
         self.diagnostics = diagnostics
+
+
+class _RequestGate:
+    """Share one rolling hourly allowance and concurrency limit across sessions in this process."""
+
+    def __init__(self, max_starts, max_in_flight):
+        self.max_starts = max_starts
+        self.max_in_flight = max_in_flight
+        self.starts = deque()
+        self.in_flight = 0
+        self.lock = Lock()
+
+    @contextmanager
+    def admit(self):
+        with self.lock:
+            now = time.monotonic()
+            while self.starts and self.starts[0] <= now - 3600:
+                self.starts.popleft()
+            if len(self.starts) >= self.max_starts:
+                raise ReviewError('Rubric Radar reached its hourly AI request limit. Your inputs are preserved. Try again later.')
+            if self.in_flight >= self.max_in_flight:
+                raise ReviewError('Rubric Radar is handling other AI requests. Your inputs are preserved. Try again shortly.')
+            self.starts.append(now)
+            self.in_flight += 1
+        try:
+            yield
+        finally:
+            with self.lock:
+                self.in_flight -= 1
+
+
+_MODEL_REQUESTS = _RequestGate(max_starts=30, max_in_flight=2)
 
 
 def obj(properties):
@@ -154,8 +190,11 @@ def call_model(task, payload, schema, *, max_tokens=7000):
                           headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'})
     start = time.monotonic()
     try:
-        with request.urlopen(req, timeout=90, context=ssl.create_default_context(cafile=certifi.where())) as response:
-            result = json.loads(response.read(2_000_000))
+        with _MODEL_REQUESTS.admit():
+            opener = request.build_opener(NoRedirect(), request.HTTPSHandler(
+                context=ssl.create_default_context(cafile=certifi.where())))
+            with opener.open(req, timeout=90) as response:
+                result = json.loads(response.read(2_000_000))
         choice = result['choices'][0]
         finish_reason = choice.get('finish_reason')
         usage = result.get('usage')
@@ -199,6 +238,7 @@ def call_model(task, payload, schema, *, max_tokens=7000):
                     'cost_usd': usage.get('cost')}
         return data, metadata
     except error.HTTPError as exc:
+        exc.close()
         messages = {401: 'OpenRouter rejected the API key.', 402: 'OpenRouter credits are insufficient.',
                     429: 'The provider is busy or rate-limited. Wait before retrying.'}
         raise ReviewError(messages.get(exc.code, 'Provider request failed. Check model availability and privacy-compatible routing, then retry.')) from None

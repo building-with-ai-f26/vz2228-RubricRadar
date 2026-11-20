@@ -22,12 +22,12 @@ def render_feedback(result, confirmed, extract_meta=None, review_meta=None):
     for i, rec in enumerate(result['recommendations'], 1):
         with st.container(border=True, key=f'priority_{i}'):
             st.caption(f"Priority {i} · {rec['label']}")
-            st.write(rec['action'])
+            st.text(rec['action'])
             if rec['requirement_ids']:
                 st.caption('Requirements: ' + ', '.join(rec['requirement_ids']))
             with st.expander('Why this matters and how to approach it'):
-                st.write('Why: ' + rec['why'])
-                st.write('Approach: ' + rec['approach'])
+                st.text('Why: ' + rec['why'])
+                st.text('Approach: ' + rec['approach'])
 
     status_colors = {'Met': 'met', 'Partially Met': 'partial',
                      'Missing': 'missing', 'Needs Review': 'review'}
@@ -38,26 +38,26 @@ def render_feedback(result, confirmed, extract_meta=None, review_meta=None):
         with st.container(border=True, key=f"finding_{status_colors[f['status']]}_{f['requirement_id']}"):
             st.write(f"**{f['requirement_id']} · {f['status']}**")
             with st.container(key='finding_title_' + f['requirement_id']):
-                st.write(requirement['text'])
-            st.write(f['explanation'])
+                st.text(requirement['text'])
+            st.text(f['explanation'])
             with st.expander('View gaps, evidence, and rubric source'):
                 if f['gap']:
-                    st.write('Gap: ' + f['gap'])
+                    st.text('Gap: ' + f['gap'])
                 if not f['evidence']:
                     st.caption('No verified draft quotes are available for this finding.')
                 for e in f['evidence']:
                     st.caption(f"Draft paragraph {e['paragraph']}")
-                    st.write(e['quote'])
+                    st.text(e['quote'])
                 if requirement['source']:
                     st.caption('Assignment source')
-                    st.write(requirement['source'])
+                    st.text(requirement['source'])
                 if requirement['student_added']:
                     st.caption('Student-provided requirement; check it against the assignment.')
 
     if result['limitations']:
-        with st.expander('Limitations and items to check'):
+        with st.container(key='feedback_limitations'), st.expander('Limitations and items to check'):
             for limitation in result['limitations']:
-                st.write(limitation)
+                st.text(limitation)
     st.write('Revise in your own editor, then start a fresh review with your updated draft. '
              'Save explicitly to keep a review; revisions are not automatically compared.')
     with st.expander('Run details (no assignment text)'):

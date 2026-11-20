@@ -1,6 +1,6 @@
 # Security audit — Build 3 (pending)
 
-**Current checkpoint — November 19.** Google sign-in worked for both approved test accounts. Hosted SQL-role, anonymous access and authenticated two-account isolation checks passed. The archive stays disabled. Expired-token verification, full app testing and the release audit are pending. Earlier checkpoints below are historical. [Test evidence](tests/README.md#november-19--two-account-direct-api-isolation)
+**Current checkpoint — November 19.** Hosted SQL-role, anonymous access, two-account isolation, token expiry, and the app archive workflow with synthetic feedback passed. The normal app archive stays disabled. Batch 4 local release controls and audit findings are recorded below. Hosted release and provider, retention and replay checks remain open. Earlier checkpoints below are historical. [Test evidence](tests/README.md#november-19--hosted-synthetic-archive-workflow)
 
 **November 18 configuration.** Google sign-in replaced email/password/code accounts. The Google Web client was configured in the builder's existing My First Project after project creation outside the school organization was refused. OAuth origins were limited to localhost:8501 and 127.0.0.1:8501. Supabase Google was enabled with nonce checks on, and Email was disabled. Hosted schema installation succeeded. The ignored local `.env` retained the provider key and was configured for the Supabase project and Google client. [Google setup](docs/setup/google-signin.md)
 
@@ -19,15 +19,15 @@ Audit the app, dependencies, repository/history, hosting/secrets, Supabase auth 
 
 | Area | Planned checks | Status / actual findings / fixes |
 | --- | --- | --- |
-| Secrets | Working tree + history; ignored local secrets; host secrets; no tokens/keys in UI/logs | Pending; no finding/fix recorded |
-| Dependencies | Installed versions, advisories, supported hosting runtime | pip check passed; advisory/runtime audit pending |
-| Authentication | Google identity, expiry/refresh, logout and per-session clients | Live sign-in and sign-out verified in the local test pages. Live expired-token and full app session checks pending |
+| Secrets | Working tree + history; ignored local secrets; host secrets; no tokens/keys in UI/logs | Targeted local scan found no matches. Host secrets and deployed logs pending. |
+| Dependencies | Installed versions, advisories, supported hosting runtime | Local pip upgraded from 26.0.1 to 26.3 after advisory findings. OSV recheck returned zero and pip check passed. Hosted runtime and installed build pending. |
+| Authentication | Google identity, expiry/refresh, logout and per-session clients | Hosted sign-in/out and expiry passed in a localhost harness. Fresh token confirmed restored 3,600-second lifetime. Deployed browser/session checks remain pending. |
 | Authorization | Grants and RLS, forged owner IDs, same-owner parents and direct API verification | Hosted SQL-role, anonymous access and two-account direct API checks passed on November 19. See evidence below |
-| Guest and account state | No guest coursework saves; logout/account/context changes clear private working state | Pending; no finding/fix recorded |
-| Input/output | Parameterized operations, bounds, escaped rendering, untrusted model/stored content, safe errors | Pending; no finding/fix recorded |
-| API and cost | Server-held provider key, privacy-compatible routing, request/concurrency controls and budget | Pending; numeric limits undecided |
-| Privacy/analytics | No coursework/credentials in logs/events/URLs; masked auth, names, drafts and history; console/network-body capture off | Pending live audit; earlier local checks are not Build 3 verification |
-| Storage/deletion | Immutable snapshots, duplicate-save guard, owned transactional deletion, retention/backup/account deletion disclosures | Hosted SQL assertions passed for uniqueness, cascading deletion and immutability. Direct API checks verified own review deletion and fixture cleanup. Full app workflow and retention decisions pending |
+| Guest and account state | No guest coursework saves; logout/account/context changes clear private working state | Hosted synthetic app check passed for guest isolation, project switch, sign-out, and a different account. |
+| Input/output | Parameterized operations, bounds, escaped rendering, untrusted model/stored content, safe errors | Review found untrusted feedback rendered as Markdown. Changed feedback and quotes to plain native text. Regression check passed. |
+| API and cost | Server-held provider key, privacy-compatible routing, request/concurrency controls and budget | Local guard allows 30 starts per rolling hour and two in flight per process. Redirects refused. Builder confirmed a $5 key cap. Hosting, key reset policy and actual launch key verification pending. |
+| Privacy/analytics | No coursework/credentials in logs/events/URLs; masked auth, names, drafts and history; console/network-body capture off | Local config and fixed-event checks passed; `live_app` label added. Hosted ingestion, provider account logging, and complete replay masking pending. |
+| Storage/deletion | Immutable snapshots, duplicate-save guard, owned transactional deletion, retention/backup/account deletion disclosures | Hosted SQL and synthetic app workflow verified explicit save and confirmed deletion with fixture cleanup. Actual backup policy and account deletion procedure pending. |
 | Hosting/recovery | HTTPS, secrets, phone usability, deployed revision, code rollback + migration recovery | Pending; no live app deployed |
 
 ## Local checks, finding and fix — November 17
@@ -46,11 +46,17 @@ The migration and rollback-only SQL role tests are under supabase/; setup and li
 4. Verify no A records are disclosed/changed and no unauthorized children are created. A can still read its unchanged fixtures. A denied read may return an empty result; do not label it a 403 unless observed.
 5. Capture a labeled refused write showing expected/observed outcome and deployed version without credentials. Link the screenshot and full evidence entry here, including failures and retests.
 
-**Result.** Hosted Supabase authorized each user's own synthetic operations. Cross-account access returned zero rows, the forged-owner insert was refused with HTTP 403, and cross-owner parent writes were refused with HTTP 409. A's records remained unchanged until fixture cleanup. Anonymous requests returned HTTP 401. Live expired-token behavior remains pending. The test ran from a localhost harness on revision `9688490` on November 19, 2026. Public app deployment remains pending. [Refused-write screenshot](tests/evidence/supabase-two-account-isolation-2026-11-19.png) · [Full record](tests/README.md#november-19--two-account-direct-api-isolation)
+**Result.** Hosted Supabase authorized each user's own synthetic operations. Cross-account access returned zero rows, the forged-owner insert was refused with HTTP 403, and cross-owner parent writes were refused with HTTP 409. A's records remained unchanged until fixture cleanup. Anonymous requests returned HTTP 401. The test ran from a localhost harness on revision `9688490` on November 19, 2026. A subsequent test observed HTTP 403 from Auth and HTTP 401 from the archive for the same genuinely expired token. Public app deployment remains pending. [Refused-write screenshot](tests/evidence/supabase-two-account-isolation-2026-11-19.png) · [Full record](tests/README.md#november-19--two-account-direct-api-isolation) · [Expiry check](tests/README.md#november-19--hosted-token-expiry)
+
+## Batch 4 local audit — November 19
+
+- **Secrets and dependencies.** Scanned 51 working-tree files and 145 Git blobs reachable from local refs for common credential signatures. No matches. `.env` and `.streamlit/secrets.toml` are ignored. The scan covers known text patterns in local refs and excludes image interpretation and remote-only history. OSV flagged only the local `pip` installer. Upgraded it in the ignored environment and repeated the audit. [Methods and outcomes](tests/README.md#november-19--batch-4-local-release-audit-and-controls)
+- **Rendering and provider transport.** Feedback and coursework quotes had been rendered as Markdown, which accepts image and link syntax. The renderer now uses native plain text for untrusted fields. OpenRouter transport reuses the existing no-redirect handler to keep credentials on the configured origin. Provider routing still requires structured-output support, no data collection and ZDR. [Streamlit text elements](https://docs.streamlit.io/develop/api-reference/text) · [OpenRouter ZDR and logging](https://openrouter.ai/blog/insights/zero-data-retention/)
+- **Abuse and spend.** Both model actions go through one process-wide gate. Attempts past the rate or concurrency cap stop before opening a provider connection. In-flight slots release on success and failure. The rate budget resets on process replacement and is shared by all visitors using that process. Confirm the actual deployed key and its reset policy before enabling live inference. [OpenRouter key limits](https://openrouter.ai/docs/api/api-reference/api-keys/create-keys)
 
 ## Remaining risks and release gates
 
-Complete expired-token and full app session verification, rate/concurrency/spending limits, provider account privacy settings, cloud retention/backups/account deletion and runtime compatibility. Verify live PostHog ingestion and complete masking before real coursework. Document any remaining limitations after fixes.
+Verify provider account privacy settings, the runtime and actual host key, and cloud retention/backups before inviting real coursework. Confirm a maintainer and an account-deletion process. Active archive deletion is verified, and backup availability and retention depend on the project plan. Verify live PostHog ingestion and complete masking. Record the known-good deployment revision and separately document database recovery. [Supabase backup policy](https://supabase.com/docs/guides/platform/backups) · [Supabase user management](https://supabase.com/docs/guides/auth/managing-user-data)
 
 ## November 18 Google configuration checkpoint
 

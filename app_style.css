@@ -82,6 +82,9 @@ input, textarea { caret-color: var(--rr-accent); }
 [class*="st-key-finding_"] [data-testid="stExpander"] { background: transparent; border-color: currentColor; }
 [class*="st-key-finding_title_"] { font-weight: 600; }
 .st-key-snapshot_text [data-testid="stText"], .st-key-snapshot_text [data-testid="stText"] * { font-family: inherit !important; line-height: 1.7; white-space: pre-wrap; }
+:is([class*="st-key-priority_"], [class*="st-key-finding_"], .st-key-feedback_limitations) :is([data-testid="stText"], [data-testid="stText"] *) {
+  font-family: inherit !important; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere;
+}
 .st-key-review_privacy { margin-top: 2rem; }
 @media (max-width: 640px) {
   [data-testid="stMainBlockContainer"] { padding: 4.25rem 1rem 2.5rem; }
