@@ -1,6 +1,6 @@
 # Security audit — Build 3 (pending)
 
-**Current checkpoint — November 19.** Hosted SQL-role, anonymous access, two-account isolation, token expiry, and the app archive workflow with synthetic feedback passed. The normal app archive stays disabled. Batch 4 local release controls and audit findings are recorded below. Hosted release and provider, retention and replay checks remain open. Earlier checkpoints below are historical. [Test evidence](tests/README.md#november-19--hosted-synthetic-archive-workflow)
+**Current checkpoint — November 22.** The app is publicly deployed, and the hosted archive is enabled. One synthetic guest review and the builder’s hosted Google sign-in passed. Hosted SQL-role, anonymous access, two-account isolation, token expiry and the earlier synthetic archive harness passed. The live browser key scan, manual backup evidence, hosted archive save and reopen, classmate phone use, and live replay checks remain open. [Deployment evidence](tests/README.md#november-22--public-deployment-and-one-live-guest-review) · [Two-account test](#required-two-account-test--november-19)
 
 **November 18 configuration.** Google sign-in replaced email/password/code accounts. The Google Web client was configured in the builder's existing My First Project after project creation outside the school organization was refused. OAuth origins were limited to localhost:8501 and 127.0.0.1:8501. Supabase Google was enabled with nonce checks on, and Email was disabled. Hosted schema installation succeeded. The ignored local `.env` retained the provider key and was configured for the Supabase project and Google client. [Google setup](docs/setup/google-signin.md)
 
@@ -19,16 +19,16 @@ Audit the app, dependencies, repository/history, hosting/secrets, Supabase auth 
 
 | Area | Planned checks | Status / actual findings / fixes |
 | --- | --- | --- |
-| Secrets | Working tree + history; ignored local secrets; host secrets; no tokens/keys in UI/logs | Targeted local scan found no matches. Host secrets and deployed logs pending. |
+| Secrets | Working tree + history; ignored local secrets; host secrets; no tokens/keys in UI/logs | Targeted local scan found no matches. Streamlit host secrets are configured. A browser-delivered code and deployed-log scan remains open. |
 | Dependencies | Installed versions, advisories, supported hosting runtime | Local pip upgraded from 26.0.1 to 26.3 after advisory findings. OSV recheck returned zero and pip check passed. Hosted runtime and installed build pending. |
-| Authentication | Google identity, expiry/refresh, logout and per-session clients | Hosted sign-in/out and expiry passed in a localhost harness. Fresh token confirmed restored 3,600-second lifetime. Deployed browser/session checks remain pending. |
+| Authentication | Google identity, expiry/refresh, logout and per-session clients | Hosted sign-in/out and expiry passed in a localhost harness. The builder’s sign-in to the deployed app passed after the HTTPS origin was added. Live refresh and classmate sign-in remain open. |
 | Authorization | Grants and RLS, forged owner IDs, same-owner parents and direct API verification | Hosted SQL-role, anonymous access and two-account direct API checks passed on November 19. See evidence below |
 | Guest and account state | No guest coursework saves; logout/account/context changes clear private working state | Hosted synthetic app check passed for guest isolation, project switch, sign-out, and a different account. |
 | Input/output | Parameterized operations, bounds, escaped rendering, untrusted model/stored content, safe errors | Review found untrusted feedback rendered as Markdown. Changed feedback and quotes to plain native text. Regression check passed. |
-| API and cost | Server-held provider key, privacy-compatible routing, request/concurrency controls and budget | Local guard allows 30 starts per rolling hour and two in flight per process. Redirects refused. Builder confirmed a $5 key cap. Hosting, key reset policy and actual launch key verification pending. |
+| API and cost | Server-held provider key, privacy-compatible routing, request/concurrency controls and budget | The guard allows 30 starts per rolling hour and two in flight per process. Redirects refused. Builder confirmed a $5 key cap. Per-visitor limits for paid calls and archive writes were deferred. |
 | Privacy/analytics | No coursework/credentials in logs/events/URLs; masked auth, names, drafts and history; console/network-body capture off | Local config and fixed-event checks passed; `live_app` label added. Hosted ingestion, provider account logging, and complete replay masking pending. |
 | Storage/deletion | Immutable snapshots, duplicate-save guard, owned transactional deletion, retention/backup/account deletion disclosures | Hosted SQL and synthetic app workflow verified explicit save and confirmed deletion with fixture cleanup. Actual backup policy and account deletion procedure pending. |
-| Hosting/recovery | HTTPS, secrets, phone usability, deployed revision, code rollback + migration recovery | Pending; no live app deployed |
+| Hosting/recovery | HTTPS, secrets, phone usability, deployed revision, code rollback + migration recovery | Signed-out desktop startup passed over HTTPS on Python 3.14.10. Phone and rollback checks remain open. |
 
 ## Local checks, finding and fix — November 17
 

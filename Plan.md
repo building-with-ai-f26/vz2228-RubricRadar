@@ -1,18 +1,22 @@
 # Build 3 — Beginner lane: private saved reviews
 
-Updated November 19, 2026. Start here when you return.
+Updated November 22, 2026. Start here when you return.
 
 ## Resume here
 
 **Verified.** The local runtime was restored. Hosted Supabase passed SQL-role, anonymous access and two-account isolation checks. The hosted expired-token check and app workflow with synthetic feedback passed, including guest no-write behavior and fixture cleanup. Batch 4 local checks passed 63 Python and seven Node tests. [Test log](tests/README.md#november-19--batch-4-local-release-audit-and-controls) · [Refused-write screenshot](tests/evidence/supabase-two-account-isolation-2026-11-19.png)
 
-**Current environment.** `RUBRIC_RADAR_ARCHIVE_ENABLED=false`. Google OAuth is External/Testing with the NYU and personal test accounts. The allowed origins are `http://localhost:8501` and `http://127.0.0.1:8501`. The hosted HTTPS origin is pending. The ignored `.env` contains working local configuration. The Streamlit app has no public URL.
+**Current environment.** [Rubric Radar is live on Streamlit Community Cloud](https://rubricradar.streamlit.app/). The hosted archive is enabled and the local archive gate remains off. Google OAuth is External/Testing and authorizes the hosted HTTPS origin plus the two local origins. Host secrets were configured. [Guest review and sign-in evidence](tests/README.md#november-22--public-deployment-and-one-live-guest-review)
 
-### Release steps
+### November 22 release checkpoint
 
-1. **Review the local release candidate.** The app admits 30 model requests per rolling hour and two in flight per process. The builder confirmed a $5 OpenRouter key cap. Verify the cap and reset policy for the key installed on the host. Check OpenRouter account logging and confirm the actual Supabase backup policy, coursework retention, and an account-deletion contact and process. [Audit register](SECURITY.md)
-2. **Approve push and public deployment separately.** Deploy `app.py` from the approved GitHub revision to Streamlit Community Cloud with Python 3.14 if offered. Verify the listen address with the host since the repo is configured for local loopback. Add flat host secrets, keep the archive gated until the hosted checks, and configure the exact Google HTTPS origin. Verify the chosen revision, HTTPS, runtime, secrets handling and Google access from a second device or account.
-3. **Verify the live release.** With explicit approval for any billable inference, check the phone review flow with synthetic content. Verify fixed-name `live_app` events and replay masking, including saved history. Record a known-good deploy revision and how to disable archive access or switch off the launch key in an incident. Prepare the submission note and live URL.
+**Public startup verified November 22.** The first attempt stopped at the GitHub access check. The retry after the professor approved Streamlit access deployed `app.py` from `main`, which tracked candidate `ac76d6b`. The host log displayed Python 3.14.10, installed dependencies, and startup on `127.0.0.1:8501`. The public HTTPS landing page loaded in an incognito Chrome window. Hosted desktop checks verified guest demo fill with consent off, the unsaved-work discard prompt, and opening a read-only sample review. The host had no model key or archive access during these checks. Inference cost $0. Active builder time and other costs unreported. [First attempt](tests/README.md#november-22--community-cloud-deployment-attempt) · [Audit register](SECURITY.md)
+
+1. **Close the remaining audit requirements.** Search browser-delivered code for secret keys, document the manual Supabase backup and monthly provider cap, and run the requested `pip-audit` or document how the existing OSV audit maps to the brief. The current paid-call limiter is shared per process. The brief asks for per-visitor limits on paid calls and database writes, which remain an implementation gap. Update SECURITY.md with evidence and remaining issues.
+
+   The builder deferred the per-visitor implementation for the submission. The proposed $0.50 budget and separate archive write limit remain future work.
+2. **Verify classmate access and analytics.** The desktop guest review and builder's hosted Google sign-in passed. A classmate's account, phone workflow from extraction to feedback, live archive save/reopen, and PostHog `live_app` events and replay masking remain unverified. Use synthetic content. The builder authorized one billable example and it is complete. Obtain approval before additional model calls.
+3. **Finish release documentation and submit.** Update PRD v3, the AGENTS.md Shipping section, and the Product Page Build 3 log with shipped behavior, failures, spend and hours. In Icerynk, put the live URL in the Link box, paste the repository, Beginner lane and SECURITY.md in the note, and attach the actual blocked-request screenshot. No assignment has been submitted.
 
 ### What is ready locally
 
@@ -20,7 +24,7 @@ Updated November 19, 2026. Start here when you return.
 - Read-only synthetic sample and Load demo example. Explore both with `.venv/bin/python -m streamlit run app.py` at `http://127.0.0.1:8501`.
 - Existing desktop and 400px/768px browser previews. Native form autocomplete warnings, broader accessibility testing and real-device checks remain open.
 
-Suggested resume message: **“Open Plan.md and continue Build 3 from the first pending step.”**
+Suggested resume message: **“Open Plan.md and continue the live Build 3 workflow checks on Streamlit.”**
 
 ## Decisions
 
@@ -53,7 +57,7 @@ Confirm deletion of a review/project/class, name the item, show affected counts,
 1. **Plan and PRD v3 — completed locally November 17.** Save this resume plan; document hosting, accounts, storage, security and guest choices; add Shipping / Ask me first / mistake-derived agent rule; create SECURITY.md as an explicitly pending audit register. Reconcile Product Page and evidence summaries. No application or infrastructure changes.
 2. **Authentication and secure storage — approved; foundation completed locally November 17.** Added supabase_api.py (stateless HTTPS, publishable key only), auth.py (per-object email/password/code/recovery/refresh/logout), archive.py (owner-scoped operations and validated snapshots), SQL migration with RLS/composite owner FKs and immutable reviews, rollback-only SQL security script, mocked tests and setup guidance. No new dependencies. No app.py integration, project provisioning or database execution. Local mocked checks do not prove deployed isolation; SQL/Auth/API tests remain pending before real saves.
 3. **Library UI — approved; completed locally November 17.** Implemented entry/auth/recovery forms, private classes/projects/history, explicit saves, duplicate-save prevention, fresh revised-draft flow, identity/context clearing, unsaved-work prompts, pagination and confirmed deletion with changed-count reconfirmation. Added read-only SampleArchive (no cloud/model writes) and Load demo example (no model call/save/auto-consent). Cloud feature gate defaults false. 61 mocked Python / four analytics tests passed; local Chrome walkthrough and demo fill verified. Live Supabase wiring/security remains pending before actual saves.
-4. **Audit, live deployment and evidence — approved and in progress.** Hosted auth and synthetic archive workflow checks are complete. Local audit and release controls are documented. Repository push, public deployment, and deployed verification remain pending.
+4. **Audit, live deployment and evidence — in progress.** The public Streamlit deployment passed startup, guest demo fill, the sample walkthrough, one guest review, and the builder's Google sign-in. Hosted archive save/reopen, phone, and analytics verification remain pending.
 
 ## Acceptance and required security proof
 
@@ -74,12 +78,22 @@ Official implementation references: [Streamlit deployment](https://docs.streamli
 
 ## Submission / classroom checklist
 
+### Submission draft
+
+> **Rubric Radar · Build 3 · Beginner lane**
+>
+> [Live app](https://rubricradar.streamlit.app/)
+>
+> One live synthetic guest review and the builder's Google sign-in passed. The hosted Supabase two-account test verified own-account access and blocked cross-account reads and writes.
+>
+> [Course repository](https://github.com/building-with-ai-f26/vz2228-RubricRadar) · [Security audit](https://github.com/building-with-ai-f26/vz2228-RubricRadar/blob/main/SECURITY.md) · [Refused cross-account write screenshot](https://github.com/building-with-ai-f26/vz2228-RubricRadar/blob/main/tests/evidence/supabase-two-account-isolation-2026-11-19.png)
+
 - [ ] Working live app URL, usable by a classmate on a phone.
-- [ ] Note containing repository URL, Beginner lane, and repository SECURITY.md link.
+- [x] Draft note containing repository URL, Beginner lane, and repository SECURITY.md link.
 - [ ] Completed audit: checks, findings, fixes and remaining risks.
 - [x] [Refused two-account write screenshot](tests/evidence/supabase-two-account-isolation-2026-11-19.png) linked in the [security record](SECURITY.md#required-two-account-test--november-19).
 - [ ] Live PostHog events and full masked session replay verified.
 - [ ] PRD v3 and AGENTS.md reflect shipped behavior; unfinished items remain labeled.
 - [ ] Bring phone November 24 for pod testing at the live address (user-supplied brief).
 
-Existing journal lists November 23 at noon as the build deadline; this has not been reverified against the new brief. No assignment submission performed. Deferred: collaboration, shared classes, uploads, automatic comparisons, cross-project AI memory, and advanced-lane infrastructure.
+The Icerynk brief was checked November 22. Build 3 is due Monday, November 23 at noon New York time, with phone pod testing on November 24. Deferred: collaboration, shared classes, uploads, automatic comparisons, cross-project AI memory, and advanced-lane infrastructure.
