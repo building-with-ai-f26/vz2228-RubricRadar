@@ -2,6 +2,8 @@
 
 **Current checkpoint — November 22.** Rubric Radar is live on Streamlit Community Cloud. Public desktop startup, one synthetic guest review and the builder’s Google sign-in passed. Hosted archive save and reopen, classmate phone use, live replay masking and remaining audit checks are open. [Live app](https://rubricradar.streamlit.app/) · [Resume plan](Plan.md) · [Test evidence](tests/README.md#november-22--public-deployment-and-one-live-guest-review)
 
+**November 24 local follow-up.** A tester reported an output token limit error. The affected stage is unknown. The local extraction budget rose to 10,000 output tokens, and the draft review default and maximum rose to 50,000. All 63 deterministic Python tests passed. Live provider verification and deployment remain pending. [Test evidence](tests/README.md#november-24--draft-review-output-budget)
+
 **Historical checkpoint — November 19.** Hosted Supabase SQL-role, anonymous access, two-account isolation, token expiry and the synthetic app archive workflow passed. The normal archive stays disabled. Batch 4 local controls limit provider requests and concurrency and render untrusted feedback as plain text. The latest local checks passed 63 Python and seven Node tests. Hosted runtime, privacy, phone and live replay checks remain pending. Earlier checkpoints below are historical. [Resume plan](Plan.md) · [Test evidence](tests/README.md#november-19--batch-4-local-release-audit-and-controls)
 
 

@@ -10,7 +10,7 @@ from urllib.error import HTTPError, URLError
 from supabase_api import NoRedirect
 
 from radar import (ReviewError, _RequestGate, check_inputs, confirmed_requirements, validate_evaluation,
-                   validate_requirements, call_model, EXTRACTION, DRAFT_LIMIT, evaluate)
+                   validate_requirements, call_model, EXTRACTION, DRAFT_LIMIT, evaluate, extract)
 
 INSTRUCTIONS = 'Compare two alternatives. Justify a recommendation.'
 DRAFT = 'Option A is cheaper. Option B offers better reach.\n\nI recommend A because our budget is limited.'
@@ -134,14 +134,14 @@ class ContractTests(unittest.TestCase):
     @patch.dict(os.environ, {'OPENROUTER_REVIEW_MAX_TOKENS': ''})
     @patch('radar.call_model', return_value=(copy.deepcopy(REPORT), {}))
     def test_review_budget_default_and_override(self, model):
-        for setting, expected in [('', 16000), ('24000', 24000)]:
+        for setting, expected in [('', 50000), ('24000', 24000), ('50000', 50000)]:
             with patch.dict(os.environ, {'OPENROUTER_REVIEW_MAX_TOKENS': setting}):
                 evaluate(INSTRUCTIONS, DRAFT, REQS)
                 self.assertEqual(model.call_args.kwargs['max_tokens'], expected)
 
     @patch('radar.call_model')
     def test_invalid_review_budget_is_blocked_before_request(self, model):
-        for setting in ('abc', '0', '-1', '32001'):
+        for setting in ('abc', '0', '-1', '50001'):
             with patch.dict(os.environ, {'OPENROUTER_REVIEW_MAX_TOKENS': setting}):
                 with self.assertRaisesRegex(ReviewError, 'OPENROUTER_REVIEW_MAX_TOKENS'):
                     evaluate(INSTRUCTIONS, DRAFT, REQS)
@@ -161,15 +161,15 @@ class ContractTests(unittest.TestCase):
                 response.__enter__.return_value.read.return_value = json.dumps({
                     'choices': [{'finish_reason': reason,
                                  'message': {'content': 'private assignment response'}}],
-                    'usage': {'prompt_tokens': 200, 'completion_tokens': 7000,
+                    'usage': {'prompt_tokens': 200, 'completion_tokens': 10000,
                               'completion_tokens_details': {'reasoning_tokens': 6500},
                               'private': 'private assignment response'}}).encode()
                 urlopen.return_value = response
                 with self.assertRaisesRegex(ReviewError, message) as ctx:
                     call_model('Task', {}, EXTRACTION)
-                self.assertEqual(ctx.exception.diagnostics['requested_max_tokens'], 7000)
+                self.assertEqual(ctx.exception.diagnostics['requested_max_tokens'], 10000)
                 self.assertEqual(ctx.exception.diagnostics['reasoning_tokens'], 6500)
-                self.assertEqual(ctx.exception.diagnostics['output_tokens'], 7000)
+                self.assertEqual(ctx.exception.diagnostics['output_tokens'], 10000)
                 self.assertNotIn('private assignment response', json.dumps(ctx.exception.diagnostics))
                 self.assertNotIn('secret-provider-detail', json.dumps(ctx.exception.diagnostics))
                 self.assertNotIn('private assignment response', str(ctx.exception))
@@ -178,23 +178,27 @@ class ContractTests(unittest.TestCase):
                     self.assertNotIn('shorter', str(ctx.exception))
 
     @patch.dict(os.environ, {'OPENROUTER_API_KEY': 'synthetic-test-key'})
+    @patch.dict(os.environ, {'OPENROUTER_REVIEW_MAX_TOKENS': ''})
     @patch('radar.request.build_opener')
     def test_request_privacy_and_provider_errors(self, build_opener):
         urlopen = build_opener.return_value.open
         response = MagicMock()
         response.__enter__.return_value.read.return_value = json.dumps({
-            'choices': [{'finish_reason': 'stop', 'message': {'content': '{"requirements": []}'}}],
+            'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps({'requirements': ORIGINALS})}}],
             'usage': {'cost': 0.001}}).encode()
         urlopen.return_value = response
-        _, meta = call_model('Task', {'instructions': INSTRUCTIONS}, EXTRACTION)
+        _, meta = extract(INSTRUCTIONS, DRAFT)
         body = json.loads(urlopen.call_args.args[0].data)
         self.assertEqual(body['provider'], {'data_collection': 'deny', 'zdr': True, 'require_parameters': True})
         self.assertEqual(meta['cost_usd'], 0.001)
-        self.assertEqual(body['max_tokens'], 7000)
+        self.assertEqual(body['max_tokens'], 10000)
         self.assertEqual(urlopen.call_args.kwargs['timeout'], 90)
         self.assertTrue(any(isinstance(handler, NoRedirect) for handler in build_opener.call_args.args))
-        call_model('Task', {}, EXTRACTION, max_tokens=16000)
-        self.assertEqual(json.loads(urlopen.call_args.args[0].data)['max_tokens'], 16000)
+        response.__enter__.return_value.read.return_value = json.dumps({
+            'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(REPORT)}}],
+        }).encode()
+        evaluate(INSTRUCTIONS, DRAFT, REQS)
+        self.assertEqual(json.loads(urlopen.call_args.args[0].data)['max_tokens'], 50000)
         for exc in [HTTPError('url', 401, 'secret response', {}, None), URLError('secret response')]:
             urlopen.side_effect = exc
             with self.assertRaises(ReviewError) as ctx: call_model('Task', {}, EXTRACTION)

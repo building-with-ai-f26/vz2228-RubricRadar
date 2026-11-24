@@ -18,6 +18,7 @@ PROMPT_VERSION = 'v1.2'
 INSTRUCTION_LIMIT = 12_000
 DRAFT_LIMIT = 30_000
 MAX_REQUIREMENTS = 25
+REVIEW_OUTPUT_TOKEN_LIMIT = 50_000
 
 
 class ReviewError(Exception):
@@ -174,7 +175,7 @@ def validate_evaluation(data, requirements, draft):
     return data
 
 
-def call_model(task, payload, schema, *, max_tokens=7000):
+def call_model(task, payload, schema, *, max_tokens=10_000):
     key = os.getenv('OPENROUTER_API_KEY', '')
     if not key or 'replace-with' in key:
         raise ReviewError('Live AI is not configured. Add your OpenRouter key to the local .env file, then restart the app.')
@@ -261,11 +262,11 @@ def extract(instructions, draft):
 def evaluate(instructions, draft, requirements):
     check_inputs(instructions, draft)
     try:
-        max_tokens = int(os.getenv('OPENROUTER_REVIEW_MAX_TOKENS', '') or '16000')
-        if not 1 <= max_tokens <= 32000:
+        max_tokens = int(os.getenv('OPENROUTER_REVIEW_MAX_TOKENS') or REVIEW_OUTPUT_TOKEN_LIMIT)
+        if not 1 <= max_tokens <= REVIEW_OUTPUT_TOKEN_LIMIT:
             raise ValueError
     except ValueError:
-        raise ReviewError('Set OPENROUTER_REVIEW_MAX_TOKENS to an integer from 1 to 32000 '
+        raise ReviewError(f'Set OPENROUTER_REVIEW_MAX_TOKENS to an integer from 1 to {REVIEW_OUTPUT_TOKEN_LIMIT} '
                           'in the local .env file, then restart the app.') from None
     data, meta = call_model('Evaluate each confirmed requirement exactly once. Cite exact draft quotes with '
                             'the supplied paragraph numbers. Missing means no evidence found; provide no quotes. '
