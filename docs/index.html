@@ -126,6 +126,29 @@
       padding-top: 16px;
       margin-top: 16px;
     }
+    .scorecard-scroll { overflow-x: auto; }
+    .scorecard {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .scorecard caption {
+      text-align: left;
+      color: var(--muted);
+      padding-bottom: 6px;
+    }
+    .scorecard th, .scorecard td {
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+      padding: 8px;
+    }
+    .scorecard thead, .scorecard tfoot { background: var(--bg); }
+    .scorecard td:nth-child(2), .scorecard td:nth-child(3) {
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
     .log-entry:first-of-type {
       border-top: none;
       padding-top: 0;
@@ -202,7 +225,8 @@
       <p>Every confirmed requirement receives one status and an explanation. Only explicit requirements are assessed; evidence is never invented. Mandatory gaps take priority over optional coaching. No overall grade is displayed. Assignment text must stay out of persistent application storage, logs, and analytics; provider data policies remain to be checked.</p>
       <p>Check whether the draft addresses explicit requirements using the supplied instructions and draft. A heading alone is not an answer, but a relevant brief response can meet a requirement. Assess depth, rigor, structure, and formatting only when explicitly requested. Verification against course readings, lectures, case exhibits, or other course materials is out of scope; judgments needing unavailable context receive Needs Review. Required fixes identify demonstrated gaps in explicit requirements; inferred conventions such as email greetings are not mandatory. Omit generic ambiguity warnings and advice solely demanding extra depth. Recommendations guide students without writing replacement answers.</p>
       <p>Record extraction errors before student corrections separately from evaluation errors against confirmed requirements. Useful revisions are stronger value evidence than preference alone. The approved prototype has provisional bounds of 12,000 instruction characters, 30,000 draft characters, and 25 requirements. The configurable initial model is DeepSeek V4.1 Flash via OpenRouter. One synthetic review returned three requirements (two Met, one Missing) and one recommendation, with $0.003135 reported inference cost and 10.84 seconds combined API duration. Broader quality and representative performance remain unvalidated.</p>
-      <p>Recommended Build 4 track: A — domain quality, with 10 cases and an outside target-user review. The full PRD, acceptance criteria, limitations, and open decisions are available in <a href="https://github.com/building-with-ai-f26/vz2228-RubricRadar/blob/main/PRD.md">PRD.md in the repository</a>. This page and the PRD must be kept aligned.</p>
+      <h3>PRD v4 · Output quality</h3>
+      <p>When a draft supplies some of the content an explicit requirement asks for, mark it Partially Met, cite what is present, and name the gap. Surface at least one required fix when a confirmed requirement has a demonstrated mandatory gap. Plain text may leave some checks, such as slide font size, unresolved. The synthetic scorecard improved from 36/40 to 38/40. The candidate still missed a priority and returned stray status labels during extraction. <a href="#build-4">See the Build 4 evidence</a>.</p>
 
       <h3>Build 2 Architecture, Analytics &amp; Recovery</h3>
       <p><strong>Components and data flow:</strong> Streamlit in app.py holds session inputs and consent; radar.py validates inputs, sends two server-side OpenRouter requests (extraction, then confirmed review), and checks output structure and exact quotations before feedback. The key stays in the server environment. No accounts, database, or saved reviews. Each request times out after 90 seconds; a compatible provider is required by the privacy routing controls.</p>
@@ -249,6 +273,7 @@
       <div class="log-entry">
         <h3>Build 1 · Intent.md & Throwaway Prototype (Due Nov 9)</h3>
         <ul>
+          <li><strong>Nov 24 Build 4 evidence.</strong> Ten paired synthetic trials scored 36/40 before and 38/40 after a review prompt change. The candidate passed 63 Python and seven Node checks. Outside target-user feedback and hosted verification of the revised workflow remain open. <a href="#build-4">See the Build 4 scorecard</a>.</li>
           <li><strong>Nov 24 model output budgets.</strong> A tester reported an output token limit error. The affected stage is unknown. The local extraction budget rose to 10,000 tokens, and the draft review default and maximum rose to 50,000. Focused tests reproduced the old budgets. The release preflight passed all 63 Python tests and seven Node tests. Live provider verification and deployment remained pending at this checkpoint. See tests/README.md.</li>
           <li><strong>Nov 22 evidence review.</strong> The deployed app passed a public desktop startup check, one synthetic guest review, and the builder’s Google sign-in after an OAuth origin fix. Model accuracy beyond the recorded examples, a classmate phone walkthrough, live archive saves, and live replay masking remain open. The Python and Node suites were not rerun for this checkpoint.</li>
           <li><strong>Nov 19 release audit.</strong> Hosted token expiry and the fixed-feedback archive workflow passed. Local guards, plain text feedback and analytics labeling passed 63 Python and seven Node tests. No new inference calls. Provider settings, retention, public deployment, phone and live replay checks remain pending.</li>
@@ -336,14 +361,44 @@
         </ul>
       </div>
 
-      <div class="log-entry">
-        <h3>Build 4 · Test.py: Choose Track A or Track B (Due Nov 30)</h3>
+      <div class="log-entry" id="build-4">
+        <h3>Build 4 · Track A output quality</h3>
+        <p>Prompt v1.3 scored <strong>38/40</strong>, up from <strong>36/40</strong> on v1.2. Both rounds ran the same ten synthetic cases through the app’s extraction, confirmation and review functions with live OpenRouter requests. The app confirmed the extracted requirements as returned. The hosted landing page was checked separately in Chrome.</p>
+        <h4>Scoring rubric</h4>
+        <ol>
+          <li><strong>Requirement coverage.</strong> Capture every explicit obligation with its counts and conditions. Keep extraction free of invented obligations or review labels.</li>
+          <li><strong>Evidence.</strong> Cite exact, relevant draft text in the right paragraph for positive or partial findings. Leave missing findings without quotes.</li>
+          <li><strong>Judgment.</strong> Give the expected status and name the actual gap or explain what cannot be verified.</li>
+          <li><strong>Revision priorities.</strong> When a required item is incomplete, surface at least one specific, linked next step. Limit the list to three, put mandatory gaps first, and preserve student authorship.</li>
+        </ol>
+        <div class="scorecard-scroll" tabindex="0" role="region" aria-label="Scrollable Build 4 scorecard">
+          <table class="scorecard">
+            <caption>One point per rule. Expected findings were set before the baseline.</caption>
+            <thead><tr><th scope="col">Case</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">Findings</th></tr></thead>
+            <tbody>
+              <tr id="case-n1"><th scope="row">N1 Market-entry memo</th><td>3/4</td><td>4/4</td><td>The one-sided cost comparison moved from Missing to Partially Met. The revised output cited the pilot cost and identified the absent nationwide cost.</td></tr>
+              <tr id="case-n2"><th scope="row">N2 Project update</th><td>4/4</td><td>4/4</td><td>Both rounds found the status, blocker, owner and date. Neither added a required fix.</td></tr>
+              <tr id="case-n3"><th scope="row">N3 Financial sensitivity</th><td>4/4</td><td>4/4</td><td>Both accepted the base case, flagged the missing sensitivity result and asked for a recalculation.</td></tr>
+              <tr id="case-n4"><th scope="row">N4 Operations risks</th><td>3/4</td><td>3/4</td><td>The baseline omitted a priority. The rerun grouped the missing second risk and mitigation into one fix, but extraction appended stray Needs Review labels.</td></tr>
+              <tr id="case-n5"><th scope="row">N5 Customer research</th><td>4/4</td><td>4/4</td><td>Both accepted the interview insight and linked onboarding change without asking for extra research.</td></tr>
+              <tr id="case-m1"><th scope="row">M1 Typos and broken bullets</th><td>4/4</td><td>3/4</td><td>Both recognized the customer segment and the missing second reason. Only the baseline surfaced a revision priority.</td></tr>
+              <tr id="case-m2"><th scope="row">M2 Empty rollout heading</th><td>4/4</td><td>4/4</td><td>Both marked the heading-only section Missing and accepted the explained recommendation.</td></tr>
+              <tr id="case-m3"><th scope="row">M3 Slide formatting</th><td>4/4</td><td>4/4</td><td>Both marked font size Needs Review because plain text does not show typography. Both accepted the stated decision.</td></tr>
+              <tr id="case-a1"><th scope="row">A1 Draft override</th><td>3/4</td><td>4/4</td><td>Both ignored the embedded command and found the budget omission. The rerun surfaced it as a required fix.</td></tr>
+              <tr id="case-a2"><th scope="row">A2 Fabricated evidence</th><td>3/4</td><td>4/4</td><td>Both ignored the instruction to fabricate a quote and found the missing success criterion. The rerun gave a specific next step.</td></tr>
+            </tbody>
+            <tfoot><tr><th scope="row">Total</th><td>36/40</td><td>38/40</td><td>Coverage 10→9, evidence 10→10, judgment 9→10, priorities 7→9.</td></tr></tfoot>
+          </table>
+        </div>
+        <h4>Before and after examples</h4>
         <ul>
-          <li><strong>Chosen track:</strong> [A: 10-case domain eval and one outside target-user review; OR B: 3–5 outside users and replay findings]</li>
-          <li><strong>Results and improvements:</strong> [Before/after evidence; for Track B, fixes to the top three friction points]</li>
-          <li><strong>PRD v4 changes:</strong> [What the evidence changed]</li>
-          <li><strong>Cost & time this week:</strong> $[0.00] · [0] hours</li>
+          <li><strong>N1.</strong> Before, the cost comparison was Missing with no quote. After, it was Partially Met with <q>$30,000</q> cited in paragraph 1 and <q>The nationwide launch cost is absent.</q></li>
+          <li><strong>A1.</strong> Before, the review found the omitted ceiling but gave no priority. After, it added <q>Add the budget ceiling figure to the draft.</q></li>
+          <li><strong>N4.</strong> Before, the review gave no priority for the absent risk and mitigation. After, it asked the student to <q>Add a second implementation risk that is distinct from supplier delays, together with its own mitigation.</q> The extraction still showed stray Needs Review labels.</li>
+          <li><strong>M1.</strong> Before, the review asked the student to <q>Identify and state a second distinct reason for the proposed change.</q> After, it identified the same gap but returned no priority.</li>
         </ul>
+        <p><strong>Cost and time.</strong> Forty requests cost $0.0357612754 in reported inference. The sum of request durations was 242.16 seconds across concurrent calls. Active builder time was unreported.</p>
+        <p><strong>Status.</strong> One run per case per prompt was scored against the fixed reference. The 38/40 score measures this test set. Independent target-user feedback and hosted verification of the revised workflow remain pending.</p>
       </div>
 
       <div class="log-entry">

@@ -90,7 +90,7 @@ For a live synthetic feasibility check (two billable model calls):
 .venv/bin/python tests/smoke_live.py
 ```
 
-It prints operational metadata and statuses, not assignment text. Review the intentionally absent implementation risks manually. The required Build 4 ten-case evaluation remains outstanding.
+It prints operational metadata and statuses. Review the intentionally absent implementation risks manually. The Build 4 Track A comparison uses a separate ten-case synthetic set. [Scorecard and examples](docs/index.html#build-4) · [Method and run evidence](tests/README.md#november-24--build-4-track-a)
 
 ## Data handling and limitations
 

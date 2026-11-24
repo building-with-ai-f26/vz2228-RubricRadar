@@ -1,0 +1,863 @@
+{
+  "head": "5ef1844f60474c6fb611ba7839c4c3b146d24d18",
+  "radar_sha256": "1e038eb7a6a26c3e124c126f32e3bf33f95d25d9db020f1e4f896c7af2227363",
+  "cases_sha256": "6daca5245e92fb4bbfaba7d50594a246d09ac61ff8edaa9ae1d99e8b17f96943",
+  "results": [
+    {
+      "id": "A1",
+      "extraction": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 7.02,
+        "input_tokens": 287,
+        "output_tokens": 996,
+        "cost_usd": 0.0004824144
+      },
+      "requirements": [
+        {
+          "text": "Name the project sponsor.",
+          "source": "Name the project sponsor and give the budget ceiling."
+        },
+        {
+          "text": "Give the budget ceiling.",
+          "source": "Name the project sponsor and give the budget ceiling."
+        }
+      ],
+      "confirmed": [
+        {
+          "id": "R1",
+          "text": "Name the project sponsor.",
+          "source": "Name the project sponsor and give the budget ceiling.",
+          "student_added": false
+        },
+        {
+          "id": "R2",
+          "text": "Give the budget ceiling.",
+          "source": "Name the project sponsor and give the budget ceiling.",
+          "student_added": false
+        }
+      ],
+      "report": {
+        "findings": [
+          {
+            "requirement_id": "R1",
+            "status": "Met",
+            "explanation": "The draft explicitly identifies the sponsor by name.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "The project sponsor is Jordan Lee.",
+                "paragraph": 1
+              }
+            ]
+          },
+          {
+            "requirement_id": "R2",
+            "status": "Missing",
+            "explanation": "The draft states no budget ceiling anywhere in the supplied text.",
+            "gap": "No dollar amount or other budget limit is provided.",
+            "evidence": []
+          }
+        ],
+        "recommendations": [
+          {
+            "label": "Required fix",
+            "requirement_ids": [
+              "R2"
+            ],
+            "action": "Add the budget ceiling figure to the draft.",
+            "why": "R2 requires the budget ceiling, and the draft supplies no amount.",
+            "approach": "State the ceiling as a specific figure alongside the sponsor sentence."
+          }
+        ],
+        "limitations": []
+      },
+      "review": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 5.36,
+        "input_tokens": 670,
+        "output_tokens": 484,
+        "cost_usd": 0.00044976
+      }
+    },
+    {
+      "id": "A2",
+      "extraction": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 6.08,
+        "input_tokens": 324,
+        "output_tokens": 614,
+        "cost_usd": 0.00044852
+      },
+      "requirements": [
+        {
+          "text": "State the pilot's duration.",
+          "source": "State the pilot's duration and one success criterion."
+        },
+        {
+          "text": "State one success criterion for the pilot.",
+          "source": "State the pilot's duration and one success criterion."
+        }
+      ],
+      "confirmed": [
+        {
+          "id": "R1",
+          "text": "State the pilot's duration.",
+          "source": "State the pilot's duration and one success criterion.",
+          "student_added": false
+        },
+        {
+          "id": "R2",
+          "text": "State one success criterion for the pilot.",
+          "source": "State the pilot's duration and one success criterion.",
+          "student_added": false
+        }
+      ],
+      "report": {
+        "findings": [
+          {
+            "requirement_id": "R1",
+            "status": "Met",
+            "explanation": "The duration is explicitly stated.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "eight weeks",
+                "paragraph": 1
+              }
+            ]
+          },
+          {
+            "requirement_id": "R2",
+            "status": "Missing",
+            "explanation": "No success criterion is stated.",
+            "gap": "The draft does not state what would count as pilot success.",
+            "evidence": []
+          }
+        ],
+        "recommendations": [
+          {
+            "label": "Required fix",
+            "requirement_ids": [
+              "R2"
+            ],
+            "action": "Add one criterion that defines what success looks like for the pilot.",
+            "why": "The draft states the duration but omits a success criterion.",
+            "approach": "State a measurable outcome or threshold that would show the pilot succeeded."
+          }
+        ],
+        "limitations": []
+      },
+      "review": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 15.03,
+        "input_tokens": 1226,
+        "output_tokens": 1945,
+        "cost_usd": 0.001596747
+      }
+    },
+    {
+      "id": "M1",
+      "extraction": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 2.13,
+        "input_tokens": 439,
+        "output_tokens": 416,
+        "cost_usd": 0.00055602
+      },
+      "requirements": [
+        {
+          "text": "Name the affected customer segment.",
+          "source": "* name affected customer segmnt"
+        },
+        {
+          "text": "Give TWO reasons for the proposed change.",
+          "source": "b) give TWO reasons for the proposed change"
+        }
+      ],
+      "confirmed": [
+        {
+          "id": "R1",
+          "text": "Name the affected customer segment.",
+          "source": "* name affected customer segmnt",
+          "student_added": false
+        },
+        {
+          "id": "R2",
+          "text": "Give TWO reasons for the proposed change.",
+          "source": "b) give TWO reasons for the proposed change",
+          "student_added": false
+        }
+      ],
+      "report": {
+        "findings": [
+          {
+            "requirement_id": "R1",
+            "status": "Met",
+            "explanation": "The draft identifies the affected customer segment.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "The proposed change applies to first-time customers.",
+                "paragraph": 1
+              }
+            ]
+          },
+          {
+            "requirement_id": "R2",
+            "status": "Partially Met",
+            "explanation": "The draft supplies only one reason for the proposed change.",
+            "gap": "A second distinct reason is absent.",
+            "evidence": [
+              {
+                "quote": "It would reduce setup time by removing a duplicate step.",
+                "paragraph": 1
+              }
+            ]
+          }
+        ],
+        "recommendations": [],
+        "limitations": []
+      },
+      "review": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 3.62,
+        "input_tokens": 675,
+        "output_tokens": 1059,
+        "cost_usd": 0.0014733
+      }
+    },
+    {
+      "id": "M2",
+      "extraction": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 2.89,
+        "input_tokens": 285,
+        "output_tokens": 294,
+        "cost_usd": 0.00021672
+      },
+      "requirements": [
+        {
+          "text": "Discuss the rollout.",
+          "source": "Discuss the rollout. Explain the recommendation."
+        },
+        {
+          "text": "Explain the recommendation.",
+          "source": "Discuss the rollout. Explain the recommendation."
+        }
+      ],
+      "confirmed": [
+        {
+          "id": "R1",
+          "text": "Discuss the rollout.",
+          "source": "Discuss the rollout. Explain the recommendation.",
+          "student_added": false
+        },
+        {
+          "id": "R2",
+          "text": "Explain the recommendation.",
+          "source": "Discuss the rollout. Explain the recommendation.",
+          "student_added": false
+        }
+      ],
+      "report": {
+        "findings": [
+          {
+            "requirement_id": "R1",
+            "status": "Missing",
+            "explanation": "Paragraph 1 is only a heading and supplies no discussion of the rollout.",
+            "gap": "The draft contains no rollout discussion content.",
+            "evidence": []
+          },
+          {
+            "requirement_id": "R2",
+            "status": "Met",
+            "explanation": "Paragraph 2 states the recommendation and gives a supporting reason.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "Recommendation: Start with existing customers because support already knows their common issues.",
+                "paragraph": 2
+              }
+            ]
+          }
+        ],
+        "recommendations": [
+          {
+            "label": "Required fix",
+            "requirement_ids": [
+              "R1"
+            ],
+            "action": "Add a discussion of the rollout to the draft.",
+            "why": "R1 is Missing because paragraph 1 is only a heading and contains no rollout discussion.",
+            "approach": "Consider addressing rollout timing, phases, audience, or sequencing, and how the rollout would proceed."
+          }
+        ],
+        "limitations": []
+      },
+      "review": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 4.04,
+        "input_tokens": 1149,
+        "output_tokens": 743,
+        "cost_usd": 0.0012363
+      }
+    },
+    {
+      "id": "M3",
+      "extraction": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 12.41,
+        "input_tokens": 295,
+        "output_tokens": 1884,
+        "cost_usd": 0.001251813
+      },
+      "requirements": [
+        {
+          "text": "Use 24-point type for the slide title.",
+          "source": "Use 24-point type for the slide title."
+        },
+        {
+          "text": "State the proposed decision on the slide.",
+          "source": "State the proposed decision on the slide."
+        }
+      ],
+      "confirmed": [
+        {
+          "id": "R1",
+          "text": "Use 24-point type for the slide title.",
+          "source": "Use 24-point type for the slide title.",
+          "student_added": false
+        },
+        {
+          "id": "R2",
+          "text": "State the proposed decision on the slide.",
+          "source": "State the proposed decision on the slide.",
+          "student_added": false
+        }
+      ],
+      "report": {
+        "findings": [
+          {
+            "requirement_id": "R1",
+            "status": "Needs Review",
+            "explanation": "Paragraph 1 contains a title, but the supplied text does not show the title's font size.",
+            "gap": "The required 24-point type cannot be verified from the supplied draft.",
+            "evidence": []
+          },
+          {
+            "requirement_id": "R2",
+            "status": "Met",
+            "explanation": "Paragraph 2 states a proposed decision to approve a six-week pilot in one region.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "Approve a six-week pilot in one region.",
+                "paragraph": 2
+              }
+            ]
+          }
+        ],
+        "recommendations": [],
+        "limitations": [
+          "R1 cannot be checked because the supplied draft does not include font-size or slide-formatting information."
+        ]
+      },
+      "review": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 10.45,
+        "input_tokens": 670,
+        "output_tokens": 1197,
+        "cost_usd": 0.00094886
+      }
+    },
+    {
+      "id": "N1",
+      "extraction": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 2.96,
+        "input_tokens": 295,
+        "output_tokens": 363,
+        "cost_usd": 0.00026772
+      },
+      "requirements": [
+        {
+          "text": "Compare a pilot launch and a nationwide launch on cost.",
+          "source": "Compare a pilot launch and a nationwide launch on cost."
+        },
+        {
+          "text": "Recommend one option.",
+          "source": "Recommend one option"
+        },
+        {
+          "text": "Explain why the recommended option was chosen.",
+          "source": "explain why"
+        }
+      ],
+      "confirmed": [
+        {
+          "id": "R1",
+          "text": "Compare a pilot launch and a nationwide launch on cost.",
+          "source": "Compare a pilot launch and a nationwide launch on cost.",
+          "student_added": false
+        },
+        {
+          "id": "R2",
+          "text": "Recommend one option.",
+          "source": "Recommend one option",
+          "student_added": false
+        },
+        {
+          "id": "R3",
+          "text": "Explain why the recommended option was chosen.",
+          "source": "explain why",
+          "student_added": false
+        }
+      ],
+      "report": {
+        "findings": [
+          {
+            "requirement_id": "R1",
+            "status": "Partially Met",
+            "explanation": "The draft gives only the pilot launch cost, so the required cost comparison is incomplete.",
+            "gap": "The nationwide launch cost is absent.",
+            "evidence": [
+              {
+                "quote": "$30,000",
+                "paragraph": 1
+              }
+            ]
+          },
+          {
+            "requirement_id": "R2",
+            "status": "Met",
+            "explanation": "The draft clearly recommends one option.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "I recommend the pilot",
+                "paragraph": 2
+              }
+            ]
+          },
+          {
+            "requirement_id": "R3",
+            "status": "Met",
+            "explanation": "The draft gives a reason for choosing the pilot.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "because we can fund it this quarter",
+                "paragraph": 2
+              }
+            ]
+          }
+        ],
+        "recommendations": [
+          {
+            "label": "Required fix",
+            "requirement_ids": [
+              "R1"
+            ],
+            "action": "Add the nationwide launch cost so the draft compares both options on cost.",
+            "why": "R1 requires a cost comparison, but the draft supplies only the pilot cost.",
+            "approach": "State the nationwide launch cost alongside the pilot cost."
+          }
+        ],
+        "limitations": []
+      },
+      "review": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 3.72,
+        "input_tokens": 707,
+        "output_tokens": 687,
+        "cost_usd": 0.0010365
+      }
+    },
+    {
+      "id": "N2",
+      "extraction": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 5.3,
+        "input_tokens": 297,
+        "output_tokens": 650,
+        "cost_usd": 0.0005144
+      },
+      "requirements": [
+        {
+          "text": "State the project's current status.",
+          "source": "State the project's current status"
+        },
+        {
+          "text": "State one blocker.",
+          "source": "one blocker"
+        },
+        {
+          "text": "State the owner of the next step.",
+          "source": "the owner and date of the next step"
+        },
+        {
+          "text": "State the date of the next step.",
+          "source": "the owner and date of the next step"
+        }
+      ],
+      "confirmed": [
+        {
+          "id": "R1",
+          "text": "State the project's current status.",
+          "source": "State the project's current status",
+          "student_added": false
+        },
+        {
+          "id": "R2",
+          "text": "State one blocker.",
+          "source": "one blocker",
+          "student_added": false
+        },
+        {
+          "id": "R3",
+          "text": "State the owner of the next step.",
+          "source": "the owner and date of the next step",
+          "student_added": false
+        },
+        {
+          "id": "R4",
+          "text": "State the date of the next step.",
+          "source": "the owner and date of the next step",
+          "student_added": false
+        }
+      ],
+      "report": {
+        "findings": [
+          {
+            "requirement_id": "R1",
+            "status": "Met",
+            "explanation": "The draft explicitly states the pilot’s current status as on schedule.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "The pilot is on schedule.",
+                "paragraph": 1
+              }
+            ]
+          },
+          {
+            "requirement_id": "R2",
+            "status": "Met",
+            "explanation": "The draft states one blocker: the missing field affecting the data export.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "The data export is blocked by a missing field.",
+                "paragraph": 1
+              }
+            ]
+          },
+          {
+            "requirement_id": "R3",
+            "status": "Met",
+            "explanation": "The draft identifies Maya as the owner of the next step.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "Maya will request the corrected export on May 6.",
+                "paragraph": 2
+              }
+            ]
+          },
+          {
+            "requirement_id": "R4",
+            "status": "Met",
+            "explanation": "The draft states the next step’s date as May 6.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "Maya will request the corrected export on May 6.",
+                "paragraph": 2
+              }
+            ]
+          }
+        ],
+        "recommendations": [],
+        "limitations": []
+      },
+      "review": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 7.12,
+        "input_tokens": 750,
+        "output_tokens": 1094,
+        "cost_usd": 0.00073365
+      }
+    },
+    {
+      "id": "N3",
+      "extraction": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 5.29,
+        "input_tokens": 304,
+        "output_tokens": 1229,
+        "cost_usd": 0.0011745
+      },
+      "requirements": [
+        {
+          "source": "Calculate the base-case contribution margin in dollars per unit.",
+          "text": "Calculate the base-case contribution margin in dollars per unit."
+        },
+        {
+          "source": "Show what happens to that margin if variable cost increases by $2 per unit.",
+          "text": "Show what happens to that margin if variable cost increases by $2 per unit."
+        }
+      ],
+      "confirmed": [
+        {
+          "id": "R1",
+          "text": "Calculate the base-case contribution margin in dollars per unit.",
+          "source": "Calculate the base-case contribution margin in dollars per unit.",
+          "student_added": false
+        },
+        {
+          "id": "R2",
+          "text": "Show what happens to that margin if variable cost increases by $2 per unit.",
+          "source": "Show what happens to that margin if variable cost increases by $2 per unit.",
+          "student_added": false
+        }
+      ],
+      "report": {
+        "findings": [
+          {
+            "evidence": [
+              {
+                "paragraph": 1,
+                "quote": "base-case contribution margin is $5 per unit"
+              }
+            ],
+            "explanation": "The draft states the base-case contribution margin in dollars per unit.",
+            "gap": "",
+            "requirement_id": "R1",
+            "status": "Met"
+          },
+          {
+            "evidence": [],
+            "explanation": "The draft does not address a $2 variable cost increase or its effect on the contribution margin.",
+            "gap": "No new margin or change in margin after the variable cost increase is shown.",
+            "requirement_id": "R2",
+            "status": "Missing"
+          }
+        ],
+        "limitations": [],
+        "recommendations": [
+          {
+            "action": "For R2, add the effect of a $2 variable cost increase on the contribution margin, showing the resulting margin or change.",
+            "approach": "State the new contribution margin or the dollar change after the variable cost increase.",
+            "label": "Required fix",
+            "requirement_ids": [
+              "R2"
+            ],
+            "why": "The draft currently provides no calculation or statement for the variable cost increase scenario."
+          }
+        ]
+      },
+      "review": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 4.14,
+        "input_tokens": 718,
+        "output_tokens": 884,
+        "cost_usd": 0.00071102
+      }
+    },
+    {
+      "id": "N4",
+      "extraction": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 7.52,
+        "input_tokens": 295,
+        "output_tokens": 1643,
+        "cost_usd": 0.001488627
+      },
+      "requirements": [
+        {
+          "source": "Identify two distinct implementation risks",
+          "text": "Identify two distinct implementation risks. Each risk must be distinct. Status: Needs Review."
+        },
+        {
+          "source": "give a mitigation for each",
+          "text": "Give a mitigation for each identified risk. Status: Needs Review."
+        },
+        {
+          "source": "State the proposed start date.",
+          "text": "State the proposed start date. Status: Needs Review."
+        }
+      ],
+      "confirmed": [
+        {
+          "id": "R1",
+          "text": "Identify two distinct implementation risks. Each risk must be distinct. Status: Needs Review.",
+          "source": "Identify two distinct implementation risks",
+          "student_added": false
+        },
+        {
+          "id": "R2",
+          "text": "Give a mitigation for each identified risk. Status: Needs Review.",
+          "source": "give a mitigation for each",
+          "student_added": false
+        },
+        {
+          "id": "R3",
+          "text": "State the proposed start date. Status: Needs Review.",
+          "source": "State the proposed start date.",
+          "student_added": false
+        }
+      ],
+      "report": {
+        "findings": [
+          {
+            "requirement_id": "R1",
+            "status": "Partially Met",
+            "explanation": "The draft names only one implementation risk, supplier delays, so the required second distinct risk is absent.",
+            "gap": "A second, distinct implementation risk is not identified; only supplier delays is given.",
+            "evidence": [
+              {
+                "quote": "Supplier delays could stall the launch.",
+                "paragraph": 2
+              }
+            ]
+          },
+          {
+            "requirement_id": "R2",
+            "status": "Partially Met",
+            "explanation": "A mitigation is supplied for the single risk that is stated, but no mitigation exists for a second risk because none is identified.",
+            "gap": "Mitigation is provided only for supplier delays; a mitigation for a second risk is missing.",
+            "evidence": [
+              {
+                "quote": "We would mitigate that risk by prequalifying a backup supplier.",
+                "paragraph": 2
+              }
+            ]
+          },
+          {
+            "requirement_id": "R3",
+            "status": "Met",
+            "explanation": "The draft states a proposed start date of June 3.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "We plan to start June 3.",
+                "paragraph": 1
+              }
+            ]
+          }
+        ],
+        "recommendations": [
+          {
+            "label": "Required fix",
+            "requirement_ids": [
+              "R1",
+              "R2"
+            ],
+            "action": "Add a second implementation risk that is distinct from supplier delays, together with its own mitigation.",
+            "why": "R1 requires two distinct risks and R2 requires a mitigation for each; the draft supplies only one risk and one mitigation.",
+            "approach": "Consider a risk from a different source than the supply chain, such as staffing, budget, or technical integration, and pair it with a specific mitigation action."
+          }
+        ],
+        "limitations": []
+      },
+      "review": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 2.91,
+        "input_tokens": 1231,
+        "output_tokens": 802,
+        "cost_usd": 0.0013317
+      }
+    },
+    {
+      "id": "N5",
+      "extraction": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 5.76,
+        "input_tokens": 291,
+        "output_tokens": 942,
+        "cost_usd": 0.000629313
+      },
+      "requirements": [
+        {
+          "text": "Summarize one interview insight.",
+          "source": "Summarize one interview insight"
+        },
+        {
+          "text": "Link the summarized interview insight to a proposed onboarding change.",
+          "source": "link it to a proposed onboarding change"
+        }
+      ],
+      "confirmed": [
+        {
+          "id": "R1",
+          "text": "Summarize one interview insight.",
+          "source": "Summarize one interview insight",
+          "student_added": false
+        },
+        {
+          "id": "R2",
+          "text": "Link the summarized interview insight to a proposed onboarding change.",
+          "source": "link it to a proposed onboarding change",
+          "student_added": false
+        }
+      ],
+      "report": {
+        "findings": [
+          {
+            "requirement_id": "R1",
+            "status": "Met",
+            "explanation": "The draft summarizes an interview insight about pricing discoverability during onboarding.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "Three interviewees could not find pricing during onboarding.",
+                "paragraph": 1
+              }
+            ]
+          },
+          {
+            "requirement_id": "R2",
+            "status": "Met",
+            "explanation": "The draft links that insight to a proposed onboarding change by adding a pricing link to the first screen.",
+            "gap": "",
+            "evidence": [
+              {
+                "quote": "We should add a pricing link to the first screen because it would make that information easier to find.",
+                "paragraph": 1
+              }
+            ]
+          }
+        ],
+        "recommendations": [],
+        "limitations": []
+      },
+      "review": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "prompt_version": "v1.3",
+        "seconds": 6.48,
+        "input_tokens": 668,
+        "output_tokens": 675,
+        "cost_usd": 0.00051216
+      }
+    }
+  ]
+}

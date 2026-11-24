@@ -4,6 +4,8 @@
 
 **November 24 local follow-up.** A tester reported an output token limit error. The affected stage is unknown. The local extraction budget rose to 10,000 output tokens, and the draft review default and maximum rose to 50,000. All 63 deterministic Python tests passed. Live provider verification and deployment remain pending. [Test evidence](tests/README.md#november-24--draft-review-output-budget)
 
+**November 24 Build 4 Track A.** Ten paired synthetic reviews scored 36/40 before and 38/40 after adjusting partial-credit and revision-priority instructions. Two defects remain in the rerun. Hosted verification of the revised workflow and outside target-user feedback are pending. [Scorecard and examples](docs/index.html#build-4) · [Test evidence](tests/README.md#november-24--build-4-track-a)
+
 **Historical checkpoint — November 19.** Hosted Supabase SQL-role, anonymous access, two-account isolation, token expiry and the synthetic app archive workflow passed. The normal archive stays disabled. Batch 4 local controls limit provider requests and concurrency and render untrusted feedback as plain text. The latest local checks passed 63 Python and seven Node tests. Hosted runtime, privacy, phone and live replay checks remain pending. Earlier checkpoints below are historical. [Resume plan](Plan.md) · [Test evidence](tests/README.md#november-19--batch-4-local-release-audit-and-controls)
 
 

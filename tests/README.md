@@ -2,11 +2,13 @@
 
 Review agent changes and verify that the product works throughout the course. Use automated tests for application behavior when useful, model evals for output quality, and manual checks for the user experience. A test shows what it checked; record its limits.
 
-## Build 4: choose one track
+## Build 4: Track A selected
 
 **Track A — Domain quality**
 
 Define 3–4 rules for good output. Evaluate 10 cases: 5 normal, 3 messy, and 2 adversarial. Compare results before and after improvements, and ask one outside target user to review the result.
+
+The November 24 paired results and current limitations are recorded below. [Scorecard and output examples](../docs/index.html#build-4) · [Run evidence](#november-24--build-4-track-a)
 
 **Track B — User friction**
 
@@ -377,3 +379,21 @@ On the working tree based on `542ab43` with Python 3.14.4, the focused mocked `t
 Extraction follow-up on the same working tree and Python version raised its budget to 10,000 output tokens. A focused pre-change run failed as expected in `test_request_privacy_and_provider_errors` in 0.013 seconds because the extraction request still sent 7,000. After the change, all 63 deterministic Python tests passed in 1.875 seconds. The mocked OpenRouter transport checks the actual extraction and review entry points and observed 10,000 and 50,000 respectively. Live provider behavior and deployment remain pending. Agent-run inference cost was $0. Active builder time was unreported.
 
 Release preflight on the working tree based on `542ab43` rechecked Build 1 evidence. All 63 deterministic Python tests passed in 1.894 seconds, and all seven Node analytics and Google sign-in tests passed in 161.919 ms. `git diff --check` passed. Provider calls were mocked. Inference cost was $0, and active builder time was unreported. Hosted verification was pending at commit time.
+
+### November 24 — Build 4 Track A
+
+The ten synthetic cases and expected findings were written before either run. Each round used the app’s `extract`, `confirmed_requirements` and `evaluate` functions with DeepSeek V4.1 Flash via OpenRouter. No extracted requirements were manually edited. The two-worker runner honored the existing app limit of two concurrent requests. Both rounds had the same fixture SHA-256. The baseline used `5ef1844` with prompt v1.2. The rerun used the v1.3 working tree based on `5ef1844`. Both JSON files preserve the app code and fixture hashes, synthetic results and provider-reported telemetry. [Fixtures and expected findings](build4/cases.json) · [Baseline output](build4/before.json) · [Rerun output](build4/after.json) · [Final scorecard](../docs/index.html#build-4)
+
+| Round | Cases completed | Provider calls | Score | Reported inference cost | Summed provider request time |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| v1.2 baseline | 10/10 | 20 | 36/40 | $0.0187012310 | 121.93 s |
+| v1.3 candidate | 10/10 | 20 | 38/40 | $0.0170600444 | 120.23 s |
+| Total | 20/20 | 40 | | $0.0357612754 | 242.16 s |
+
+One agent graded both rounds against the same four binary rules. Baseline N1 lost judgment credit after calling a partial comparison Missing. Baseline N4, A1 and A2 lost priority credit after reporting mandatory gaps without a next step. The v1.3 review prompt addressed both patterns. The rerun recovered all four points and lost two others. M1 omitted the next step and N4 extraction added status labels even though the extraction instructions were unchanged. A single run per case cannot establish how often either defect occurs or attribute the extraction defect to the review prompt change.
+
+All 63 deterministic Python tests passed on the v1.3 working tree in 1.907 seconds. All seven Node analytics and sign-in tests passed in 162.773 ms. These suites used mocks. Chrome initially rejected one navigation after its state changed. Refreshing the observed state and using a new tab confirmed the hosted landing page and guest entry without sending a model request. The scored runs used the app functions with a live provider from the local environment. They did not exercise the hosted browser workflow, its credentials, archive behavior or analytics. Summed request time includes overlap. Active builder time was unreported. The builder asked to keep the candidate and Product Page local and will provide outside feedback separately.
+
+Static evidence verification passed all checks for the ten case IDs and group counts, identical fixture bytes, model and app source versions, 40 completed calls, reported cost, scorecard totals, unique HTML IDs, and internal anchors. `git diff --check` passed. This verification made no provider calls. Elapsed validation and active builder time were unreported.
+
+The builder subsequently approved committing and pushing the Build 4 changes. Pre-commit review checked the Build 1 and Build 4 Product Page evidence, and scanned the ten outgoing files for configured local credential values. No matches were found. No app suite or model evaluations were rerun in this preflight. Additional inference cost was $0. Hosted workflow verification and outside-user feedback remained pending at commit time.

@@ -1,4 +1,6 @@
-# Rubric Radar — PRD v3
+# Rubric Radar — PRD v4
+
+**Build 4 Track A — November 24.** The same ten synthetic cases scored 36/40 on v1.2 and 38/40 on v1.3 against fixed expectations. Prompt v1.3 tells the reviewer to credit partial explicitly required content, cite what is present, and surface at least one actionable required fix for a demonstrated mandatory gap. The rerun still omitted a priority in one case and returned stray review labels during extraction in another. The checks exercised both app stages against OpenRouter. Outside target-user feedback and hosted verification of the revised workflow remain pending. [Scorecard and examples](docs/index.html#build-4) · [Test evidence](tests/README.md#november-24--build-4-track-a)
 
 **Current checkpoint — November 22.** Rubric Radar is live on Streamlit Community Cloud. Public desktop startup, one synthetic guest review and the builder’s Google sign-in passed. Hosted archive save and reopen, classmate phone use, live replay masking and remaining audit checks are open. [Live app](https://rubricradar.streamlit.app/) · [Resume plan](Plan.md) · [Test evidence](tests/README.md#november-22--public-deployment-and-one-live-guest-review)
 
@@ -224,7 +226,7 @@ Record extraction errors separately from evaluation errors. Measure extraction a
 
 **Session:** Observe an uncoached attempt, inspect at least one resulting revision, and collect reasons for preference. Score the proposed metrics in section 4 and record failures, sample size, and limitations. If major false Met judgments occur, resolve them before treating feedback as ready for broader testing. If relative value is weak, simplify or revise the value proposition before adding features.
 
-**Recommended Build 4 track — A, domain quality:** Define four output-quality rules: requirement coverage, evidence integrity, justified statuses/uncertainty, and actionable priorities. Run 10 cases: 5 normal, 3 messy, and 2 adversarial. Include omitted mandatory content, partial coverage, conflicting instructions, formatting-dependent requirements, and embedded attempts to override the reviewer. Record before/after results and obtain at least one outside target-user review. This track is recommended, not yet completed.
+**Build 4 Track A — output quality.** The four rules are complete requirement coverage, relevant exact evidence, correct statuses with honest limitations, and specific revision priorities. The ten-case synthetic set covers five normal, three messy and two adversarial inputs. Preserve the original extraction output in the test so missed or invented requirements affect the score. Credit the parts of a requirement that appear in the draft, and direct the student to the highest-priority demonstrated gap. Treat model-generated status labels in extraction and skipped priorities as remaining defects. Obtain at least one outside target-user review before calling the evaluation complete. [Scorecard and examples](docs/index.html#build-4)
 
 **Deterministic verification scope:** Empty/oversize inputs, changed inputs invalidating results, confirmation behavior, malformed API output, missing/duplicate requirement IDs, invented quotations, recommendation limits, safe rendering, and provider failures. Keep deterministic checks separate from model-quality evaluations.
 

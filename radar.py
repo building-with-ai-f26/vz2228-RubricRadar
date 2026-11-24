@@ -14,7 +14,7 @@ import certifi
 from supabase_api import NoRedirect
 
 MODEL = 'deepseek/deepseek-v4.1-flash'
-PROMPT_VERSION = 'v1.2'
+PROMPT_VERSION = 'v1.3'
 INSTRUCTION_LIMIT = 12_000
 DRAFT_LIMIT = 30_000
 MAX_REQUIREMENTS = 25
@@ -269,10 +269,16 @@ def evaluate(instructions, draft, requirements):
         raise ReviewError(f'Set OPENROUTER_REVIEW_MAX_TOKENS to an integer from 1 to {REVIEW_OUTPUT_TOKEN_LIMIT} '
                           'in the local .env file, then restart the app.') from None
     data, meta = call_model('Evaluate each confirmed requirement exactly once. Cite exact draft quotes with '
-                            'the supplied paragraph numbers. Missing means no evidence found; provide no quotes. '
-                            'Met and Partially Met require evidence. Explain specific gaps. Return zero to three '
-                            'priorities; mandatory fixes before optional quality improvements. Each required fix '
-                            'must reference a requirement and a demonstrated missing explicit element. '
+                            'the supplied paragraph numbers. Mark Partially Met when the draft supplies some '
+                            'explicitly required content but omits another part. For example, a comparison of two '
+                            'options on cost is Partially Met if the draft supplies only one option’s cost. '
+                            'Quote that cost and identify what is absent. Use Missing only when the draft supplies '
+                            'none of the required content; provide no quotes. Met and Partially Met require '
+                            'evidence. Explain specific gaps. When any confirmed requirement has a demonstrated '
+                            'mandatory gap, include at least one Required fix for the most important such gap. '
+                            'Return at most three priorities, put required fixes first, and combine related fixes '
+                            'when one action addresses them. Link each required fix to the affected requirement '
+                            'and the demonstrated missing element. An unverifiable item alone is not a required fix. '
                             'Do not label conditional advice (if required) as a Required fix. '
                             'For example, an email update without a greeting can be Met unless a greeting '
                             'is explicitly required. A brief explanation can be Met when an explanation is '
