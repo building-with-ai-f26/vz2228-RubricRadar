@@ -64,7 +64,7 @@ class LibraryUITests(unittest.TestCase):
         auth, api = signed_in(); api.send.return_value = USER
         app = AppTest.from_file('../app.py')
         app.session_state['rr_auth'] = auth; app.session_state['rr_owner'] = A
-        app.session_state['rr_route'] = {'screen': screen, **({'project_id': P} if screen == 'work' else {})}
+        app.session_state['rr_route'] = {'screen': screen, **({'project_id': P} if screen in ('project', 'work') else {})}
         return app.run()
 
     def complete_review(self, app):
@@ -81,8 +81,10 @@ class LibraryUITests(unittest.TestCase):
         button(app, 'Open class').click().run()
         self.assertTrue(button(app, 'Create project').disabled)
         button(app, 'Open project').click().run()
-        self.assertTrue(button(app, 'Save project').disabled)
-        self.assertTrue(button(app, 'Extract requirements').disabled)
+        self.assertTrue(button(app, 'New review').disabled)
+        self.assertEqual(app.selectbox[0].options, ['Market entry · sample project · Draft 1'])
+        self.assertFalse(app.text_area)
+        app.selectbox[0].select_index(0).run()
         button(app, 'Open saved review').click().run()
         self.assertTrue(button(app, 'Check a revised draft').disabled)
         self.assertTrue(button(app, 'Delete review').disabled)
@@ -167,6 +169,7 @@ class LibraryUITests(unittest.TestCase):
         app.text_input(key='form_project_name').input('New synthetic project')
         app.text_area(key='form_project_instructions').input(INSTRUCTIONS)
         button(app, 'Create project').click().run()
+        button(app, 'New review').click().run()
         self.assertEqual(app.text_area(key='instructions').value, INSTRUCTIONS)
         self.assertEqual(archive.writes, ['create_class', 'save_project'])
         self.assertFalse(app.exception)
@@ -185,6 +188,14 @@ class LibraryUITests(unittest.TestCase):
         self.assertTrue(button(app, 'Save review').disabled)
         self.assertNotIn('rr_save_token', app.session_state)
         self.assertEqual(saved, archive.reviews[R])
+        button(app, 'Back to project').click().run()
+        button(app, 'Discard and continue').click().run()
+        self.assertEqual(app.selectbox[0].options, ['Synthetic project · Draft 1'])
+        app.selectbox[0].select_index(0).run()
+        button(app, 'Open saved review').click().run()
+        self.assertEqual(app.session_state['rr_route']['review_id'], R)
+        evaluate.assert_called_once()
+        extract.assert_called_once()
         self.assertFalse(app.exception)
 
     @patch('radar.extract', return_value=(ORIGINALS, META))
@@ -204,9 +215,14 @@ class LibraryUITests(unittest.TestCase):
     @patch('radar.call_model')
     def test_open_and_revise_saved_review_requires_fresh_consent_and_extraction(self, model):
         archive = FakeArchive(); archive.reviews[R] = dict(id=R, project_id=P, created_at='Synthetic date', snapshot=snapshot())
-        app = self.private_app(archive)
+        archive.reviews[B] = dict(id=B, project_id=P, created_at='Later synthetic date', snapshot=snapshot())
+        app = self.private_app(archive, screen='project')
+        self.assertEqual(app.selectbox[0].options, ['Synthetic project · Draft 1', 'Synthetic project · Draft 2'])
+        app.selectbox[0].select_index(1).run()
         button(app, 'Open saved review').click().run()
         self.assertEqual(app.session_state['rr_route']['screen'], 'saved')
+        self.assertEqual(app.session_state['rr_route']['review_id'], B)
+        self.assertIn('Synthetic project · Draft 2', [item.value for item in app.text])
         button(app, 'Check a revised draft').click().run()
         self.assertEqual(app.text_area(key='draft').value, DRAFT)
         self.assertFalse(app.checkbox(key='consent').value)
@@ -233,7 +249,7 @@ class LibraryUITests(unittest.TestCase):
         self.assertFalse(app.exception)
 
     def test_delete_cancellation_and_changed_counts_require_reconfirmation(self):
-        archive = FakeArchive(); app = self.private_app(archive)
+        archive = FakeArchive(); app = self.private_app(archive, screen='project')
         button(app, 'Delete project').click().run(); button(app, 'Cancel deletion').click().run()
         self.assertEqual(archive.writes, [])
         button(app, 'Delete project').click().run(); archive.changed_counts = True

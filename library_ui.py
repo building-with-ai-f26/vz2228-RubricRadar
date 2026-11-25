@@ -126,7 +126,7 @@ def shell():
                 st.session_state.rr_route = {'screen': 'login'}
                 st.session_state.rr_notice = 'Your session could not be verified. Sign in again.'
                 st.rerun()
-    elif route['screen'] in ('classes', 'projects', 'saved') or (route['screen'] == 'work' and not route.get('guest')):
+    elif route['screen'] in ('classes', 'projects', 'project', 'saved') or (route['screen'] == 'work' and not route.get('guest')):
         if not st.session_state.get('rr_sample'):
             transition({'screen': 'login'})
             st.rerun()
@@ -166,24 +166,24 @@ def page_buttons(route, length):
 
 
 def home():
-    st.html('''<section class="rr-hero">
-      <h1>Know what to fix next.</h1>
-      <p class="rr-intro">Turn your rubric into a clear review.<br>Find the gaps. Focus your next revision.</p>
-    </section>''')
-    with st.container(key='home_actions'):
-        a, b = st.columns(2, vertical_alignment='center')
-        a.button('Continue as guest', type='primary', on_click=begin_guest, width='stretch')
-        with b:
+    with st.container(key='home_intro'):
+        intro, actions = st.columns([3, 2], gap='large', vertical_alignment='center')
+        with intro:
+            st.html('''<section class="rr-hero">
+              <h1>Know what to fix next.</h1>
+              <p class="rr-intro">Turn your rubric into a clear review.<br>Find the gaps. Focus your next revision.</p>
+            </section>''')
+        with actions, st.container(key='home_actions'):
+            st.button('Continue as guest', type='primary', on_click=begin_guest, width='stretch')
             nav_button('Open my library', {'screen': 'classes'} if st.session_state.get('rr_owner') else {'screen': 'login'},
-                       type='tertiary', width='stretch')
-        st.button('Explore sample library', on_click=begin_sample, type='tertiary', width='stretch')
-        st.caption('No account needed for a guest review.')
+                       type='secondary', width='stretch')
+            st.button('Explore sample library', on_click=begin_sample, type='tertiary', width='stretch')
+            st.caption('No account needed for a guest review.')
     with st.container(key='home_steps'):
-        for column, number, title, description in zip(st.columns(3, gap='large'),
-                ('01', '02', '03'), ('Bring your rubric.', 'Check the evidence.', 'Revise with focus.'),
+        for column, title, description in zip(st.columns(3, gap='large'),
+                ('Bring your rubric.', 'Check the evidence.', 'Revise with focus.'),
                 ('Paste your instructions and draft.', 'Confirm requirements. See what is covered.', 'Leave with up to three revision priorities.')):
             with column:
-                st.caption(number)
                 st.subheader(title)
                 st.caption(description)
     st.caption('For MBA reports and projects. Feedback is guidance, not an official grade.')
@@ -219,8 +219,9 @@ def login():
         st.caption('If you close the Google window, you can try again or continue as guest.')
     else:
         st.button('Continue with Google', disabled=True)
-    st.button('Explore sample library', on_click=begin_sample)
-    st.button('Continue as guest', on_click=begin_guest)
+    with st.container(horizontal=True):
+        st.button('Continue as guest', on_click=begin_guest)
+        st.button('Explore sample library', on_click=begin_sample, type='tertiary')
     st.caption('Google and Supabase process your sign-in identity. No Gmail or Drive access is requested. '
                'This app does not collect a password. Sign out ends this app session; it does not sign you out of Google.')
 
@@ -278,7 +279,7 @@ def projects(route):
         with columns[index % 2], st.container(border=True, key='project_card_' + row['id'] + '_tone_' + class_accent(course['id'])):
             with st.container(key='item_title_' + row['id']):
                 st.text(row['name'])
-            nav_button('Open project', {'screen': 'work', 'project_id': row['id']},
+            nav_button('Open project', {'screen': 'project', 'project_id': row['id']},
                        key='open_project_' + row['id'], type='tertiary')
     if not records: st.info('No projects on this page. Add a project and its instructions below.')
     page_buttons(route, len(records))
@@ -290,8 +291,38 @@ def projects(route):
             submitted = st.form_submit_button('Create project', disabled=not writable())
         if submitted:
             row = archive.save_project(course['id'], name, instructions)
-            transition({'screen': 'work', 'project_id': row['id']}); st.rerun()
+            transition({'screen': 'project', 'project_id': row['id']}); st.rerun()
     delete_button('Delete class', 'classes', course, {'screen': 'classes'})
+
+
+def project_page(route):
+    archive = store()
+    project = archive.get_project(route['project_id'])
+    project_id = project['id']
+    class_id = project['class_id']
+    st.header('Project')
+    course_label(project['name'], class_id)
+    nav_button('Back to projects', {'screen': 'projects', 'class_id': class_id}, type='tertiary')
+    st.button('New review', on_click=navigate, args=({'screen': 'work', 'project_id': project_id},),
+              disabled=not writable(), type='primary')
+
+    with st.container(key='project_history'):
+        offset = route.get('offset', 0)
+        rows = archive.list_reviews(project_id, offset=offset)
+        if rows:
+            reviews = {row['id']: (number, row['created_at']) for number, row in enumerate(rows, offset + 1)}
+            review_id = st.selectbox('Saved reviews', options=list(reviews), index=None,
+                                     format_func=lambda item: f"{project['name']} · Draft {reviews[item][0]}",
+                                     placeholder='Choose a saved review', disabled=locked())
+            if review_id is not None:
+                number, created_at = reviews[review_id]
+                st.caption(str(created_at))
+                nav_button('Open saved review', {'screen': 'saved', 'review_id': review_id,
+                                                'draft_number': number})
+        else:
+            st.caption('No saved reviews on this page yet.')
+        page_buttons(route, len(rows))
+    delete_button('Delete project', 'projects', project, {'screen': 'projects', 'class_id': class_id})
 
 
 def work_context(route):
@@ -302,7 +333,7 @@ def work_context(route):
         return None
     archive = store(); project = archive.get_project(route['project_id']); course = archive.get_class(project['class_id'])
     course_label(course['name'] + ' / ' + project['name'], course['id'])
-    nav_button('Back to projects', {'screen': 'projects', 'class_id': course['id']}, type='tertiary')
+    nav_button('Back to project', {'screen': 'project', 'project_id': project['id']}, type='tertiary')
     if st.session_state.get('rr_work_context') != project['id']:
         clear_work()
         st.session_state.rr_work_context = project['id']
@@ -310,8 +341,6 @@ def work_context(route):
         st.session_state.project_name = project['name']
         st.session_state.rr_baseline = {'instructions': project['instructions'], 'draft': '', 'project_name': project['name']}
     st.text_input('Project name', key='project_name', max_chars=200, disabled=not writable())
-    if st.session_state.get('rr_sample'):
-        st.caption('Read-only sample. Open the saved review below to inspect example feedback.')
     return project
 
 
@@ -345,26 +374,20 @@ def save_controls(project):
         st.session_state.rr_saved_token = st.session_state.rr_save_token
         st.session_state.rr_baseline = dict(instructions=st.session_state.instructions, draft=st.session_state.draft,
                                             project_name=st.session_state.project_name)
-        st.success('Review saved. It is now available in this project’s history.')
         st.rerun()
-    if already: st.success('This review is saved.')
-    st.subheader('Saved reviews')
-    offset = st.session_state.get('rr_route', {}).get('offset', 0)
-    rows = archive.list_reviews(project['id'], offset=offset)
-    for row in rows:
-        with st.container(border=True):
-            st.text(str(row['created_at']))
-            nav_button('Open saved review', {'screen': 'saved', 'review_id': row['id'], 'project_id': project['id']}, key='open_review_' + row['id'])
-    if not rows: st.caption('No saved reviews on this page yet.')
-    page_buttons(st.session_state.rr_route, len(rows))
-    delete_button('Delete project', 'projects', project, {'screen': 'projects', 'class_id': project['class_id']})
+    if already:
+        st.success('Review saved. Find it under Saved reviews on the project page.')
 
 
 def saved(route):
     archive = store(); row = archive.load_review(route['review_id']); project = archive.get_project(row['project_id'])
-    st.header('Saved review'); course_label(project['name'], project['class_id']); st.text(str(row['created_at']))
+    title = f"{project['name']} · Draft {route['draft_number']}" if 'draft_number' in route else project['name']
+    st.header('Saved review')
+    course_label(title, project['class_id'])
+    st.caption(str(row['created_at']))
     st.caption('Read-only snapshot. Opening it makes no AI calls.')
-    nav_button('Back to project', {'screen': 'work', 'project_id': project['id']}, type='tertiary')
+    back = {'screen': 'project', 'project_id': project['id']}
+    nav_button('Back to project', back, type='tertiary')
     if st.button('Check a revised draft', disabled=not writable()):
         snapshot = row['snapshot']
         transition({'screen': 'work', 'project_id': project['id']})
@@ -378,8 +401,7 @@ def saved(route):
     with st.container(key='snapshot_text'), st.expander('Instructions and draft in this snapshot'):
         st.text(snapshot['instructions']); st.text(snapshot['draft'])
     render_feedback(snapshot['result'], snapshot['confirmed'], snapshot['extract_meta'], snapshot['review_meta'])
-    delete_button('Delete review', 'reviews', {'id': row['id'], 'name': 'Review from ' + str(row['created_at'])},
-                  {'screen': 'work', 'project_id': project['id']})
+    delete_button('Delete review', 'reviews', {'id': row['id'], 'name': title}, back)
 
 
 def delete_button(label, kind, row, back):
@@ -415,7 +437,7 @@ def render_page(route):
     elif route['screen'] == 'login':
         login()
     else:
-        {'classes': classes, 'projects': projects, 'saved': saved}[route['screen']](route)
+        {'classes': classes, 'projects': projects, 'project': project_page, 'saved': saved}[route['screen']](route)
 
 
 def cloud_error(exc):

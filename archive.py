@@ -145,8 +145,8 @@ class Archive:
         project_id = valid_id(project_id)
         session = self.auth.verified_session()
         return self._rows(session, 'reviews', filters={'project_id': 'eq.' + project_id},
-                          extra={'select': 'id,owner_id,project_id,created_at',
-                                 **self._page(offset)})
+                          extra={**self._page(offset), 'order': 'created_at.asc,id.asc',
+                                 'select': 'id,owner_id,project_id,created_at'})
 
     def load_review(self, review_id):
         review_id = valid_id(review_id)

@@ -1,8 +1,21 @@
-# Build 3 — Beginner lane: private saved reviews
+# Rubric Radar — Resume plan
+
+## Build 4 — Resume November 25, 2026
+
+**Due Monday, November 30 at noon ET.** Track A is selected. Commit `23718b2` is on `main` with prompt v1.3, PRD v4, the rubric, scorecard, and output examples. The same ten synthetic cases scored 36/40 before and 38/40 after. The paired runs used the app’s local review code with live OpenRouter calls. Hosted verification reached the landing page. [Scorecard](docs/index.html#build-4) · [Test evidence](tests/README.md#november-24--build-4-track-a)
+
+1. **Outside-user feedback recorded.** The first MBA user testing outside class reported an output-token-limit error, addressed in `5ef1844`. A second user reported that saved reviews were hard to find and showed dates as their only labels. The local project page now offers a Saved reviews dropdown and a separate New review button. Labels use the assignment name and chronological draft number. Both users’ experience with their respective fixes is unconfirmed. [First report](tests/README.md#november-25--outside-target-user-feedback) · [Second report and verification](tests/README.md#november-25--saved-review-discoverability)
+2. **Verify the public release.** Confirm the published Product Page shows the scorecard. Verify the revised workflow on the hosted app with synthetic content, then check PostHog for the session and masked inputs and feedback. Record the actual results. Get approval before any additional agent-run billable model calls. [Public Product Page](https://building-with-ai-f26.github.io/vz2228-RubricRadar/#build-4) · [Live app](https://rubricradar.streamlit.app/)
+3. **Log hours and make the second-day commit.** Both recent commits were dated November 24. Record active work hours if the builder can supply them, then commit the new evidence on a separate day outside class. The existing inference total is $0.0357612754.
+4. **Prepare the submission.** Capture a screenshot of the scorecard. Submit the Product Page URL and include Track A, the live app URL, the GitHub repo link, and two or three sentences about what testing changed. [Build 4 brief](https://www.icerynk.com/content/build-4-test-py-tests-model-evals?course=fa26-tech-gb-2160-dm2-f2)
+
+The rerun’s known defects are a skipped priority in M1 and stray extraction status labels in N4.
+
+## Build 3 — Beginner lane: private saved reviews
 
 Updated November 22, 2026. Start here when you return.
 
-## Resume here
+### Build 3 resume notes
 
 **Verified.** The local runtime was restored. Hosted Supabase passed SQL-role, anonymous access and two-account isolation checks. The hosted expired-token check and app workflow with synthetic feedback passed, including guest no-write behavior and fixture cleanup. Batch 4 local checks passed 63 Python and seven Node tests. [Test log](tests/README.md#november-19--batch-4-local-release-audit-and-controls) · [Refused-write screenshot](tests/evidence/supabase-two-account-isolation-2026-11-19.png)
 

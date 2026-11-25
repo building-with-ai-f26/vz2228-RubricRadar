@@ -51,10 +51,10 @@ def load_demo():
 def review(route):
     project = library.work_context(route)
     readonly = library.locked() or bool(st.session_state.get('rr_sample'))
-    a, b = st.columns(2)
-    a.button('Clear this session', on_click=clear, disabled=readonly)
-    b.button('Load demo example', on_click=load_demo, disabled=readonly,
-             help='Replace both working text fields with a synthetic example. Nothing is saved or sent; sharing consent resets.')
+    with st.container(horizontal=True):
+        st.button('Clear this session', on_click=clear, disabled=readonly, type='tertiary')
+        st.button('Load demo example', on_click=load_demo, disabled=readonly,
+                  help='Replace both working text fields with a synthetic example. Nothing is saved or sent; sharing consent resets.')
     instructions = st.text_area('Assignment instructions or rubric', key='instructions', height=180,
                                 help=f'Maximum {INSTRUCTION_LIMIT:,} characters. No silent truncation.',
                                 on_change=invalidate_inputs, disabled=readonly)

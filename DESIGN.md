@@ -1,15 +1,15 @@
 # Rubric Radar — existing visual system
 
-Updated November 17, 2026 after the builder requested Impeccable-guided aesthetic
-refinement. This records the current implementation, not an unrelated redesign.
+Updated November 25, 2026 after a full Streamlit polish pass using the upstream
+Impeccable polish, Operate and craft-floor guidance.
 Product scope and evidence live in PRD.md and tests/README.md.
 
 ## Direction
 
 Minimal, familiar and quiet. Preserve the builder-approved Home → Class → Project →
 Review structure, guest/demo entry, explicit saves and existing button labels.
-No sidebar, promotional claims, decorative imagery or added navigation controls.
-Keep the main action blue and let typography/spacing carry hierarchy.
+No sidebar, promotional claims or decorative imagery. Use warm-white surfaces
+and slate actions. Reserve class and feedback colors for identity and status.
 
 ## Implementation
 
@@ -24,28 +24,32 @@ Keep the main action blue and let typography/spacing carry hierarchy.
 
 ## Type and spacing
 
-- Home display: 3.75rem desktop, 2.75rem at <=640px; natural balanced wrapping.
+- Home display: 3.65rem desktop, 3rem at <=800px, 2.75rem at <=640px. The
+  introduction and entry actions sit side by side on desktop and stack on mobile.
 - Page titles: 2rem, reducing to 1.75rem on narrow screens.
 - Section headings: 1.125rem; class/project titles: 1.2rem, weight 600.
 - Body/editor: 1rem with comfortable leading; captions: .875rem with explicit
   readable foreground rather than opacity. Heading tracking never below -.035em.
 - Maximum content width: 960px, with 2.2rem desktop / 1rem mobile side gutters.
-- Top padding clears Streamlit's fixed toolbar (4.5rem / 4.25rem mobile).
+- Top padding clears Streamlit's fixed toolbar (3.9rem / 3.75rem mobile).
 - Group related information tightly; keep separate sections clearly apart.
 
 ## Color and surfaces
 
-- Action/focus blue: #0066cc. Muted text: #606975; rules: #dfe4eb; panels: white.
+- Primary actions use slate `#26364a`, and focus rings use `#526d88`. Main
+  background is `#f7f7f4`, with white panels and recessed surfaces in `#eceeea`.
+- Muted text uses `#4e5a67`. Rules and panel borders use `#c8cfd2`.
 - Existing stable class palette: blue, mint, violet, peach, rose and sand. Color
   comes from the class UUID, survives renames/order changes, and may repeat.
   Class names remain the primary identifiers. No new database color field.
-- Class/project cards retain light tints and a 3px top accent. Use darker
+- Class/project cards use light tints and a thin class-colored border. Use darker
   hue-related metadata on tinted surfaces. Context labels use a thin neutral
-  outline with the matching class tint, rather than a heavy side stripe.
+  outline with the matching class tint.
 - Review status is separate from course identity: green Met, amber Partially Met,
   red Missing, blue Needs Review. Keep written statuses visible. Use light tints,
   thin outlines and readable state-colored text; do not rely on color alone.
-- Card radius 14px, controls/expanders 10px. Use borders without stacked shadows.
+- Card radius 12px, controls and expanders 10px. Primary buttons use a single
+  soft shadow. Secondary buttons use an outline. Tertiary actions use text.
 
 ## Interaction and responsive behavior
 
@@ -61,14 +65,11 @@ Keep the main action blue and let typography/spacing carry hierarchy.
 
 ## Verification and limits
 
-Impeccable 4.9.2 is installed in the user's Codex skills folder. Its polish and
-Operate/craft-floor references informed the changes. Context launch initially
-failed due to executable permission; the launcher permission was repaired, but
-context/detector/hooks were not run afterwards. No automatic detector pass is
-claimed. The skill is discoverable on the next turn; its instructions were read
-and applied directly in this turn.
+November 25 used the upstream Impeccable 4.11.0 guidance directly. The local
+launcher was unavailable, so the pass used this file and the existing UI as
+context. See the test log for Chrome walkthroughs, automated checks and limits.
 
-Source calculation checked 12 declared text/background pairs (minimum 5.33:1),
+On November 17, source calculation checked 12 declared text/background pairs (minimum 5.33:1),
 not every rendered state. Local Chrome visually checked desktop Home/library/
 editor/saved feedback, 400px Home/library/editor/summary, and 768px feedback.
 These are emulated layouts, not real-phone tests. Dark override, full keyboard/

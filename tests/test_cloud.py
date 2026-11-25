@@ -212,14 +212,14 @@ class ArchiveTests(unittest.TestCase):
     def test_archive_pagination_and_current_record_reads(self):
         auth, api = signed_in(); store = Archive(auth)
         row = {'id': P, 'owner_id': A}
-        for action in (lambda: store.list_classes(offset=100),
-                       lambda: store.list_projects(P, offset=100),
-                       lambda: store.list_reviews(P, offset=100)):
+        for action, order in ((lambda: store.list_classes(offset=100), 'created_at.desc,id.desc'),
+                              (lambda: store.list_projects(P, offset=100), 'created_at.desc,id.desc'),
+                              (lambda: store.list_reviews(P, offset=100), 'created_at.asc,id.asc')):
             api.send.side_effect = [USER, [row]]
             action()
             query = parse_qs(urlsplit(api.send.call_args.args[1]).query)
             self.assertEqual(query['offset'], ['100'])
-            self.assertEqual(query['order'], ['created_at.desc,id.desc'])
+            self.assertEqual(query['order'], [order])
         for action in (lambda: store.get_class(P), lambda: store.get_project(P)):
             api.send.side_effect = [USER, [row]]
             self.assertEqual(action()['id'], P)
