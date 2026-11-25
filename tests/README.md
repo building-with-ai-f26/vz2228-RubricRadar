@@ -423,3 +423,19 @@ Python 3.14.4 deterministic runs passed all 63 tests in 1.901 and 2.105 seconds.
 Reviewed the Build 1 Product Page status and synchronized the current Build 4 summaries in Intent.md, PRD.md and the Product Page. Before the push, Chrome opened the public Streamlit app and showed the earlier Home layout with numbered steps. The pre-release repository revision was `23718b2`, the candidate rollback source. The exact pre-release hosted revision was unreported. The earlier local suites are the deterministic evidence for this release. No application suites or model calls were rerun in preflight. Inference cost was $0. Active builder time and preview elapsed time were unreported.
 
 Static checks passed `git diff --check`, 14 unique Product Page IDs and five internal links. A targeted scan of the 13 outgoing files found zero matches for configured credential values or common secret signatures. The local `.env` is ignored. The scan covers the outgoing files.
+
+### November 25 — Build 4 hosted release verification
+
+Pushed `8ddfea7` to `main` on November 25, the second Build 4 commit date. Streamlit Community Cloud displayed the new Home layout and the project-level Saved reviews dropdown. The published GitHub Pages scorecard showed the 36/40 → 38/40 comparison, saved-review feedback and the polish entry. A public sample Draft 1 opened from the dropdown and displayed its read-only review summary. The pre-release repository revision available for code rollback is `23718b2`. Rollback was not exercised.
+
+With builder authorization, ran exactly one hosted guest review using Load demo example. Prompt v1.3 on DeepSeek V4.1 Flash via OpenRouter returned six requirements and one linked required fix. The summary showed 5 Met, 0 Partially Met, 1 Missing and 0 Needs Review. No real coursework was used. Signed-in archive writes and phone use were outside this check.
+
+| Hosted stage | Provider request time | Reported inference cost |
+| --- | ---: | ---: |
+| Extraction | 8.38 s | $0.00170208 |
+| Review | 36.52 s | $0.005385445 |
+| Total | 44.90 s | $0.007087525 |
+
+PostHog Activity showed the hosted `ui_clicked` event with `action=confirm_review` and `surface=live_app`. Its linked replay masked the assignment instructions, draft, confirmed requirements, review summary, revision priority and requirement details. This covers the observed guest session. Signed-in fields and archive history masking were not exercised. The browser rejected a tab-switch shortcut, so the review tab was selected directly. A separate sample check arrived before the page loaded and succeeded after reading a fresh browser state. Neither retry made a model request. No application or analytics suites were rerun. Active builder hours and total browser elapsed time were unreported.
+
+The evidence follow-up reviewed the Build 1 status, checked Product Page anchors and request arithmetic, and passed `git diff --check`. No configured credential values were found in the six outgoing evidence files.
