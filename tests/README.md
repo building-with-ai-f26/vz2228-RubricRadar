@@ -439,3 +439,11 @@ With builder authorization, ran exactly one hosted guest review using Load demo 
 PostHog Activity showed the hosted `ui_clicked` event with `action=confirm_review` and `surface=live_app`. Its linked replay masked the assignment instructions, draft, confirmed requirements, review summary, revision priority and requirement details. This covers the observed guest session. Signed-in fields and archive history masking were not exercised. The browser rejected a tab-switch shortcut, so the review tab was selected directly. A separate sample check arrived before the page loaded and succeeded after reading a fresh browser state. Neither retry made a model request. No application or analytics suites were rerun. Active builder hours and total browser elapsed time were unreported.
 
 The evidence follow-up reviewed the Build 1 status, checked Product Page anchors and request arithmetic, and passed `git diff --check`. No configured credential values were found in the six outgoing evidence files.
+
+### November 25 — Build 4 walkthrough and builder time
+
+The builder confirmed that the second participant completed the outside-user walkthrough on the builder’s laptop while signed in with the builder’s account. The participant navigated to saved reviews and reported that saved feedback was hard to locate and identify. This is the same walkthrough that led to the project-level dropdown and named draft labels in `8ddfea7`. The session date, app revision, inference cost and walkthrough duration were unreported. The recorded feedback concerns access to saved output. No account identity or coursework is retained in this evidence.
+
+The builder reported three total hours across this week’s Build 4 work sessions. This is the weekly builder total. The earlier request durations measure provider time. No application or analytics suites were rerun, and no model calls were made for this documentation update. Additional inference cost was $0.
+
+The documentation preflight reviewed the Build 1 Product Page status, verified the walkthrough and hours across five evidence files, checked the Product Page anchors, and passed `git diff --check`. The five files contained no configured credential values.
